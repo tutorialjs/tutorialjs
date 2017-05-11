@@ -10,7 +10,7 @@
                 this.elems = Array.from(document.getElementsByClassName(selector));
 
                 if (this.elems.length === 0) {
-                    throw new Error("No activitys point defined");
+                    throw new Error("No activities point defined");
                 }
                 else if (!this.elems.every(el => el.getAttribute("t-step"))) {
                     throw new Error("Not all steps defined");
