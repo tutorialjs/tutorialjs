@@ -1,0 +1,25 @@
+{
+  "name": "clientseitige",
+  "version": "0.0.1",
+  "description": "introjs clone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-es2015": "^6.24.1",
+    "flow-bin": "^0.45.0",
+    "flow-remove-types": "^1.2.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-optimize-js": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^2.1.2",
+    "gulp-watch": "^4.3.11",
+    "through2": "^2.0.3"
+  }
+}
