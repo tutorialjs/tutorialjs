@@ -1,7 +1,7 @@
 {
-  "name": "clientseitige",
+  "name": "tutorial.js",
   "version": "0.0.1",
-  "description": "introjs clone",
+  "description": "tutorial.js - the tutorial-guide for your website",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -10,7 +10,7 @@ const gulp = require("gulp"),
     babel  = require("gulp-babel");
 
 gulp.task("default", () => {
-    return gulp.src(path.join(__dirname, "/src/kieferbaron.js"))
+    return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
             presets: ["es2015"]
         }))
@@ -22,13 +22,13 @@ gulp.task("default", () => {
 });
 
 gulp.task('sass', function () {
-  return gulp.src(path.join(__dirname, "/src/kieferbaron.scss"))
+  return gulp.src(path.join(__dirname, "/src/tutorial.scss"))
     .pipe(sass().on('error', sass.logError))
     .pipe(gulp.dest(path.join(__dirname, "/dist")));
 });
 
 gulp.task("production", () => {
-    return gulp.src(path.join(__dirname, "/src/kieferbaron.js"))
+    return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
             presets: ["es2015"]
         }))
@@ -38,12 +38,12 @@ gulp.task("production", () => {
         }))
         .pipe(uglify())
         .pipe(optimizejs())
-        .pipe(rename("kieferbaron.min.js"))
+        .pipe(rename("tutorial.min.js"))
         .pipe(gulp.dest(path.join(__dirname, "/dist")))
 });
 
 gulp.task("watch", () => {
-    return watch(path.join(__dirname, "/src/kieferbaron.js"), function() {
+    return watch(path.join(__dirname, "/src/tutorial.js"), function() {
         gulp.start("default");
         gulp.start("sass");
     })
