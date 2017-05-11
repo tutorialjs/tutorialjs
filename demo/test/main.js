@@ -1,3 +1,1 @@
-var kb = new KB();
-
-kb.start();
+var kb = new Tutorial({selector: "tut", debug: true});

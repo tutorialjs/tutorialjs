@@ -1,7 +1,44 @@
-#test {
-  color: rebeccapurple;
+.tutorial-highlight {
+  position: relative;
+  z-index: 9999;
+}
+
+.tutorial-blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background-color: rgb(0, 0, 0);
+  opacity: 0.4;
 }
 
 .tutorial-wrapper {
+  position: absolute;
 
+  background-color: white;
+
+  border-radius: 2px;
+  box-shadow: 0px 1px 2px #333;
+}
+
+.tutorial-index {
+  position: absolute;
+  display: block;
+
+  top: -12px;
+  left: -12px;
+
+  width: 20px;
+
+  font-size: 16px;
+  font-style: normal;
+
+  text-align: center;
+
+  border: 1px solid black;
+  border-radius: 50%;
+
+  background-color: white;
 }

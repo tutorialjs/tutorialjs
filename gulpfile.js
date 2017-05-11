@@ -43,7 +43,7 @@ gulp.task("production", () => {
 });
 
 gulp.task("watch", () => {
-    return watch(path.join(__dirname, "/src/tutorial.js"), function() {
+    return watch([path.join(__dirname, "/src/tutorial.js"), path.join(__dirname, "/src/tutorial.scss")], function() {
         gulp.start("default");
         gulp.start("sass");
     })
