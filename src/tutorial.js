@@ -1,19 +1,33 @@
-/* @flow */
+//v0.0.1
 
 (function (window, document, undefined) {
+    "use strict";
+
     class Tutorial {
         constructor(
             {
                 selector = "tut-action",
+                selectorList = [],
                 debug = false
             } = {}) {
-                this.elems = Array.from(document.getElementsByClassName(selector));
+                if(selectorList.length > 0) {
+                    this.elems = this._queryElementList(selectorList);
+                }
+                else {
+                    this.elems = Array.from(document.getElementsByClassName(selector));
+
+                    if (!this.elems.every(el => el.getAttribute("t-step"))) {
+                        throw new Error("Not all steps defined");
+                    }
+                    else {
+                        this.elems.sort((a, b) => {
+                            return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
+                        });
+                    }
+                }
 
                 if (this.elems.length === 0) {
                     throw new Error("No activitys point defined");
-                }
-                else if (!this.elems.every(el => el.getAttribute("t-step"))) {
-                    throw new Error("Not all steps defined");
                 }
                 else {
                     this.selector = selector;
@@ -24,10 +38,6 @@
                     this._body = document.getElementsByTagName("body")[0];
                     this._blurElement = this._createBlurElement();
                     this._highlightBackground = this._createHighlightBackground();
-
-                    this.elems.sort((a, b) => {
-                        return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
-                    });
                 }
         }
 
@@ -70,7 +80,7 @@
                 return;
             }
 
-            if(debug)
+            if(this.debug)
                 console.log(`Going to previous element: #${this.step}`);
 
             //at first step
@@ -92,7 +102,7 @@
                 return;
             }
 
-            if(debug)
+            if(this.debug)
                 console.log(`Going to next element: #${this.step}`);
 
             //last step?
@@ -114,11 +124,10 @@
                 console.warn("Tutorial is not running.");
                 return;
             }
-            else if(step === this.step) {
-                return;
-            }
             else if(!this._stepInBounds(step)) {
                 throw new Error("Step out of bounds.");
+            }
+            else if(step === this.step) {
                 return;
             }
 
@@ -157,6 +166,30 @@
             this._highlightBackground.style.width  = bounds.width + 24;
 
             this._highlightBackground.childNodes[0].innerText = this.step + 1;
+        }
+
+        _queryElementList(list) {
+            let nodes = [];
+            let node  = null;
+
+            for(let elem of list) {
+                //get if getElement gets more than 1 elem
+                switch(elem.charAt(0)) {
+                    case ".":
+                        node = document.getElementsByClassName(elem.substr(1, this.length))[0];
+                        break;
+                    case "#":
+                        node = document.getElementById(elem.substr(1, this.length))[0];
+                        break;
+                    default:
+                        throw new Error("Unknown selector. Please only use id or class.");
+                        break;
+                }
+
+                nodes.push(node);
+            }
+
+            return nodes;
         }
     }
 

@@ -1,1 +1,1 @@
-var kb = new Tutorial({selector: "tut", debug: true});
+var kb = new Tutorial({selectorList: [".a", ".b"], debug: true});

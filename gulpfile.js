@@ -12,11 +12,7 @@ const gulp = require("gulp"),
 gulp.task("default", () => {
     return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
-            presets: ["es2015"]
-        }))
-        .pipe(through.obj((file, enc, cb) => {
-            file.contents = new Buffer(flowRemoveTypes(file.contents.toString('utf8')).toString())
-            cb(null, file);
+            presets: ["flow", "es2015"]
         }))
         .pipe(gulp.dest(path.join(__dirname, "/dist")))
 });
@@ -30,11 +26,7 @@ gulp.task('sass', function () {
 gulp.task("production", () => {
     return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
-            presets: ["es2015"]
-        }))
-        .pipe(through.obj((file, enc, cb) => {
-            file.contents = new Buffer(flowRemoveTypes(file.contents.toString('utf8')).toString())
-            cb(null, file);
+            presets: ["flow", "es2015"]
         }))
         .pipe(uglify())
         .pipe(optimizejs())
