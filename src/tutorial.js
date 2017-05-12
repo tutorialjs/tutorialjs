@@ -70,7 +70,7 @@
                 return;
             }
 
-            if(debug)
+            if(this.debug)
                 console.log(`Going to previous element: #${this.step}`);
 
             //at first step

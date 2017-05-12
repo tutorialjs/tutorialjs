@@ -82,7 +82,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                if (debug) console.log("Going to previous element: #" + this.step);
+                if (this.debug) console.log("Going to previous element: #" + this.step);
 
                 //at first step
                 if (this.step === 0) {
