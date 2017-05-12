@@ -38,7 +38,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
 
             if (this.elems.length === 0) {
-                throw new Error("No activitys point defined");
+                throw new Error("No activities point defined");
             } else {
                 this.selector = selector;
                 this.debug = debug;
@@ -202,7 +202,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                 node = document.getElementsByClassName(elem.substr(1, this.length))[0];
                                 break;
                             case "#":
-                                node = document.getElementById(elem.substr(1, this.length))[0];
+                                node = document.getElementById(elem.substr(1, this.length));
                                 break;
                             default:
                                 throw new Error("Unknown selector. Please only use id or class.");

@@ -179,7 +179,7 @@
                         node = document.getElementsByClassName(elem.substr(1, this.length))[0];
                         break;
                     case "#":
-                        node = document.getElementById(elem.substr(1, this.length))[0];
+                        node = document.getElementById(elem.substr(1, this.length));
                         break;
                     default:
                         throw new Error("Unknown selector. Please only use id or class.");
