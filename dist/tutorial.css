@@ -40,3 +40,49 @@
   border: 1px solid black;
   border-radius: 50%;
   background-color: white; }
+
+.tutorial-box {
+  position: relative;
+  display: inline-block;
+  z-index: 9998;
+  padding: 8px;
+  min-width: 200px;
+  width: 30%;
+  max-width: 320px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 2px #333;
+  background-color: white; }
+  .tutorial-box > .tutorial-box-edge {
+    position: absolute;
+    top: -5px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid white; }
+  .tutorial-box > .tutorial-box-wrapper {
+    overflow: hidden;
+    text-overflow: ellipsis; }
+    .tutorial-box > .tutorial-box-wrapper:after {
+      content: "";
+      display: table;
+      clear: both; }
+    .tutorial-box > .tutorial-box-wrapper > .tutorial-description {
+      line-height: 1.1em;
+      margin: 0 0 1em 0; }
+    .tutorial-box > .tutorial-box-wrapper > .tutorial-step-position {
+      display: inline; }
+    .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons {
+      float: right; }
+      .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > a {
+        text-decoration: none;
+        background-color: lightgrey;
+        color: white;
+        padding: 2px 8px; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > a:first-of-type {
+          border-top-left-radius: 2px;
+          border-bottom-left-radius: 2px;
+          border: 1px solid black; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > a:last-of-type {
+          border-top-right-radius: 2px;
+          border-bottom-right-radius: 2px;
+          border: 1px solid black;
+          border-left: none; }

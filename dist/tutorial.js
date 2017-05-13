@@ -199,6 +199,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return el;
             }
         }, {
+            key: "_createTutorialBox",
+            value: function _createTutorialBox() {
+                var box = document.createElement("div");
+            }
+        }, {
             key: "_moveHighlightBox",
             value: function _moveHighlightBox() {
                 if (this.running && this.animate) {
