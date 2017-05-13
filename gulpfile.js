@@ -1,8 +1,7 @@
 const gulp = require("gulp"),
     path   = require("path"),
-    flowRemoveTypes = require('flow-remove-types'),
+    stripDebug = require('gulp-strip-debug'),
     optimizejs = require('gulp-optimize-js'),
-    through = require('through2'),
     sass   = require('gulp-sass'),
     watch  = require('gulp-watch'),
     uglify = require("gulp-uglify"),
@@ -28,6 +27,7 @@ gulp.task("production", () => {
         .pipe(babel({
             presets: ["flow", "es2015"]
         }))
+        .pipe(stripDebug())
         .pipe(uglify())
         .pipe(optimizejs())
         .pipe(rename("tutorial.min.js"))

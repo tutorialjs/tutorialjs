@@ -33,11 +33,17 @@
                     this.selector = selector;
                     this.debug = debug;
                     this.step = 0;
+                    this.animate = true;
                     this.running = false;
+
+                    this.animation = {
+                        running: false,
+                        id: null
+                    };
 
                     this._body = document.getElementsByTagName("body")[0];
                     this._blurElement = this._createBlurElement();
-                    this._highlightBackground = this._createHighlightBackground();
+                    this._highlightBox = this._createHighlightBox();
                 }
         }
 
@@ -52,9 +58,9 @@
                 this.elems[this.step].classList.add("tutorial-highlight");
 
                 this._body.appendChild(this._blurElement);
-                this._body.appendChild(this._highlightBackground);
+                this._body.appendChild(this._highlightBox);
 
-                this._moveHighlightBackground();
+                this._moveHighlightBox();
                 this.running = true;
             }
         }
@@ -67,8 +73,10 @@
 
             this.elems[this.step].classList.remove("tutorial-highlight");
 
+            this._highlightBox.style.transform = "";
+
             this._body.removeChild(this._blurElement);
-            this._body.removeChild(this._highlightBackground);
+            this._body.removeChild(this._highlightBox);
 
             this.running = false;
             this.step = 0;
@@ -77,6 +85,10 @@
         prev() {
             if(!this.running) {
                 console.warn("Tutorial is not running");
+                return;
+            }
+            else if(this.animation.running) {
+                console.warn("Animation is already running");
                 return;
             }
 
@@ -92,13 +104,17 @@
                 this.elems[this.step].classList.remove("tutorial-highlight");
                 this.elems[--this.step].classList.add("tutorial-highlight");
 
-                this._moveHighlightBackground();
+                this._moveHighlightBox();
             }
         }
 
         next() {
             if(!this.running) {
                 console.warn("Tutorial is not running");
+                return;
+            }
+            else if(this.animation.running) {
+                console.warn("Animation is already running");
                 return;
             }
 
@@ -114,7 +130,7 @@
                 this.elems[this.step].classList.remove("tutorial-highlight");
                 this.elems[++this.step].classList.add("tutorial-highlight");
 
-                this._moveHighlightBackground();
+                this._moveHighlightBox();
             }
         }
 
@@ -143,29 +159,72 @@
         _createBlurElement() {
             let el = document.createElement("div");
             el.classList.add("tutorial-blur");
+
+            el.onclick = () => {
+                this.close();
+            }
+
             return el;
         }
-        _createHighlightBackground() {
+        _createHighlightBox() {
             let el = document.createElement("div");
+            let background = document.createElement("div");
             let index = document.createElement("i");
 
+            el.classList.add("tutorial-wrapper");
+            background.classList.add("tutorial-background");
             index.classList.add("tutorial-index");
 
-            el.classList.add("tutorial-wrapper");
+            el.onlick = e => {
+                e.preventPropagation();
+            }
+
+            el.appendChild(background);
             el.appendChild(index);
 
             return el;
         }
+        _createTutorialBox() {
+            let box = document.createElement("div");
+        }
 
-        _moveHighlightBackground() {
-            let bounds = this.elems[this.step].getBoundingClientRect();
+        _moveHighlightBox() {
+            if(this.running && this.animate) {
+                this._animateHighlightBox()
+            }
+            else {
+                //remove dup
+                let bounds  = this.elems[this.step].getBoundingClientRect();
 
-            this._highlightBackground.style.top = bounds.top - 12;
-            this._highlightBackground.style.left = bounds.left - 12;
-            this._highlightBackground.style.height = bounds.bottom - bounds.top + 24;
-            this._highlightBackground.style.width  = bounds.width + 24;
+                this._highlightBox.style.top = bounds.top - 12;
+                this._highlightBox.style.left = bounds.left - 12;
+                this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
+                this._highlightBox.childNodes[0].style.width  = bounds.width + 24;
+            }
 
-            this._highlightBackground.childNodes[0].innerText = this.step + 1;
+            this._highlightBox.childNodes[1].innerText = this.step + 1;
+        }
+        _animateHighlightBox() {
+            //flip technique
+            //https://aerotwist.com/blog/flip-your-animations/
+            let first = this._highlightBox.getBoundingClientRect();
+            let background = this._highlightBox.childNodes[0].getBoundingClientRect();
+
+            let last  = this.elems[this.step].getBoundingClientRect();
+
+            let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
+
+            let invertY = (last.top - 12) - (first.top) + transform.translateY;
+            let invertX = (last.left - 12) - (first.left) + transform.translateX;
+            let scaleY = ((last.height + 24)/(background.height)) + transform.scaleY;
+            let scaleX = ((last.width + 24)/(background.width)) + transform.scaleX;
+
+            this._highlightBox.style.transform = `translateX(${invertX}px) translateY(${invertY}px)`;
+            this._highlightBox.childNodes[0].style.transform = `scaleX(${scaleX}) scaleY(${scaleY})`;
+
+            this._highlightBox.addEventListener("transitioned", () => {
+                this.animation.running = false;
+            })
         }
 
         _queryElementList(list) {
@@ -190,6 +249,31 @@
             }
 
             return nodes;
+        }
+        _getTransformValues(transform, childTransform) {
+            let extracted = {};
+
+            if(transform === "") {
+                extracted = {
+                    translateY: 0,
+                    translateX: 0,
+                    scaleX: 0,
+                    scaleY: 0
+                }
+            }
+            else {
+                let parent = transform.split(" ");
+                let child  = childTransform.split(" ");
+
+                extracted = {
+                    translateX: parseFloat(parent[0].substr(11, this.length).replace("px)", "")),
+                    translateY: parseFloat(parent[1].substr(11, this.length).replace("px)", "")),
+                    scaleX: parseFloat(child[0].substr(7, this.length).replace("px)", "")) - 1,
+                    scaleY: parseFloat(child[1].substr(7, this.length).replace("px)", "")) - 1
+                }
+            }
+
+            return extracted;
         }
     }
 

@@ -38,16 +38,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
 
             if (this.elems.length === 0) {
-                throw new Error("No activitys point defined");
+                throw new Error("No activities point defined");
             } else {
                 this.selector = selector;
                 this.debug = debug;
                 this.step = 0;
+                this.animate = true;
                 this.running = false;
+
+                this.animation = {
+                    running: false,
+                    id: null
+                };
 
                 this._body = document.getElementsByTagName("body")[0];
                 this._blurElement = this._createBlurElement();
-                this._highlightBackground = this._createHighlightBackground();
+                this._highlightBox = this._createHighlightBox();
             }
         }
 
@@ -62,9 +68,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.elems[this.step].classList.add("tutorial-highlight");
 
                     this._body.appendChild(this._blurElement);
-                    this._body.appendChild(this._highlightBackground);
+                    this._body.appendChild(this._highlightBox);
 
-                    this._moveHighlightBackground();
+                    this._moveHighlightBox();
                     this.running = true;
                 }
             }
@@ -78,8 +84,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.elems[this.step].classList.remove("tutorial-highlight");
 
+                this._highlightBox.style.transform = "";
+
                 this._body.removeChild(this._blurElement);
-                this._body.removeChild(this._highlightBackground);
+                this._body.removeChild(this._highlightBox);
 
                 this.running = false;
                 this.step = 0;
@@ -89,6 +97,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function prev() {
                 if (!this.running) {
                     console.warn("Tutorial is not running");
+                    return;
+                } else if (this.animation.running) {
+                    console.warn("Animation is already running");
                     return;
                 }
 
@@ -102,7 +113,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.elems[this.step].classList.remove("tutorial-highlight");
                     this.elems[--this.step].classList.add("tutorial-highlight");
 
-                    this._moveHighlightBackground();
+                    this._moveHighlightBox();
                 }
             }
         }, {
@@ -110,6 +121,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function next() {
                 if (!this.running) {
                     console.warn("Tutorial is not running");
+                    return;
+                } else if (this.animation.running) {
+                    console.warn("Animation is already running");
                     return;
                 }
 
@@ -123,7 +137,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.elems[this.step].classList.remove("tutorial-highlight");
                     this.elems[++this.step].classList.add("tutorial-highlight");
 
-                    this._moveHighlightBackground();
+                    this._moveHighlightBox();
                 }
             }
 
@@ -153,34 +167,79 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_createBlurElement",
             value: function _createBlurElement() {
+                var _this = this;
+
                 var el = document.createElement("div");
                 el.classList.add("tutorial-blur");
+
+                el.onclick = function () {
+                    _this.close();
+                };
+
                 return el;
             }
         }, {
-            key: "_createHighlightBackground",
-            value: function _createHighlightBackground() {
+            key: "_createHighlightBox",
+            value: function _createHighlightBox() {
                 var el = document.createElement("div");
+                var background = document.createElement("div");
                 var index = document.createElement("i");
 
+                el.classList.add("tutorial-wrapper");
+                background.classList.add("tutorial-background");
                 index.classList.add("tutorial-index");
 
-                el.classList.add("tutorial-wrapper");
+                el.onlick = function (e) {
+                    e.preventPropagation();
+                };
+
+                el.appendChild(background);
                 el.appendChild(index);
 
                 return el;
             }
         }, {
-            key: "_moveHighlightBackground",
-            value: function _moveHighlightBackground() {
-                var bounds = this.elems[this.step].getBoundingClientRect();
+            key: "_moveHighlightBox",
+            value: function _moveHighlightBox() {
+                if (this.running && this.animate) {
+                    this._animateHighlightBox();
+                } else {
+                    //remove dup
+                    var bounds = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBackground.style.top = bounds.top - 12;
-                this._highlightBackground.style.left = bounds.left - 12;
-                this._highlightBackground.style.height = bounds.bottom - bounds.top + 24;
-                this._highlightBackground.style.width = bounds.width + 24;
+                    this._highlightBox.style.top = bounds.top - 12;
+                    this._highlightBox.style.left = bounds.left - 12;
+                    this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
+                    this._highlightBox.childNodes[0].style.width = bounds.width + 24;
+                }
 
-                this._highlightBackground.childNodes[0].innerText = this.step + 1;
+                this._highlightBox.childNodes[1].innerText = this.step + 1;
+            }
+        }, {
+            key: "_animateHighlightBox",
+            value: function _animateHighlightBox() {
+                var _this2 = this;
+
+                //flip technique
+                //https://aerotwist.com/blog/flip-your-animations/
+                var first = this._highlightBox.getBoundingClientRect();
+                var background = this._highlightBox.childNodes[0].getBoundingClientRect();
+
+                var last = this.elems[this.step].getBoundingClientRect();
+
+                var transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
+
+                var invertY = last.top - 12 - first.top + transform.translateY;
+                var invertX = last.left - 12 - first.left + transform.translateX;
+                var scaleY = (last.height + 24) / background.height + transform.scaleY;
+                var scaleX = (last.width + 24) / background.width + transform.scaleX;
+
+                this._highlightBox.style.transform = "translateX(" + invertX + "px) translateY(" + invertY + "px)";
+                this._highlightBox.childNodes[0].style.transform = "scaleX(" + scaleX + ") scaleY(" + scaleY + ")";
+
+                this._highlightBox.addEventListener("transitioned", function () {
+                    _this2.animation.running = false;
+                });
             }
         }, {
             key: "_queryElementList",
@@ -227,6 +286,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 return nodes;
+            }
+        }, {
+            key: "_getTransformValues",
+            value: function _getTransformValues(transform, childTransform) {
+                var extracted = {};
+
+                if (transform === "") {
+                    extracted = {
+                        translateY: 0,
+                        translateX: 0,
+                        scaleX: 0,
+                        scaleY: 0
+                    };
+                } else {
+                    var parent = transform.split(" ");
+                    var child = childTransform.split(" ");
+
+                    extracted = {
+                        translateX: parseFloat(parent[0].substr(11, this.length).replace("px)", "")),
+                        translateY: parseFloat(parent[1].substr(11, this.length).replace("px)", "")),
+                        scaleX: parseFloat(child[0].substr(7, this.length).replace("px)", "")) - 1,
+                        scaleY: parseFloat(child[1].substr(7, this.length).replace("px)", "")) - 1
+                    };
+                }
+
+                return extracted;
             }
         }]);
 
