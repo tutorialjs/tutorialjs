@@ -43,7 +43,8 @@
 
                     this._body = document.getElementsByTagName("body")[0];
                     this._blurElement = this._createBlurElement();
-                    this._highlightBox = this._createHighlightBox();
+                    [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
+                    this._highlightBox = this._createHighlightBox(this._tutorialBox);
                 }
         }
 
@@ -74,6 +75,7 @@
             this.elems[this.step].classList.remove("tutorial-highlight");
 
             this._highlightBox.style.transform = "";
+            this._highlightBox.childNodes[0].style.transform = "";
 
             this._body.removeChild(this._blurElement);
             this._body.removeChild(this._highlightBox);
@@ -166,7 +168,7 @@
 
             return el;
         }
-        _createHighlightBox() {
+        _createHighlightBox(tutorialBox) {
             let el = document.createElement("div");
             let background = document.createElement("div");
             let index = document.createElement("i");
@@ -181,16 +183,67 @@
 
             el.appendChild(background);
             el.appendChild(index);
+            el.appendChild(tutorialBox);
 
             return el;
         }
         _createTutorialBox() {
-            let box = document.createElement("div");
+            let wrapper   = document.createElement("div");
+            let edge      = wrapper.cloneNode(false);
+            let content_wrapper = wrapper.cloneNode(false);
+            let text      = document.createElement("p");
+            let position  = text.cloneNode();
+            let buttonbox = wrapper.cloneNode(false);
+            let close     = document.createElement("button");
+            let back      = document.createElement("a");
+            back.href     = "#";
+            let next      = back.cloneNode(false);
+
+            wrapper.classList.add("tutorial-box");
+            edge.classList.add("tutorial-box-edge");
+            content_wrapper.classList.add("tutorial-box-wrapper");
+            text.classList.add("tutorial-description");
+            position.classList.add("tutorial-step-position");
+            buttonbox.classList.add("tutorial-buttons");
+
+            close.textContent = "Close";
+            back.textContent = "Back";
+            next.textContent = "Next";
+
+            close.onclick = e => {
+                e.preventDefault();
+
+                this.close();
+            }
+            back.onclick = e => {
+                e.preventDefault();
+
+                this.prev();
+            }
+
+            next.onclick = e => {
+                e.preventDefault();
+
+                this.next();
+            }
+
+            buttonbox.appendChild(close);
+            buttonbox.appendChild(back);
+            buttonbox.appendChild(next);
+
+            content_wrapper.appendChild(text);
+            content_wrapper.appendChild(position);
+            content_wrapper.appendChild(buttonbox);
+
+            wrapper.appendChild(edge);
+            wrapper.appendChild(content_wrapper);
+
+            return [wrapper, text, position];
         }
 
         _moveHighlightBox() {
             if(this.running && this.animate) {
-                this._animateHighlightBox()
+                this._animateHighlightBox();
             }
             else {
                 //remove dup
@@ -200,9 +253,12 @@
                 this._highlightBox.style.left = bounds.left - 12;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                 this._highlightBox.childNodes[0].style.width  = bounds.width + 24;
+
+                this._tutorialBox.style.top = bounds.height + 30 + "px";
             }
 
             this._highlightBox.childNodes[1].innerText = this.step + 1;
+            this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
         }
         _animateHighlightBox() {
             //flip technique
@@ -218,6 +274,9 @@
             let invertX = (last.left - 12) - (first.left) + transform.translateX;
             let scaleY = ((last.height + 24)/(background.height)) + transform.scaleY;
             let scaleX = ((last.width + 24)/(background.width)) + transform.scaleX;
+
+            //use transform or not ?
+            this._tutorialBox.style.top = last.height + 30 + "px";
 
             this._highlightBox.style.transform = `translateX(${invertX}px) translateY(${invertY}px)`;
             this._highlightBox.childNodes[0].style.transform = `scaleX(${scaleX}) scaleY(${scaleY})`;
@@ -253,6 +312,7 @@
         _getTransformValues(transform, childTransform) {
             let extracted = {};
 
+            //save values intern to skip this shit
             if(transform === "") {
                 extracted = {
                     translateY: 0,

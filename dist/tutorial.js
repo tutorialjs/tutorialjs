@@ -1,5 +1,7 @@
 "use strict";
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -53,7 +55,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this._body = document.getElementsByTagName("body")[0];
                 this._blurElement = this._createBlurElement();
-                this._highlightBox = this._createHighlightBox();
+
+                var _createTutorialBox2 = this._createTutorialBox();
+
+                var _createTutorialBox3 = _slicedToArray(_createTutorialBox2, 3);
+
+                this._tutorialBox = _createTutorialBox3[0];
+                this._tutorialText = _createTutorialBox3[1];
+                this._tutorialPosition = _createTutorialBox3[2];
+
+                this._highlightBox = this._createHighlightBox(this._tutorialBox);
             }
         }
 
@@ -85,6 +96,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.elems[this.step].classList.remove("tutorial-highlight");
 
                 this._highlightBox.style.transform = "";
+                this._highlightBox.childNodes[0].style.transform = "";
 
                 this._body.removeChild(this._blurElement);
                 this._body.removeChild(this._highlightBox);
@@ -180,7 +192,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: "_createHighlightBox",
-            value: function _createHighlightBox() {
+            value: function _createHighlightBox(tutorialBox) {
                 var el = document.createElement("div");
                 var background = document.createElement("div");
                 var index = document.createElement("i");
@@ -195,13 +207,66 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 el.appendChild(background);
                 el.appendChild(index);
+                el.appendChild(tutorialBox);
 
                 return el;
             }
         }, {
             key: "_createTutorialBox",
             value: function _createTutorialBox() {
-                var box = document.createElement("div");
+                var _this2 = this;
+
+                var wrapper = document.createElement("div");
+                var edge = wrapper.cloneNode(false);
+                var content_wrapper = wrapper.cloneNode(false);
+                var text = document.createElement("p");
+                var position = text.cloneNode();
+                var buttonbox = wrapper.cloneNode(false);
+                var close = document.createElement("button");
+                var back = document.createElement("a");
+                back.href = "#";
+                var next = back.cloneNode(false);
+
+                wrapper.classList.add("tutorial-box");
+                edge.classList.add("tutorial-box-edge");
+                content_wrapper.classList.add("tutorial-box-wrapper");
+                text.classList.add("tutorial-description");
+                position.classList.add("tutorial-step-position");
+                buttonbox.classList.add("tutorial-buttons");
+
+                close.textContent = "Close";
+                back.textContent = "Back";
+                next.textContent = "Next";
+
+                close.onclick = function (e) {
+                    e.preventDefault();
+
+                    _this2.close();
+                };
+                back.onclick = function (e) {
+                    e.preventDefault();
+
+                    _this2.prev();
+                };
+
+                next.onclick = function (e) {
+                    e.preventDefault();
+
+                    _this2.next();
+                };
+
+                buttonbox.appendChild(close);
+                buttonbox.appendChild(back);
+                buttonbox.appendChild(next);
+
+                content_wrapper.appendChild(text);
+                content_wrapper.appendChild(position);
+                content_wrapper.appendChild(buttonbox);
+
+                wrapper.appendChild(edge);
+                wrapper.appendChild(content_wrapper);
+
+                return [wrapper, text, position];
             }
         }, {
             key: "_moveHighlightBox",
@@ -216,14 +281,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._highlightBox.style.left = bounds.left - 12;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 24;
+
+                    this._tutorialBox.style.top = bounds.height + 30 + "px";
                 }
 
                 this._highlightBox.childNodes[1].innerText = this.step + 1;
+                this._tutorialPosition.textContent = this.step + 1 + "/" + this.elems.length;
             }
         }, {
             key: "_animateHighlightBox",
             value: function _animateHighlightBox() {
-                var _this2 = this;
+                var _this3 = this;
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
@@ -239,11 +307,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var scaleY = (last.height + 24) / background.height + transform.scaleY;
                 var scaleX = (last.width + 24) / background.width + transform.scaleX;
 
+                //use transform or not ?
+                this._tutorialBox.style.top = last.height + 30 + "px";
+
                 this._highlightBox.style.transform = "translateX(" + invertX + "px) translateY(" + invertY + "px)";
                 this._highlightBox.childNodes[0].style.transform = "scaleX(" + scaleX + ") scaleY(" + scaleY + ")";
 
                 this._highlightBox.addEventListener("transitioned", function () {
-                    _this2.animation.running = false;
+                    _this3.animation.running = false;
                 });
             }
         }, {
@@ -297,6 +368,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _getTransformValues(transform, childTransform) {
                 var extracted = {};
 
+                //save values intern to skip this shit
                 if (transform === "") {
                     extracted = {
                         translateY: 0,

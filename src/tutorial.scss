@@ -60,7 +60,7 @@
 }
 
 .tutorial-box {
-  position: relative;
+  position: absolute;
   display: inline-block;
 
   z-index: 9998;
@@ -75,6 +75,8 @@
   box-shadow: 0px 1px 2px #333;
 
   background-color: white;
+
+  will-change: top;
 
   & > .tutorial-box-edge {
     position: absolute;
