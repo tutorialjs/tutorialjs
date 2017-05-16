@@ -17,6 +17,10 @@
   transform-origin: 0 0;
   transition: transform 400ms ease;
   will-change: transform; }
+  .tutorial-wrapper.skip-animation {
+    transition: none; }
+    .tutorial-wrapper.skip-animation > .tutorial-background {
+      transition: none; }
 
 .tutorial-background {
   position: absolute;

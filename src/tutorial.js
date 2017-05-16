@@ -69,6 +69,18 @@
                             }
                         }
                     });
+
+                    window.addEventListener("resize", () => {
+                        this._highlightBox.classList.add("skip-animation");
+                        this._animateHighlightBox();
+
+                        clearTimeout(this._resizeTimer);
+                        this._resizeTimer = setTimeout(() => {
+
+                            this._highlightBox.classList.remove("skip-animation");
+
+                        }, 200);
+                    });
                 }
         }
 
@@ -310,7 +322,7 @@
             this._transform.scaleY -= 1;
             this._transform.scaleX -= 1;
 
-            this._highlightBox.addEventListener("transitioned", () => {
+            this._highlightBox.addEventListener("transitionend", () => {
                 this.animation.running = false;
             })
         }

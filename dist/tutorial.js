@@ -104,6 +104,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
                     }
                 });
+
+                window.addEventListener("resize", function () {
+                    _this._highlightBox.classList.add("skip-animation");
+                    _this._animateHighlightBox();
+
+                    clearTimeout(_this._resizeTimer);
+                    _this._resizeTimer = setTimeout(function () {
+
+                        _this._highlightBox.classList.remove("skip-animation");
+                    }, 200);
+                });
             }
         }
 
@@ -357,7 +368,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._transform.scaleY -= 1;
                 this._transform.scaleX -= 1;
 
-                this._highlightBox.addEventListener("transitioned", function () {
+                this._highlightBox.addEventListener("transitionend", function () {
                     _this4.animation.running = false;
                 });
             }
