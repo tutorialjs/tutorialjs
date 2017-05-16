@@ -1,14 +1,22 @@
-//v0.0.1
+//v0.0.2
 
 (function (window, document, undefined) {
     "use strict";
 
+    class Util {
+        static mandatory(param) {
+            throw new Error(`${param} is required.`);
+        }
+    }
+
     class Tutorial {
         constructor(
             {
-                selector = "tut-action",
+                selector     = "tut-action",
                 selectorList = [],
-                debug = false
+                name         = Util.mandatory("Name"),
+                persistent   = false,
+                debug        = false
             } = {}) {
                 if(selectorList.length > 0) {
                     this.elems = this._queryElementList(selectorList);
@@ -30,11 +38,16 @@
                     throw new Error("No activities point defined");
                 }
                 else {
+                    this._reset();
+
+                    this._name = name;
+                    this._persistent = persistent;
+                    this._advancedStorage = this._checkStorageSupport();
+                    this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+
                     this.selector = selector;
                     this.debug = debug;
-                    this.step = 0;
                     this.animate = true;
-                    this.running = false;
 
                     this.animation = {
                         running: false,
@@ -45,6 +58,17 @@
                     this._blurElement = this._createBlurElement();
                     [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
                     this._highlightBox = this._createHighlightBox(this._tutorialBox);
+
+                    Object.defineProperty(this, "step", {
+                        get: () => this._step,
+                        set: x => {
+                            this._step = x;
+
+                            if(this._persistent) {
+                                this._saveCurrentPosition();
+                            }
+                        }
+                    });
                 }
         }
 
@@ -80,8 +104,7 @@
             this._body.removeChild(this._blurElement);
             this._body.removeChild(this._highlightBox);
 
-            this.running = false;
-            this.step = 0;
+            this._reset();
         }
 
         prev() {
@@ -108,6 +131,8 @@
 
                 this._moveHighlightBox();
             }
+
+            this._saveCurrentPosition();
         }
 
         next() {
@@ -134,6 +159,8 @@
 
                 this._moveHighlightBox();
             }
+
+            this._saveCurrentPosition();
         }
 
         //even if is not running?
@@ -268,18 +295,20 @@
 
             let last  = this.elems[this.step].getBoundingClientRect();
 
-            let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
-
-            let invertY = (last.top - 12) - (first.top) + transform.translateY;
-            let invertX = (last.left - 12) - (first.left) + transform.translateX;
-            let scaleY = ((last.height + 24)/(background.height)) + transform.scaleY;
-            let scaleX = ((last.width + 24)/(background.width)) + transform.scaleX;
+            //let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
+            this._transform.translateY = (last.top - 12) - (first.top) + this._transform.translateY;
+            this._transform.translateX = (last.left - 12) - (first.left) + this._transform.translateX;
+            this._transform.scaleY = ((last.height + 24)/(background.height)) + this._transform.scaleY;
+            this._transform.scaleX = ((last.width + 24)/(background.width)) + this._transform.scaleX;
 
             //use transform or not ?
             this._tutorialBox.style.top = last.height + 30 + "px";
 
-            this._highlightBox.style.transform = `translateX(${invertX}px) translateY(${invertY}px)`;
-            this._highlightBox.childNodes[0].style.transform = `scaleX(${scaleX}) scaleY(${scaleY})`;
+            this._highlightBox.style.transform = `translateX(${this._transform.translateX}px) translateY(${this._transform.translateY}px)`;
+            this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
+
+            this._transform.scaleY -= 1;
+            this._transform.scaleX -= 1;
 
             this._highlightBox.addEventListener("transitioned", () => {
                 this.animation.running = false;
@@ -309,35 +338,49 @@
 
             return nodes;
         }
-        _getTransformValues(transform, childTransform) {
-            let extracted = {};
 
-            //save values intern to skip this shit
-            if(transform === "") {
-                extracted = {
-                    translateY: 0,
-                    translateX: 0,
-                    scaleX: 0,
-                    scaleY: 0
-                }
+        _checkStorageSupport() {
+            try {
+                localStorage.setItem("a", 1);
+                localStorage.removeItem("a");
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        _saveCurrentPosition() {
+            if(this._advancedStorage) {
+                window.localStorage.setItem(`tutorial-${this._name}`, this.step);
             }
             else {
-                let parent = transform.split(" ");
-                let child  = childTransform.split(" ");
-
-                extracted = {
-                    translateX: parseFloat(parent[0].substr(11, this.length).replace("px)", "")),
-                    translateY: parseFloat(parent[1].substr(11, this.length).replace("px)", "")),
-                    scaleX: parseFloat(child[0].substr(7, this.length).replace("px)", "")) - 1,
-                    scaleY: parseFloat(child[1].substr(7, this.length).replace("px)", "")) - 1
-                }
+                document.cookie += `tutorial-${this._name}=${this.step};`;
             }
+        }
+        _getCurrentPosition() {
+            if(this._advancedStorage) {
+                return window.localStorage.getItem(`tutorial-${this._name}`);
+            }
+            else {
+                return document.cookie.split(",")
+                    .filter(item => item.includes(`tutorial-${this._name}`))
+                    .map(item => parseInt(item.replace(`tutorial-${this._name}=`, "")));
+            }
+        }
+        _reset() {
+            this.step = 0;
+            this.running = false;
 
-            return extracted;
+            this._transform = {
+                translateY: 0,
+                translateX: 0,
+                scaleX: 0,
+                scaleY: 0
+            };
         }
     }
 
     if (!window.Tutorial) {
         window.Tutorial = Tutorial;
     }
-})(window, document)
+})(window, document);

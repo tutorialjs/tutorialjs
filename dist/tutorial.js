@@ -6,18 +6,39 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-//v0.0.1
+//v0.0.2
 
 (function (window, document, undefined) {
     "use strict";
 
+    var Util = function () {
+        function Util() {
+            _classCallCheck(this, Util);
+        }
+
+        _createClass(Util, null, [{
+            key: "mandatory",
+            value: function mandatory(param) {
+                throw new Error(param + " is required.");
+            }
+        }]);
+
+        return Util;
+    }();
+
     var Tutorial = function () {
         function Tutorial() {
+            var _this = this;
+
             var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
                 _ref$selector = _ref.selector,
                 selector = _ref$selector === undefined ? "tut-action" : _ref$selector,
                 _ref$selectorList = _ref.selectorList,
                 selectorList = _ref$selectorList === undefined ? [] : _ref$selectorList,
+                _ref$name = _ref.name,
+                name = _ref$name === undefined ? Util.mandatory("Name") : _ref$name,
+                _ref$persistent = _ref.persistent,
+                persistent = _ref$persistent === undefined ? false : _ref$persistent,
                 _ref$debug = _ref.debug,
                 debug = _ref$debug === undefined ? false : _ref$debug;
 
@@ -42,11 +63,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             if (this.elems.length === 0) {
                 throw new Error("No activities point defined");
             } else {
+                this._reset();
+
+                this._name = name;
+                this._persistent = persistent;
+                this._advancedStorage = this._checkStorageSupport();
+                this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+
                 this.selector = selector;
                 this.debug = debug;
-                this.step = 0;
                 this.animate = true;
-                this.running = false;
 
                 this.animation = {
                     running: false,
@@ -65,6 +91,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._tutorialPosition = _createTutorialBox3[2];
 
                 this._highlightBox = this._createHighlightBox(this._tutorialBox);
+
+                Object.defineProperty(this, "step", {
+                    get: function get() {
+                        return _this._step;
+                    },
+                    set: function set(x) {
+                        _this._step = x;
+
+                        if (_this._persistent) {
+                            _this._saveCurrentPosition();
+                        }
+                    }
+                });
             }
         }
 
@@ -101,8 +140,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._body.removeChild(this._blurElement);
                 this._body.removeChild(this._highlightBox);
 
-                this.running = false;
-                this.step = 0;
+                this._reset();
             }
         }, {
             key: "prev",
@@ -127,6 +165,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     this._moveHighlightBox();
                 }
+
+                this._saveCurrentPosition();
             }
         }, {
             key: "next",
@@ -151,6 +191,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     this._moveHighlightBox();
                 }
+
+                this._saveCurrentPosition();
             }
 
             //even if is not running?
@@ -179,13 +221,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_createBlurElement",
             value: function _createBlurElement() {
-                var _this = this;
+                var _this2 = this;
 
                 var el = document.createElement("div");
                 el.classList.add("tutorial-blur");
 
                 el.onclick = function () {
-                    _this.close();
+                    _this2.close();
                 };
 
                 return el;
@@ -214,7 +256,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_createTutorialBox",
             value: function _createTutorialBox() {
-                var _this2 = this;
+                var _this3 = this;
 
                 var wrapper = document.createElement("div");
                 var edge = wrapper.cloneNode(false);
@@ -241,18 +283,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 close.onclick = function (e) {
                     e.preventDefault();
 
-                    _this2.close();
+                    _this3.close();
                 };
                 back.onclick = function (e) {
                     e.preventDefault();
 
-                    _this2.prev();
+                    _this3.prev();
                 };
 
                 next.onclick = function (e) {
                     e.preventDefault();
 
-                    _this2.next();
+                    _this3.next();
                 };
 
                 buttonbox.appendChild(close);
@@ -291,7 +333,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_animateHighlightBox",
             value: function _animateHighlightBox() {
-                var _this3 = this;
+                var _this4 = this;
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
@@ -300,21 +342,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var last = this.elems[this.step].getBoundingClientRect();
 
-                var transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
-
-                var invertY = last.top - 12 - first.top + transform.translateY;
-                var invertX = last.left - 12 - first.left + transform.translateX;
-                var scaleY = (last.height + 24) / background.height + transform.scaleY;
-                var scaleX = (last.width + 24) / background.width + transform.scaleX;
+                //let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
+                this._transform.translateY = last.top - 12 - first.top + this._transform.translateY;
+                this._transform.translateX = last.left - 12 - first.left + this._transform.translateX;
+                this._transform.scaleY = (last.height + 24) / background.height + this._transform.scaleY;
+                this._transform.scaleX = (last.width + 24) / background.width + this._transform.scaleX;
 
                 //use transform or not ?
                 this._tutorialBox.style.top = last.height + 30 + "px";
 
-                this._highlightBox.style.transform = "translateX(" + invertX + "px) translateY(" + invertY + "px)";
-                this._highlightBox.childNodes[0].style.transform = "scaleX(" + scaleX + ") scaleY(" + scaleY + ")";
+                this._highlightBox.style.transform = "translateX(" + this._transform.translateX + "px) translateY(" + this._transform.translateY + "px)";
+                this._highlightBox.childNodes[0].style.transform = "scaleX(" + this._transform.scaleX + ") scaleY(" + this._transform.scaleY + ")";
+
+                this._transform.scaleY -= 1;
+                this._transform.scaleX -= 1;
 
                 this._highlightBox.addEventListener("transitioned", function () {
-                    _this3.animation.running = false;
+                    _this4.animation.running = false;
                 });
             }
         }, {
@@ -364,31 +408,52 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return nodes;
             }
         }, {
-            key: "_getTransformValues",
-            value: function _getTransformValues(transform, childTransform) {
-                var extracted = {};
-
-                //save values intern to skip this shit
-                if (transform === "") {
-                    extracted = {
-                        translateY: 0,
-                        translateX: 0,
-                        scaleX: 0,
-                        scaleY: 0
-                    };
-                } else {
-                    var parent = transform.split(" ");
-                    var child = childTransform.split(" ");
-
-                    extracted = {
-                        translateX: parseFloat(parent[0].substr(11, this.length).replace("px)", "")),
-                        translateY: parseFloat(parent[1].substr(11, this.length).replace("px)", "")),
-                        scaleX: parseFloat(child[0].substr(7, this.length).replace("px)", "")) - 1,
-                        scaleY: parseFloat(child[1].substr(7, this.length).replace("px)", "")) - 1
-                    };
+            key: "_checkStorageSupport",
+            value: function _checkStorageSupport() {
+                try {
+                    localStorage.setItem("a", 1);
+                    localStorage.removeItem("a");
+                    return true;
+                } catch (e) {
+                    return false;
                 }
+            }
+        }, {
+            key: "_saveCurrentPosition",
+            value: function _saveCurrentPosition() {
+                if (this._advancedStorage) {
+                    window.localStorage.setItem("tutorial-" + this._name, this.step);
+                } else {
+                    document.cookie += "tutorial-" + this._name + "=" + this.step + ";";
+                }
+            }
+        }, {
+            key: "_getCurrentPosition",
+            value: function _getCurrentPosition() {
+                var _this5 = this;
 
-                return extracted;
+                if (this._advancedStorage) {
+                    return window.localStorage.getItem("tutorial-" + this._name);
+                } else {
+                    return document.cookie.split(",").filter(function (item) {
+                        return item.includes("tutorial-" + _this5._name);
+                    }).map(function (item) {
+                        return parseInt(item.replace("tutorial-" + _this5._name + "=", ""));
+                    });
+                }
+            }
+        }, {
+            key: "_reset",
+            value: function _reset() {
+                this.step = 0;
+                this.running = false;
+
+                this._transform = {
+                    translateY: 0,
+                    translateX: 0,
+                    scaleX: 0,
+                    scaleY: 0
+                };
             }
         }]);
 
