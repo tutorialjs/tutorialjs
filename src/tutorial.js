@@ -44,6 +44,7 @@
                     this._persistent = persistent;
                     this._advancedStorage = this._checkStorageSupport();
                     this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+                    //this._basePosition = this.elems[0].getBoundingClientRect();
 
                     this.selector = selector;
                     this.debug = debug;
@@ -71,15 +72,19 @@
                     });
 
                     window.addEventListener("resize", () => {
+                        if(!this.running)
+                            return;
+
+                        let first = this.elems[0].getBoundingClientRect();
                         this._highlightBox.classList.add("skip-animation");
+
+                        this._highlightBox.style.left = first.left - 12;
+                        this._highlightBox.style.top = first.top - 12;
+
                         this._animateHighlightBox();
 
-                        clearTimeout(this._resizeTimer);
-                        this._resizeTimer = setTimeout(() => {
-
-                            this._highlightBox.classList.remove("skip-animation");
-
-                        }, 200);
+                        //debounce to remove after 200ms
+                        this._highlightBox.classList.remove("skip-animation");
                     });
                 }
         }
@@ -302,25 +307,20 @@
         _animateHighlightBox() {
             //flip technique
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this._highlightBox.getBoundingClientRect();
-            let background = this._highlightBox.childNodes[0].getBoundingClientRect();
-
+            let first = this.elems[0].getBoundingClientRect();
             let last  = this.elems[this.step].getBoundingClientRect();
+            //let cur   = this._highlightBox.getBoundingClientRect();
 
-            //let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
-            this._transform.translateY = (last.top - 12) - (first.top) + this._transform.translateY;
-            this._transform.translateX = (last.left - 12) - (first.left) + this._transform.translateX;
-            this._transform.scaleY = ((last.height + 24)/(background.height)) + this._transform.scaleY;
-            this._transform.scaleX = ((last.width + 24)/(background.width)) + this._transform.scaleX;
+            this._transform.translateY = last.top - first.top;
+            this._transform.translateX = last.left - first.left;
+            this._transform.scaleY = ((last.height + 24)/(first.height + 24));
+            this._transform.scaleX = ((last.width + 24)/(first.width + 24));
 
             //use transform or not ?
             this._tutorialBox.style.top = last.height + 30 + "px";
 
             this._highlightBox.style.transform = `translateX(${this._transform.translateX}px) translateY(${this._transform.translateY}px)`;
             this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
-
-            this._transform.scaleY -= 1;
-            this._transform.scaleX -= 1;
 
             this._highlightBox.addEventListener("transitionend", () => {
                 this.animation.running = false;

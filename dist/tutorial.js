@@ -69,6 +69,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._persistent = persistent;
                 this._advancedStorage = this._checkStorageSupport();
                 this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+                //this._basePosition = this.elems[0].getBoundingClientRect();
 
                 this.selector = selector;
                 this.debug = debug;
@@ -106,14 +107,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
 
                 window.addEventListener("resize", function () {
+                    if (!_this.running) return;
+
+                    var first = _this.elems[0].getBoundingClientRect();
                     _this._highlightBox.classList.add("skip-animation");
+
+                    _this._highlightBox.style.left = first.left - 12;
+                    _this._highlightBox.style.top = first.top - 12;
+
                     _this._animateHighlightBox();
 
-                    clearTimeout(_this._resizeTimer);
-                    _this._resizeTimer = setTimeout(function () {
-
-                        _this._highlightBox.classList.remove("skip-animation");
-                    }, 200);
+                    //debounce to remove after 200ms
+                    _this._highlightBox.classList.remove("skip-animation");
                 });
             }
         }
@@ -348,25 +353,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this._highlightBox.getBoundingClientRect();
-                var background = this._highlightBox.childNodes[0].getBoundingClientRect();
-
+                var first = this.elems[0].getBoundingClientRect();
                 var last = this.elems[this.step].getBoundingClientRect();
+                //let cur   = this._highlightBox.getBoundingClientRect();
 
-                //let transform = this._getTransformValues(this._highlightBox.style.transform, this._highlightBox.childNodes[0].style.transform);
-                this._transform.translateY = last.top - 12 - first.top + this._transform.translateY;
-                this._transform.translateX = last.left - 12 - first.left + this._transform.translateX;
-                this._transform.scaleY = (last.height + 24) / background.height + this._transform.scaleY;
-                this._transform.scaleX = (last.width + 24) / background.width + this._transform.scaleX;
+                this._transform.translateY = last.top - first.top;
+                this._transform.translateX = last.left - first.left;
+                this._transform.scaleY = (last.height + 24) / (first.height + 24);
+                this._transform.scaleX = (last.width + 24) / (first.width + 24);
 
                 //use transform or not ?
                 this._tutorialBox.style.top = last.height + 30 + "px";
 
+                /*
+                if(this._highlightBox.classList.contains("skip-animation")) {
+                    this._transform.translateX = last.left - this._basePosition.left;
+                    this._transform.translateY = last.top - this._basePosition.top;
+                }
+                */
+
                 this._highlightBox.style.transform = "translateX(" + this._transform.translateX + "px) translateY(" + this._transform.translateY + "px)";
                 this._highlightBox.childNodes[0].style.transform = "scaleX(" + this._transform.scaleX + ") scaleY(" + this._transform.scaleY + ")";
-
-                this._transform.scaleY -= 1;
-                this._transform.scaleX -= 1;
 
                 this._highlightBox.addEventListener("transitionend", function () {
                     _this4.animation.running = false;
