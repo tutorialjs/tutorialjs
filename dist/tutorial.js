@@ -359,21 +359,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this._transform.translateY = last.top - first.top;
                 this._transform.translateX = last.left - first.left;
-                this._transform.scaleY = (last.height + 24) / (first.height + 24);
-                this._transform.scaleX = (last.width + 24) / (first.width + 24);
+                //this._transform.scaleY = ((last.height + 24)/(first.height + 24));
+                //this._transform.scaleX = ((last.width + 24)/(first.width + 24));
 
                 //use transform or not ?
                 this._tutorialBox.style.top = last.height + 30 + "px";
 
-                /*
-                if(this._highlightBox.classList.contains("skip-animation")) {
-                    this._transform.translateX = last.left - this._basePosition.left;
-                    this._transform.translateY = last.top - this._basePosition.top;
-                }
-                */
-
                 this._highlightBox.style.transform = "translateX(" + this._transform.translateX + "px) translateY(" + this._transform.translateY + "px)";
-                this._highlightBox.childNodes[0].style.transform = "scaleX(" + this._transform.scaleX + ") scaleY(" + this._transform.scaleY + ")";
+                //this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
+                this._highlightBox.childNodes[0].style.width = last.width + 24;
+                this._highlightBox.childNodes[0].style.height = last.height + 24;
 
                 this._highlightBox.addEventListener("transitionend", function () {
                     _this4.animation.running = false;
