@@ -42,8 +42,8 @@
 
   transform-origin: 0 0;
 
-  transition: transform 400ms ease;
-  will-change: transform;
+  transition: width 400ms ease, height 400ms ease;
+  will-change: width, height;
 }
 
 .tutorial-index {
