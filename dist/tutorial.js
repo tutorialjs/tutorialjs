@@ -75,6 +75,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.selector = selector;
                 this.buttons = buttons;
                 this.animate = true;
+                this.animating = false;
                 this.buttons = {
                     close: buttons.close === undefined ? 'Close' : buttons.close,
                     previous: buttons.previous === undefined ? 'Back' : buttons.close,
@@ -82,12 +83,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 };
                 this.debug = debug;
 
-                this.animation = {
-                    running: false,
-                    id: null
-                };
-
-                this._body = document.getElementsByTagName("body")[0];
+                this._body = document.body;
                 this._blurElement = this._createBlurElement();
 
                 var _createTutorialBox2 = this._createTutorialBox();
@@ -171,7 +167,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (!this.running) {
                     console.warn("Tutorial is not running");
                     return;
-                } else if (this.animation.running) {
+                } else if (this.animating) {
                     console.warn("Animation is already running");
                     return;
                 }
@@ -197,7 +193,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (!this.running) {
                     console.warn("Tutorial is not running");
                     return;
-                } else if (this.animation.running) {
+                } else if (this.animating) {
                     console.warn("Animation is already running");
                     return;
                 }
@@ -337,6 +333,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_moveHighlightBox",
             value: function _moveHighlightBox() {
                 if (this.running && this.animate) {
+                    this.animating = true;
                     this._animateHighlightBox();
                 } else {
                     //remove dup
@@ -378,7 +375,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._highlightBox.childNodes[0].style.height = last.height + 24;
 
                 this._highlightBox.addEventListener("transitionend", function () {
-                    _this4.animation.running = false;
+                    _this4.animating = false;
                 });
             }
         }, {

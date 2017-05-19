@@ -47,9 +47,10 @@
                     this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
                     //this._basePosition = this.elems[0].getBoundingClientRect();
 
-                    this.selector = selector;
-                    this.buttons = buttons;
-                    this.animate = true;
+                    this.selector  = selector;
+                    this.buttons   = buttons;
+                    this.animate   = true;
+                    this.animating = false;
                     this.buttons = {
                         close   : buttons.close === undefined ? 'Close' : buttons.close,
                         previous: buttons.previous === undefined ? 'Back' : buttons.close,
@@ -57,12 +58,7 @@
                     };
                     this.debug = debug;
 
-                    this.animation = {
-                        running: false,
-                        id: null
-                    };
-
-                    this._body = document.getElementsByTagName("body")[0];
+                    this._body = document.body;
                     this._blurElement = this._createBlurElement();
                     [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
                     this._highlightBox = this._createHighlightBox(this._tutorialBox);
@@ -136,7 +132,7 @@
                 console.warn("Tutorial is not running");
                 return;
             }
-            else if(this.animation.running) {
+            else if(this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
@@ -164,7 +160,7 @@
                 console.warn("Tutorial is not running");
                 return;
             }
-            else if(this.animation.running) {
+            else if(this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
@@ -294,6 +290,7 @@
 
         _moveHighlightBox() {
             if(this.running && this.animate) {
+                this.animating = true;
                 this._animateHighlightBox();
             }
             else {
@@ -332,7 +329,7 @@
             this._highlightBox.childNodes[0].style.height = last.height + 24;
 
             this._highlightBox.addEventListener("transitionend", () => {
-                this.animation.running = false;
+                this.animating = false;
             })
         }
 

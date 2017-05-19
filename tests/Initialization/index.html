@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link href="../../node_modules/mocha/mocha.css" rel="stylesheet">
+    <link href="../../dist/tutorial.css" rel="stylesheet">
+</head>
+<body>
+
+    <div id="mocha"></div>
+
+    <script src="../../node_modules/mocha/mocha.js"></script>
+    <script src="../../node_modules/chai/chai.js"></script>
+    <script src="../../node_modules/sinon/pkg/sinon-2.2.0.js"></script>
+    <script src="../../dist/tutorial.js"></script>
+    <script>mocha.setup("bdd")</script>
+    <script src="test.js"></script>
+    <script>mocha.run()</script>
+</body>
+</html>
