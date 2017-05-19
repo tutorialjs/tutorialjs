@@ -16,8 +16,9 @@
                 selectorList = [],
                 name         = Util.mandatory("Name"),
                 persistent   = false,
+                buttons      = {},
                 debug        = false
-            } = {}) {
+            }) {
                 if(selectorList.length > 0) {
                     this.elems = this._queryElementList(selectorList);
                 }
@@ -47,8 +48,14 @@
                     //this._basePosition = this.elems[0].getBoundingClientRect();
 
                     this.selector = selector;
-                    this.debug = debug;
+                    this.buttons = buttons;
                     this.animate = true;
+                    this.buttons = {
+                        close   : buttons.close === undefined ? 'Close' : buttons.close,
+                        previous: buttons.previous === undefined ? 'Back' : buttons.close,
+                        next    : buttons.next === undefined ? 'Next' : buttons.close
+                    };
+                    this.debug = debug;
 
                     this.animation = {
                         running: false,
@@ -250,9 +257,9 @@
             position.classList.add("tutorial-step-position");
             buttonbox.classList.add("tutorial-buttons");
 
-            close.textContent = "Close";
-            back.textContent = "Back";
-            next.textContent = "Next";
+            close.textContent = this.buttons.close;
+            back.textContent = this.buttons.previous;
+            next.textContent = this.buttons.next;
 
             close.onclick = e => {
                 e.preventDefault();

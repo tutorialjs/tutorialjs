@@ -27,11 +27,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }();
 
     var Tutorial = function () {
-        function Tutorial() {
+        function Tutorial(_ref) {
             var _this = this;
 
-            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-                _ref$selector = _ref.selector,
+            var _ref$selector = _ref.selector,
                 selector = _ref$selector === undefined ? "tut-action" : _ref$selector,
                 _ref$selectorList = _ref.selectorList,
                 selectorList = _ref$selectorList === undefined ? [] : _ref$selectorList,
@@ -39,6 +38,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 name = _ref$name === undefined ? Util.mandatory("Name") : _ref$name,
                 _ref$persistent = _ref.persistent,
                 persistent = _ref$persistent === undefined ? false : _ref$persistent,
+                _ref$buttons = _ref.buttons,
+                buttons = _ref$buttons === undefined ? {} : _ref$buttons,
                 _ref$debug = _ref.debug,
                 debug = _ref$debug === undefined ? false : _ref$debug;
 
@@ -72,8 +73,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 //this._basePosition = this.elems[0].getBoundingClientRect();
 
                 this.selector = selector;
-                this.debug = debug;
+                this.buttons = buttons;
                 this.animate = true;
+                this.buttons = {
+                    close: buttons.close === undefined ? 'Close' : buttons.close,
+                    previous: buttons.previous === undefined ? 'Back' : buttons.close,
+                    next: buttons.next === undefined ? 'Next' : buttons.close
+                };
+                this.debug = debug;
 
                 this.animation = {
                     running: false,
@@ -292,9 +299,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 position.classList.add("tutorial-step-position");
                 buttonbox.classList.add("tutorial-buttons");
 
-                close.textContent = "Close";
-                back.textContent = "Back";
-                next.textContent = "Next";
+                close.textContent = this.buttons.close;
+                back.textContent = this.buttons.previous;
+                next.textContent = this.buttons.next;
 
                 close.onclick = function (e) {
                     e.preventDefault();
@@ -364,13 +371,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //use transform or not ?
                 this._tutorialBox.style.top = last.height + 30 + "px";
-
-                /*
-                if(this._highlightBox.classList.contains("skip-animation")) {
-                    this._transform.translateX = last.left - this._basePosition.left;
-                    this._transform.translateY = last.top - this._basePosition.top;
-                }
-                */
 
                 this._highlightBox.style.transform = "translateX(" + this._transform.translateX + "px) translateY(" + this._transform.translateY + "px)";
                 this._highlightBox.childNodes[0].style.transform = "scaleX(" + this._transform.scaleX + ") scaleY(" + this._transform.scaleY + ")";
