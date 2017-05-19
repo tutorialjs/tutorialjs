@@ -241,6 +241,7 @@
             let text      = document.createElement("p");
             let position  = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
+            let buttonbox_wrapper = document.createElement("div");
             let close     = document.createElement("button");
             let back      = document.createElement("a");
             back.href     = "#";
@@ -252,6 +253,7 @@
             text.classList.add("tutorial-description");
             position.classList.add("tutorial-step-position");
             buttonbox.classList.add("tutorial-buttons");
+            close.classList.add("tutorial-close");
 
             close.textContent = this.buttons.close;
             back.textContent = this.buttons.previous;
@@ -275,8 +277,9 @@
             }
 
             buttonbox.appendChild(close);
-            buttonbox.appendChild(back);
-            buttonbox.appendChild(next);
+            buttonbox.appendChild(buttonbox_wrapper);
+            buttonbox_wrapper.appendChild(back);
+            buttonbox_wrapper.appendChild(next);
 
             content_wrapper.appendChild(text);
             content_wrapper.appendChild(position);
@@ -297,7 +300,7 @@
                 //remove dup
                 let bounds  = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top - 12;
+                this._highlightBox.style.top = bounds.top;
                 this._highlightBox.style.left = bounds.left - 12;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                 this._highlightBox.childNodes[0].style.width  = bounds.width + 24;

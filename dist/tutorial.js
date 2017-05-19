@@ -283,6 +283,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var text = document.createElement("p");
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
+                var buttonbox_wrapper = document.createElement("div");
                 var close = document.createElement("button");
                 var back = document.createElement("a");
                 back.href = "#";
@@ -294,6 +295,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 text.classList.add("tutorial-description");
                 position.classList.add("tutorial-step-position");
                 buttonbox.classList.add("tutorial-buttons");
+                close.classList.add("tutorial-close");
 
                 close.textContent = this.buttons.close;
                 back.textContent = this.buttons.previous;
@@ -317,8 +319,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 };
 
                 buttonbox.appendChild(close);
-                buttonbox.appendChild(back);
-                buttonbox.appendChild(next);
+                buttonbox.appendChild(buttonbox_wrapper);
+                buttonbox_wrapper.appendChild(back);
+                buttonbox_wrapper.appendChild(next);
 
                 content_wrapper.appendChild(text);
                 content_wrapper.appendChild(position);
@@ -339,7 +342,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //remove dup
                     var bounds = this.elems[this.step].getBoundingClientRect();
 
-                    this._highlightBox.style.top = bounds.top - 12;
+                    this._highlightBox.style.top = bounds.top;
                     this._highlightBox.style.left = bounds.left - 12;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 24;

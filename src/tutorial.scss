@@ -1,3 +1,16 @@
+button {
+  cursor:pointer;
+  border: 1px solid darkgrey;
+  background: white;
+  padding: 4px 10px;
+  font-size: 16px;
+  border-radius: 3px;
+}
+
+button:hover {
+  background:#f2f2f2;
+}
+
 .tutorial-highlight {
   position: relative;
   z-index: 9999;
@@ -75,7 +88,7 @@
 
   padding: 8px;
 
-  min-width: 200px;
+  min-width: 250px;
   width: 30%;
   max-width: 320px;
 
@@ -117,27 +130,32 @@
     }
 
     & > .tutorial-buttons {
-      float: right;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content:space-between;
+      justify-content:space-between;
 
-      & > a {
+      & > div > a {
         text-decoration: none;
+        background-color: #ffffff;
+        color: #444444;
+        padding: 4px 10px;
+        display: inline-block;
+        border: 1px solid darkgrey;
 
-        background-color: lightgrey;
-        color: white;
-
-        padding: 2px 8px;
+        &:hover {
+          background:#f2f2f2;
+        }
 
         &:first-of-type {
           border-top-left-radius: 2px;
           border-bottom-left-radius: 2px;
-
-          border: 1px solid black;
         }
         &:last-of-type {
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
-
-          border: 1px solid black;
           border-left: none;
         }
       }
