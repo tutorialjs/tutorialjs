@@ -241,7 +241,7 @@
             let text      = document.createElement("p");
             let position  = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
-            let buttonbox_wrapper = document.createElement("div");
+            let buttonbox_wrapper = wrapper.cloneNode(false);
             let close     = document.createElement("button");
             let back      = document.createElement("a");
             back.href     = "#";
@@ -300,7 +300,7 @@
                 //remove dup
                 let bounds  = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top;
+                this._highlightBox.style.top = bounds.top - 12;
                 this._highlightBox.style.left = bounds.left - 12;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                 this._highlightBox.childNodes[0].style.width  = bounds.width + 24;

@@ -283,7 +283,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var text = document.createElement("p");
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
-                var buttonbox_wrapper = document.createElement("div");
+                var buttonbox_wrapper = wrapper.cloneNode(false);
                 var close = document.createElement("button");
                 var back = document.createElement("a");
                 back.href = "#";
@@ -342,7 +342,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //remove dup
                     var bounds = this.elems[this.step].getBoundingClientRect();
 
-                    this._highlightBox.style.top = bounds.top;
+                    this._highlightBox.style.top = bounds.top - 12;
                     this._highlightBox.style.left = bounds.left - 12;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 24;

@@ -1,14 +1,3 @@
-button {
-  cursor: pointer;
-  border: 1px solid darkgrey;
-  background: white;
-  padding: 4px 10px;
-  font-size: 16px;
-  border-radius: 3px; }
-
-button:hover {
-  background: #f2f2f2; }
-
 .tutorial-highlight {
   position: relative;
   z-index: 9999; }
@@ -77,22 +66,24 @@ button:hover {
   .tutorial-box > .tutorial-box-wrapper {
     overflow: hidden;
     text-overflow: ellipsis; }
-    .tutorial-box > .tutorial-box-wrapper:after {
-      content: "";
-      display: table;
-      clear: both; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-description {
       line-height: 1.1em;
       margin: 0 0 1em 0; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-step-position {
       display: inline; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
       display: flex;
-      -webkit-justify-content: space-between;
       justify-content: space-between; }
+      .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > button {
+        cursor: pointer;
+        border: 1px solid darkgrey;
+        background: white;
+        padding: 4px 10px;
+        font-size: 16px;
+        border-radius: 3px;
+        outline: none; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > button:hover {
+          background: #f2f2f2; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a {
         text-decoration: none;
         background-color: #ffffff;

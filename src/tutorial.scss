@@ -1,16 +1,3 @@
-button {
-  cursor:pointer;
-  border: 1px solid darkgrey;
-  background: white;
-  padding: 4px 10px;
-  font-size: 16px;
-  border-radius: 3px;
-}
-
-button:hover {
-  background:#f2f2f2;
-}
-
 .tutorial-highlight {
   position: relative;
   z-index: 9999;
@@ -112,12 +99,6 @@ button:hover {
   & > .tutorial-box-wrapper {
     overflow: hidden;
     text-overflow: ellipsis;
-    
-    &:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
 
     & > .tutorial-description {
       line-height: 1.1em;
@@ -130,12 +111,22 @@ button:hover {
     }
 
     & > .tutorial-buttons {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
       display: flex;
-      -webkit-justify-content:space-between;
       justify-content:space-between;
+
+      & > button {
+        cursor: pointer;
+        border: 1px solid darkgrey;
+        background: white;
+        padding: 4px 10px;
+        font-size: 16px;
+        border-radius: 3px;
+        outline: none;
+
+        &:hover {
+          background:#f2f2f2;
+        }
+      }
 
       & > div > a {
         text-decoration: none;
