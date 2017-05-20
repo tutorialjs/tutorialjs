@@ -41,7 +41,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _ref$buttons = _ref.buttons,
                 buttons = _ref$buttons === undefined ? {} : _ref$buttons,
                 _ref$debug = _ref.debug,
-                debug = _ref$debug === undefined ? false : _ref$debug;
+                debug = _ref$debug === undefined ? false : _ref$debug,
+                _ref$autoplay = _ref.autoplay,
+                autoplay = _ref$autoplay === undefined ? false : _ref$autoplay;
 
             _classCallCheck(this, Tutorial);
 
@@ -123,6 +125,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //debounce to remove after 200ms
                     _this._highlightBox.classList.remove("skip-animation");
                 });
+
+                if (autoplay) {
+                    this.start();
+                }
             }
         }
 

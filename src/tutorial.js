@@ -17,7 +17,8 @@
                 name         = Util.mandatory("Name"),
                 persistent   = false,
                 buttons      = {},
-                debug        = false
+                debug        = false,
+                autoplay     = false
             }) {
                 if(selectorList.length > 0) {
                     this.elems = this._queryElementList(selectorList);
@@ -89,6 +90,10 @@
                         //debounce to remove after 200ms
                         this._highlightBox.classList.remove("skip-animation");
                     });
+
+                    if (autoplay) {
+                        this.start();
+                    }
                 }
         }
 
