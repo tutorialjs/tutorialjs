@@ -17,7 +17,8 @@
                 name         = Util.mandatory("Name"),
                 persistent   = false,
                 buttons      = {},
-                debug        = false
+                debug        = false,
+                autoplay     = false
             }) {
                 if(selectorList.length > 0) {
                     this.elems = this._queryElementList(selectorList);
@@ -89,6 +90,10 @@
                         //debounce to remove after 200ms
                         this._highlightBox.classList.remove("skip-animation");
                     });
+
+                    if (autoplay) {
+                        this.start();
+                    }
                 }
         }
 
@@ -300,7 +305,7 @@
                 //remove dup
                 let bounds  = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top;
+                this._highlightBox.style.top = bounds.top - 12;
                 this._highlightBox.style.left = bounds.left - 12;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                 this._highlightBox.childNodes[0].style.width  = bounds.width + 24;

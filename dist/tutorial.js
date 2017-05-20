@@ -41,7 +41,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _ref$buttons = _ref.buttons,
                 buttons = _ref$buttons === undefined ? {} : _ref$buttons,
                 _ref$debug = _ref.debug,
-                debug = _ref$debug === undefined ? false : _ref$debug;
+                debug = _ref$debug === undefined ? false : _ref$debug,
+                _ref$autoplay = _ref.autoplay,
+                autoplay = _ref$autoplay === undefined ? false : _ref$autoplay;
 
             _classCallCheck(this, Tutorial);
 
@@ -123,6 +125,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //debounce to remove after 200ms
                     _this._highlightBox.classList.remove("skip-animation");
                 });
+
+                if (autoplay) {
+                    this.start();
+                }
             }
         }
 
@@ -342,7 +348,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //remove dup
                     var bounds = this.elems[this.step].getBoundingClientRect();
 
-                    this._highlightBox.style.top = bounds.top;
+                    this._highlightBox.style.top = bounds.top - 12;
                     this._highlightBox.style.left = bounds.left - 12;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 24;
