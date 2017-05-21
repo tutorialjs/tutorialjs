@@ -8,7 +8,14 @@ const gulp = require("gulp"),
     uglify  = require("gulp-uglify"),
     rename  = require("gulp-rename"),
     cssnano = require('gulp-cssnano'),
-    babel   = require("gulp-babel");
+    babel   = require("gulp-babel"),
+    http = require('http'),
+    connect = require('connect'),
+    serveStatic = require('serve-static'),
+    Launcher = require('webdriverio/build/lib/launcher'),
+    wdio = new Launcher(path.join(__dirname, 'wdio.conf.js'));;
+
+let httpServer;
 
 gulp.task("default", () => {
     return gulp.src(path.join(__dirname, "/src/tutorial.js"))
@@ -58,4 +65,22 @@ gulp.task("watch", () => {
         gulp.start("default");
         gulp.start("sass");
     })
+});
+
+gulp.task("http", (done) => {
+    const app = connect().use(serveStatic('.'));
+    httpServer = http.createServer(app).listen(9000, done);
+});
+
+gulp.task("wdio", ['http'], () => {
+    return wdio.run(code => {
+        process.exit(code);
+    }, error => {
+        console.error('Launcher failed to start the test', error.stacktrace);
+        process.exit(1);
+    });
+});
+
+gulp.task('test', ['wdio'], () => {
+    httpServer.close();
 });
