@@ -13,26 +13,29 @@
         constructor(
             {
                 selector     = "tut-action",
-                selectorList = [],
+                steps        = [],
                 name         = Util.mandatory("Name"),
                 persistent   = false,
                 buttons      = {},
+                padding      = {},
                 debug        = false,
                 autoplay     = false
             }) {
-                if(selectorList.length > 0) {
-                    this.elems = this._queryElementList(selectorList);
+                if(steps.length > 0) {
+                    this.elems = this._queryElementList(steps);
+                    this.text  = steps.map(item => item.text);
                 }
                 else {
                     this.elems = Array.from(document.getElementsByClassName(selector));
 
-                    if (!this.elems.every(el => el.getAttribute("t-step"))) {
+                    if (!this.elems.every(el => el.getAttribute("t-step")) || !this.elems.every(el => el.getAttribute("t-text"))) {
                         throw new Error("Not all steps defined");
                     }
                     else {
                         this.elems.sort((a, b) => {
                             return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                         });
+                        this.text = this.elems.map(item => item.getAttribute("t-text"));
                     }
                 }
 
@@ -46,6 +49,10 @@
                     this._persistent = persistent;
                     this._advancedStorage = this._checkStorageSupport();
                     this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+                    this._padding = {
+                        top   : padding.top === undefined ? 12 : buttons.close,
+                        left  : padding.left === undefined ? 12 : buttons.close
+                    };
                     //this._basePosition = this.elems[0].getBoundingClientRect();
 
                     this.selector  = selector;
@@ -82,8 +89,8 @@
                         let first = this.elems[0].getBoundingClientRect();
                         this._highlightBox.classList.add("skip-animation");
 
-                        this._highlightBox.style.left = first.left - 12;
-                        this._highlightBox.style.top = first.top - 12;
+                        this._highlightBox.style.left = first.left - this._padding.left;
+                        this._highlightBox.style.top = first.top - this._padding.top;
 
                         this._animateHighlightBox();
 
@@ -111,6 +118,8 @@
                 this._body.appendChild(this._highlightBox);
 
                 this._moveHighlightBox();
+                this._updateText();
+
                 this.running = true;
             }
         }
@@ -157,6 +166,7 @@
                 this._moveHighlightBox();
             }
 
+            this._updateText();
             this._saveCurrentPosition();
         }
 
@@ -185,6 +195,7 @@
                 this._moveHighlightBox();
             }
 
+            this._updateText();
             this._saveCurrentPosition();
         }
 
@@ -305,16 +316,16 @@
                 //remove dup
                 let bounds  = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top - 12;
-                this._highlightBox.style.left = bounds.left - 12;
-                this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 24;
-                this._highlightBox.childNodes[0].style.width  = bounds.width + 24;
+                this._highlightBox.style.top = bounds.top - this._padding.top;
+                this._highlightBox.style.left = bounds.left - this._padding.left;
+                this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + (2 * this._padding.top);
+                this._highlightBox.childNodes[0].style.width  = bounds.width + (2 * this._padding.left);
 
-                this._tutorialBox.style.top = bounds.height + 30 + "px";
+                this._tutorialBox.style.top = bounds.height + (2 * this._padding.top) + 6 + "px";
             }
 
-            this._highlightBox.childNodes[1].innerText = this.step + 1;
-            this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
+            this._highlightBox.childNodes[1].textContent = this.step + 1;
+            //this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
         }
         _animateHighlightBox() {
             //flip technique
@@ -329,16 +340,19 @@
             //this._transform.scaleX = ((last.width + 24)/(first.width + 24));
 
             //use transform or not ?
-            this._tutorialBox.style.top = last.height + 30 + "px";
+            this._tutorialBox.style.top = last.height + (2 * this._padding.top) + 6 + "px";
 
             this._highlightBox.style.transform = `translateX(${this._transform.translateX}px) translateY(${this._transform.translateY}px)`;
             //this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
-            this._highlightBox.childNodes[0].style.width = last.width + 24;
-            this._highlightBox.childNodes[0].style.height = last.height + 24;
-
+            this._highlightBox.childNodes[0].style.width = last.width + (2 * this._padding.top);
+            this._highlightBox.childNodes[0].style.height = last.height + (2 * this._padding.top);
             this._highlightBox.addEventListener("transitionend", () => {
                 this.animating = false;
             })
+        }
+
+        _updateText() {
+            this._tutorialText.textContent = this.text[this.step];
         }
 
         _queryElementList(list) {
@@ -347,12 +361,12 @@
 
             for(let elem of list) {
                 //get if getElement gets more than 1 elem
-                switch(elem.charAt(0)) {
+                switch(elem.highlight.charAt(0)) {
                     case ".":
-                        node = document.getElementsByClassName(elem.substr(1, this.length))[0];
+                        node = document.getElementsByClassName(elem.highlight.substr(1, this.length))[0];
                         break;
                     case "#":
-                        node = document.getElementById(elem.substr(1, this.length));
+                        node = document.getElementById(elem.highlight.substr(1, this.length));
                         break;
                     default:
                         throw new Error("Unknown selector. Please only use id or class.");
@@ -399,9 +413,9 @@
 
             this._transform = {
                 translateY: 0,
-                translateX: 0,
-                scaleX: 0,
-                scaleY: 0
+                translateX: 0//,
+                //scaleX: 0,
+                //scaleY: 0
             };
         }
     }
