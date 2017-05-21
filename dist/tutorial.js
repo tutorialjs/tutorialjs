@@ -290,10 +290,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
                 var buttonbox_wrapper = wrapper.cloneNode(false);
-                var close = document.createElement("button");
                 var back = document.createElement("a");
                 back.href = "#";
                 var next = back.cloneNode(false);
+                var close = back.cloneNode(false);
 
                 wrapper.classList.add("tutorial-box");
                 edge.classList.add("tutorial-box-edge");
@@ -324,13 +324,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _this3.next();
                 };
 
+                buttonbox.appendChild(position);
                 buttonbox.appendChild(close);
                 buttonbox.appendChild(buttonbox_wrapper);
                 buttonbox_wrapper.appendChild(back);
                 buttonbox_wrapper.appendChild(next);
 
                 content_wrapper.appendChild(text);
-                content_wrapper.appendChild(position);
+                //content_wrapper.appendChild(position);
                 content_wrapper.appendChild(buttonbox);
 
                 wrapper.appendChild(edge);

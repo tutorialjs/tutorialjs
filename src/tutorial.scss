@@ -1,3 +1,7 @@
+p {
+  margin:0px;
+}
+
 .tutorial-highlight {
   position: relative;
   z-index: 9999;
@@ -99,6 +103,7 @@
   & > .tutorial-box-wrapper {
     overflow: hidden;
     text-overflow: ellipsis;
+    position:relative;
 
     & > .tutorial-description {
       line-height: 1.1em;
@@ -113,20 +118,7 @@
     & > .tutorial-buttons {
       display: flex;
       justify-content:space-between;
-
-      & > button {
-        cursor: pointer;
-        border: 1px solid darkgrey;
-        background: white;
-        padding: 4px 10px;
-        font-size: 16px;
-        border-radius: 3px;
-        outline: none;
-
-        &:hover {
-          background:#f2f2f2;
-        }
-      }
+      align-items:center;
 
       & > div > a {
         text-decoration: none;
@@ -148,6 +140,32 @@
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
           border-left: none;
+        }
+      }
+
+      & > .tutorial-close {
+        text-indent: -9999px;
+        position: absolute;
+        top: 0px;
+        z-index: 1;
+        right: 0px;
+        width: 10px;
+        height: 10px;
+
+        &:before,
+        &:after {
+          content: "";
+          width: 10px;
+          height: 2px;
+          background: #444444;
+          position: absolute;
+          top: 4px;
+          right: 0px;
+          transform: rotateZ(45deg);
+        }
+
+        &:after {
+          transform: rotateZ(-45deg);
         }
       }
     }

@@ -1,3 +1,6 @@
+p {
+  margin: 0px; }
+
 .tutorial-highlight {
   position: relative;
   z-index: 9999; }
@@ -65,7 +68,8 @@
     border-bottom: 5px solid white; }
   .tutorial-box > .tutorial-box-wrapper {
     overflow: hidden;
-    text-overflow: ellipsis; }
+    text-overflow: ellipsis;
+    position: relative; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-description {
       line-height: 1.1em;
       margin: 0 0 1em 0; }
@@ -73,17 +77,8 @@
       display: inline; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons {
       display: flex;
-      justify-content: space-between; }
-      .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > button {
-        cursor: pointer;
-        border: 1px solid darkgrey;
-        background: white;
-        padding: 4px 10px;
-        font-size: 16px;
-        border-radius: 3px;
-        outline: none; }
-        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > button:hover {
-          background: #f2f2f2; }
+      justify-content: space-between;
+      align-items: center; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a {
         text-decoration: none;
         background-color: #ffffff;
@@ -100,3 +95,22 @@
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
           border-left: none; }
+      .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
+        text-indent: -9999px;
+        position: absolute;
+        top: 0px;
+        z-index: 1;
+        right: 0px;
+        width: 10px;
+        height: 10px; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:before, .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:after {
+          content: "";
+          width: 10px;
+          height: 2px;
+          background: #444444;
+          position: absolute;
+          top: 4px;
+          right: 0px;
+          transform: rotateZ(45deg); }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:after {
+          transform: rotateZ(-45deg); }

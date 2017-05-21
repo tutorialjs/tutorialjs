@@ -247,10 +247,10 @@
             let position  = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
             let buttonbox_wrapper = wrapper.cloneNode(false);
-            let close     = document.createElement("button");
             let back      = document.createElement("a");
             back.href     = "#";
             let next      = back.cloneNode(false);
+            let close     = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
             edge.classList.add("tutorial-box-edge");
@@ -281,13 +281,14 @@
                 this.next();
             }
 
+            buttonbox.appendChild(position);
             buttonbox.appendChild(close);
             buttonbox.appendChild(buttonbox_wrapper);
             buttonbox_wrapper.appendChild(back);
             buttonbox_wrapper.appendChild(next);
 
             content_wrapper.appendChild(text);
-            content_wrapper.appendChild(position);
+            //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
 
             wrapper.appendChild(edge);
