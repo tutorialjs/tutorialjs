@@ -60,7 +60,7 @@
                     this.animate   = true;
                     this.animating = false;
                     this.buttons = {
-                        close   : buttons.close === undefined ? 'Close' : buttons.close,
+                        //close   : buttons.close === undefined ? 'Close' : buttons.close,
                         previous: buttons.previous === undefined ? 'Back' : buttons.close,
                         next    : buttons.next === undefined ? 'Next' : buttons.close
                     };
@@ -258,10 +258,10 @@
             let position  = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
             let buttonbox_wrapper = wrapper.cloneNode(false);
-            let close     = document.createElement("button");
             let back      = document.createElement("a");
             back.href     = "#";
             let next      = back.cloneNode(false);
+            let close     = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
             edge.classList.add("tutorial-box-edge");
@@ -271,7 +271,7 @@
             buttonbox.classList.add("tutorial-buttons");
             close.classList.add("tutorial-close");
 
-            close.textContent = this.buttons.close;
+            //close.textContent = this.buttons.close;
             back.textContent = this.buttons.previous;
             next.textContent = this.buttons.next;
 
@@ -292,13 +292,14 @@
                 this.next();
             }
 
+            buttonbox.appendChild(position);
             buttonbox.appendChild(close);
             buttonbox.appendChild(buttonbox_wrapper);
             buttonbox_wrapper.appendChild(back);
             buttonbox_wrapper.appendChild(next);
 
             content_wrapper.appendChild(text);
-            content_wrapper.appendChild(position);
+            //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
 
             wrapper.appendChild(edge);

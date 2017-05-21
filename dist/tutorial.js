@@ -93,7 +93,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.animate = true;
                 this.animating = false;
                 this.buttons = {
-                    close: buttons.close === undefined ? 'Close' : buttons.close,
+                    //close   : buttons.close === undefined ? 'Close' : buttons.close,
                     previous: buttons.previous === undefined ? 'Back' : buttons.close,
                     next: buttons.next === undefined ? 'Next' : buttons.close
                 };
@@ -308,10 +308,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
                 var buttonbox_wrapper = wrapper.cloneNode(false);
-                var close = document.createElement("button");
                 var back = document.createElement("a");
                 back.href = "#";
                 var next = back.cloneNode(false);
+                var close = back.cloneNode(false);
 
                 wrapper.classList.add("tutorial-box");
                 edge.classList.add("tutorial-box-edge");
@@ -321,7 +321,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 buttonbox.classList.add("tutorial-buttons");
                 close.classList.add("tutorial-close");
 
-                close.textContent = this.buttons.close;
+                //close.textContent = this.buttons.close;
                 back.textContent = this.buttons.previous;
                 next.textContent = this.buttons.next;
 
@@ -342,13 +342,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _this3.next();
                 };
 
+                buttonbox.appendChild(position);
                 buttonbox.appendChild(close);
                 buttonbox.appendChild(buttonbox_wrapper);
                 buttonbox_wrapper.appendChild(back);
                 buttonbox_wrapper.appendChild(next);
 
                 content_wrapper.appendChild(text);
-                content_wrapper.appendChild(position);
+                //content_wrapper.appendChild(position);
                 content_wrapper.appendChild(buttonbox);
 
                 wrapper.appendChild(edge);
