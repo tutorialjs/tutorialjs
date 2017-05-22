@@ -31,6 +31,8 @@
     "wdio-mocha-framework": "^0.5.10",
     "wdio-phantomjs-service": "^0.2.2",
     "wdio-selenium-standalone-service": "0.0.8",
-    "wdio-spec-reporter": "^0.1.0"
+    "wdio-spec-reporter": "^0.1.0",
+    "gulp-webdriver": "^2.0.3",
+    "webdriverio": "^4.6.2"
   }
 }
