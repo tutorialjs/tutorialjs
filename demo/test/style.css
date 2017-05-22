@@ -1,6 +1,83 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono');
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+
 html {
     font-size: 16px;
-
-    padding: 20%;
+    padding: 0px;
+    font-family:"Lato", Arial, sans-serif;
+    color:#485863;
 }
 
+body {
+    margin:0px;
+}
+
+p, h1, h2, h3, h4 {
+    margin: 0px;
+}
+
+h1, h2, h3, h4 {
+    font-weight:700;
+}
+
+h1 {
+    font-size:50px;
+}
+
+h1, h2 {
+    margin-bottom:15px;
+}
+
+code {
+    font-family:"Fira Mono";
+    font-size: 14px;
+    line-height:1.7;
+    white-space:pre-line;
+}
+
+pre {
+    margin: 0px;
+    padding: 0px 20px 20px 20px;
+    background: #fafbfd;
+    white-space: initial;
+    border: 1px solid #eceef3;
+}
+
+code span {
+    white-space: pre-wrap;
+}
+
+.section {
+    width: 600px;
+    margin: 40px auto;
+}
+
+.center {
+    text-align: center;
+}
+
+#wrapper {
+    padding: 40px;
+}
+
+.more-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.more-links a {
+    color: #111;
+    text-decoration: none;
+    border: 1px solid #929292;
+    padding: 10px 20px;
+    margin: 0px 10px;
+}
+
+.more-links a:hover {
+    background: #f2f2f2;
+}
+
+.more-links .fa {
+    margin-right: 5px;
+}
