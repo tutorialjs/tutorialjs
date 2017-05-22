@@ -81,3 +81,9 @@ code span {
 .more-links .fa {
     margin-right: 5px;
 }
+
+@media (max-width: 600px) {
+    .section {
+        width:100%;
+    }
+}
