@@ -347,7 +347,7 @@
             this._highlightBox.childNodes[0].style.width = last.width + (2 * this._padding.top);
             this._highlightBox.childNodes[0].style.height = last.height + (2 * this._padding.top);
             this._highlightBox.addEventListener("transitionend", () => {
-                this.animating = false;
+                this.animating = ;
             })
         }
 

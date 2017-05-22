@@ -3,23 +3,54 @@
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
+
         <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" href="../../dist/tutorial.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 
         <script type="text/javascript" src="../../dist/tutorial.js" defer></script>
         <script type="text/javascript" src="main.js" defer></script>
 
-        <link rel="stylesheet" href="../../dist/tutorial.css">
     </head>
     <body>
-        <p class="tut a" t-step="2" style="margin-left: 50px;">Hallo</p>
-
-        <input type="text" class="tut b" t-step="1">
-
-        <p class="tut" t-step="3" style="height: 40px;">test</p>
-
-        <button onclick="kb.start()">Start</button>
-
-        <p t-step="4" class="tut c">Hi</p>
+        <div id="wrapper">
+            <div class="section center first-step">
+                <h1>Tutorial.js</h1>
+                <p>A lightweight introductory tool for your application</p>
+            </div>
+            <div class="section second-step">
+                <h2>How to</h2>
+                <pre>
+                    <code>
+                        <span><</span><span>link</span><span> rel="stylesheet"</span><span> href="tutorial.css" /></span>
+                        <span><</span><span>script src="tutorial.js"></span><span><</span><span>/script></span>
+                    </code>
+                </pre>
+            </div>
+            <div class="section third-step">
+                <h2>Initialization</h2>
+                <pre>
+                    <code>
+                        <span>var guide = new Tutorial({</span>
+                        <span>   steps: [</span>
+                        <span>      {</span>
+                        <span>          highlight: ".myclass1",</span>
+                        <span>          text: "my first text"</span>
+                        <span>      },</span>
+                        <span>      {</span>
+                        <span>          highlight: ".mysecondclass",</span>
+                        <span>          text: "my second text"</span>
+                        <span>      }],</span>
+                        <span>      buttons: {next: "Weiter"},</span>
+                        <span>      autoplay: true</span>
+                        <span>)};</span>
+                    </code>
+                </pre>
+            </div>
+            <div class="section center more-links">
+                <a href="#"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
+                <a href="#"><i class="fa fa-file" aria-hidden="true"></i> Documentation</a>
+            </div>
+        </div>
     </body>
 </html>
