@@ -94,7 +94,7 @@
           border-left: none; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
         position: absolute;
-        top: 0px;
+        top: 5px;
         z-index: 1;
         right: 0px;
         width: 10px;

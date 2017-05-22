@@ -89,7 +89,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 //this._basePosition = this.elems[0].getBoundingClientRect();
 
                 this.selector = selector;
-                this.buttons = buttons;
                 this.animate = true;
                 this.animating = false;
                 this.buttons = {
