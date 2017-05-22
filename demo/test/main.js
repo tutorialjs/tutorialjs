@@ -16,7 +16,7 @@ window.onload = function() {
         debug: true,
         name: "nico<3",
         persistent: false,
-        buttons: {close: "Schließen"},
+        buttons: { close: "Schließen" },
         autoplay: true
     });
 };
