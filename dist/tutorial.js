@@ -61,6 +61,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             if (steps.length > 0) {
                 this.elems = this._queryElementList(steps);
+                this.title = steps.map(function (item) {
+                    return item.title;
+                });
                 this.text = steps.map(function (item) {
                     return item.text;
                 });
@@ -122,11 +125,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var _createTutorialBox2 = this._createTutorialBox();
 
-                var _createTutorialBox3 = _slicedToArray(_createTutorialBox2, 3);
+                var _createTutorialBox3 = _slicedToArray(_createTutorialBox2, 4);
 
                 this._tutorialBox = _createTutorialBox3[0];
-                this._tutorialText = _createTutorialBox3[1];
-                this._tutorialPosition = _createTutorialBox3[2];
+                this._tutorialTitle = _createTutorialBox3[1];
+                this._tutorialText = _createTutorialBox3[2];
+                this._tutorialPosition = _createTutorialBox3[3];
 
                 this._highlightBox = this._createHighlightBox(this._tutorialBox);
 
@@ -163,6 +167,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._body.appendChild(this._highlightBox);
 
                     this._moveHighlightBox();
+                    this._updateTitle();
                     this._updateText();
 
                     this.running = true;
@@ -213,6 +218,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._moveHighlightBox();
                 }
 
+                this._updateTitle();
                 this._updateText();
                 this._saveCurrentPosition();
             }
@@ -240,6 +246,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._moveHighlightBox();
                 }
 
+                this._updateTitle();
                 this._updateText();
                 this._saveCurrentPosition();
             }
@@ -310,6 +317,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var wrapper = document.createElement("div");
                 var edge = wrapper.cloneNode(false);
                 var content_wrapper = wrapper.cloneNode(false);
+                var title = document.createElement("p");
                 var text = document.createElement("p");
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
@@ -322,6 +330,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 wrapper.classList.add("tutorial-box");
                 edge.classList.add("tutorial-box-edge");
                 content_wrapper.classList.add("tutorial-box-wrapper");
+                title.classList.add("tutorial-title");
                 text.classList.add("tutorial-description");
                 position.classList.add("tutorial-step-position");
                 buttonbox.classList.add("tutorial-buttons");
@@ -354,6 +363,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 buttonbox_wrapper.appendChild(back);
                 buttonbox_wrapper.appendChild(next);
 
+                content_wrapper.appendChild(title);
                 content_wrapper.appendChild(text);
                 //content_wrapper.appendChild(position);
                 content_wrapper.appendChild(buttonbox);
@@ -361,7 +371,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 wrapper.appendChild(edge);
                 wrapper.appendChild(content_wrapper);
 
-                return [wrapper, text, position];
+                return [wrapper, title, text, position];
             }
         }, {
             key: "_moveHighlightBox",
@@ -420,6 +430,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_updateText",
             value: function _updateText() {
                 this._tutorialText.textContent = this.text[this.step];
+            }
+        }, {
+            key: "_updateTitle",
+            value: function _updateTitle() {
+                this._tutorialTitle.textContent = this.title[this.step];
             }
         }, {
             key: "_queryElementList",

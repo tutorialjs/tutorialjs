@@ -28,6 +28,7 @@
                     }) {
             if (steps.length > 0) {
                 this.elems = this._queryElementList(steps);
+                this.title = steps.map(item => item.title);
                 this.text = steps.map(item => item.text);
             }
             else {
@@ -81,7 +82,7 @@
 
                 this._body = document.body;
                 this._blurElement = this._createBlurElement();
-                [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
+                [this._tutorialBox, this._tutorialTitle, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
                 this._highlightBox = this._createHighlightBox(this._tutorialBox);
 
                 Object.defineProperty(this, "step", {
@@ -115,6 +116,7 @@
                 this._body.appendChild(this._highlightBox);
 
                 this._moveHighlightBox();
+                this._updateTitle();
                 this._updateText();
 
                 this.running = true;
@@ -166,6 +168,7 @@
                 this._moveHighlightBox();
             }
 
+            this._updateTitle();
             this._updateText();
             this._saveCurrentPosition();
         }
@@ -195,6 +198,7 @@
                 this._moveHighlightBox();
             }
 
+            this._updateTitle();
             this._updateText();
             this._saveCurrentPosition();
         }
@@ -256,6 +260,7 @@
             let wrapper = document.createElement("div");
             let edge = wrapper.cloneNode(false);
             let content_wrapper = wrapper.cloneNode(false);
+            let title = document.createElement("p");
             let text = document.createElement("p");
             let position = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
@@ -268,6 +273,7 @@
             wrapper.classList.add("tutorial-box");
             edge.classList.add("tutorial-box-edge");
             content_wrapper.classList.add("tutorial-box-wrapper");
+            title.classList.add("tutorial-title");
             text.classList.add("tutorial-description");
             position.classList.add("tutorial-step-position");
             buttonbox.classList.add("tutorial-buttons");
@@ -300,6 +306,7 @@
             buttonbox_wrapper.appendChild(back);
             buttonbox_wrapper.appendChild(next);
 
+            content_wrapper.appendChild(title);
             content_wrapper.appendChild(text);
             //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
@@ -307,7 +314,7 @@
             wrapper.appendChild(edge);
             wrapper.appendChild(content_wrapper);
 
-            return [wrapper, text, position];
+            return [wrapper, title, text, position];
         }
 
         _moveHighlightBox() {
@@ -362,6 +369,10 @@
 
         _updateText() {
             this._tutorialText.textContent = this.text[this.step];
+        }
+
+        _updateTitle() {
+            this._tutorialTitle.textContent = this.title[this.step];
         }
 
         _queryElementList(list) {
