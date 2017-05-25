@@ -258,7 +258,6 @@
 
         _createTutorialBox() {
             let wrapper = document.createElement("div");
-            let edge = wrapper.cloneNode(false);
             let content_wrapper = wrapper.cloneNode(false);
             let title = document.createElement("p");
             let text = document.createElement("p");
@@ -271,7 +270,6 @@
             let close = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
-            edge.classList.add("tutorial-box-edge");
             content_wrapper.classList.add("tutorial-box-wrapper");
             title.classList.add("tutorial-title");
             text.classList.add("tutorial-description");
@@ -311,7 +309,6 @@
             //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
 
-            wrapper.appendChild(edge);
             wrapper.appendChild(content_wrapper);
 
             return [wrapper, title, text, position];

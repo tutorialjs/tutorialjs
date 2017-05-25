@@ -315,7 +315,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this3 = this;
 
                 var wrapper = document.createElement("div");
-                var edge = wrapper.cloneNode(false);
                 var content_wrapper = wrapper.cloneNode(false);
                 var title = document.createElement("p");
                 var text = document.createElement("p");
@@ -328,7 +327,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var close = back.cloneNode(false);
 
                 wrapper.classList.add("tutorial-box");
-                edge.classList.add("tutorial-box-edge");
                 content_wrapper.classList.add("tutorial-box-wrapper");
                 title.classList.add("tutorial-title");
                 text.classList.add("tutorial-description");
@@ -368,7 +366,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 //content_wrapper.appendChild(position);
                 content_wrapper.appendChild(buttonbox);
 
-                wrapper.appendChild(edge);
                 wrapper.appendChild(content_wrapper);
 
                 return [wrapper, title, text, position];
