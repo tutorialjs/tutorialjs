@@ -1,4 +1,4 @@
-//v0.0.2
+//v0.0.3
 
 (function (window, document, undefined) {
     "use strict";
@@ -7,107 +7,105 @@
         static mandatory(param) {
             throw new Error(`${param} is required.`);
         }
+
+        //https://github.com/jaxgeller/ez.js
+        static easeOutQuad(t, b, c, d) {
+            return -c * (t /= d) * (t - 2) + b;
+        }
     }
 
     class Tutorial {
-        constructor(
-            {
-                selector     = "tut-action",
-                steps        = [],
-                name         = Util.mandatory("Name"),
-                persistent   = false,
-                buttons      = {},
-                padding      = {},
-                debug        = false,
-                autoplay     = false
-            }) {
-                if(steps.length > 0) {
-                    this.elems = this._queryElementList(steps);
-                    this.text  = steps.map(item => item.text);
+        constructor({
+                        selector = "tut-action",
+                        steps = [],
+                        name = Util.mandatory("Name"),
+                        persistent = false,
+                        buttons = {},
+                        padding = {},
+                        debug = false,
+                        autoplay = false,
+                        scrollSpeed = 500
+                    }) {
+            if (steps.length > 0) {
+                this.elems = this._queryElementList(steps);
+                this.text = steps.map(item => item.text);
+            }
+            else {
+                this.elems = Array.from(document.getElementsByClassName(selector));
+
+                if (!this.elems.every(el => el.getAttribute("t-step")) || !this.elems.every(el => el.getAttribute("t-text"))) {
+                    throw new Error("Not all steps defined");
                 }
                 else {
-                    this.elems = Array.from(document.getElementsByClassName(selector));
-
-                    if (!this.elems.every(el => el.getAttribute("t-step")) || !this.elems.every(el => el.getAttribute("t-text"))) {
-                        throw new Error("Not all steps defined");
-                    }
-                    else {
-                        this.elems.sort((a, b) => {
-                            return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
-                        });
-                        this.text = this.elems.map(item => item.getAttribute("t-text"));
-                    }
+                    this.elems.sort((a, b) => {
+                        return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
+                    });
+                    this.text = this.elems.map(item => item.getAttribute("t-text"));
                 }
+            }
 
-                if (this.elems.length === 0) {
-                    throw new Error("No activities point defined");
-                }
-                else {
-                    this._reset();
+            if (this.elems.length === 0) {
+                throw new Error("No activities point defined");
+            }
+            else {
+                this._reset();
 
-                    this._name = name;
-                    this._persistent = persistent;
-                    this._advancedStorage = this._checkStorageSupport();
-                    this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
-                    this._padding = {
-                        top   : padding.top === undefined ? 12 : buttons.close,
-                        left  : padding.left === undefined ? 12 : buttons.close
-                    };
-                    //this._basePosition = this.elems[0].getBoundingClientRect();
+                this._name = name;
+                this._persistent = persistent;
+                this._advancedStorage = this._checkStorageSupport();
+                this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+                this._scrolling = {
+                    speed: scrollSpeed,
+                    timer: null,
+                    position: window.scrollY
+                };
+                this._padding = {
+                    top: padding.top === undefined ? 12 : buttons.close,
+                    left: padding.left === undefined ? 12 : buttons.close
+                };
+                this._eventHandler = {
+                    load: this.__load(),
+                    resize: this.__resize()
+                };
+                //this._basePosition = this.elems[0].getBoundingClientRect();
 
-                    this.selector  = selector;
-                    this.animate   = true;
-                    this.animating = false;
-                    this.buttons = {
-                        //close   : buttons.close === undefined ? 'Close' : buttons.close,
-                        previous: buttons.previous === undefined ? 'Back' : buttons.close,
-                        next    : buttons.next === undefined ? 'Next' : buttons.close
-                    };
-                    this.debug = debug;
+                this.selector = selector;
+                this.animate = true;
+                this.animating = false;
+                this.buttons = {
+                    //close   : buttons.close === undefined ? 'Close' : buttons.close,
+                    previous: buttons.previous === undefined ? 'Back' : buttons.close,
+                    next: buttons.next === undefined ? 'Next' : buttons.close
+                };
+                this.debug = debug;
 
-                    this._body = document.body;
-                    this._blurElement = this._createBlurElement();
-                    [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
-                    this._highlightBox = this._createHighlightBox(this._tutorialBox);
+                this._body = document.body;
+                this._blurElement = this._createBlurElement();
+                [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
+                this._highlightBox = this._createHighlightBox(this._tutorialBox);
 
-                    Object.defineProperty(this, "step", {
-                        get: () => this._step,
-                        set: x => {
-                            this._step = x;
+                Object.defineProperty(this, "step", {
+                    get: () => this._step,
+                    set: x => {
+                        this._step = x;
 
-                            if(this._persistent) {
-                                this._saveCurrentPosition();
-                            }
+                        if (this._persistent) {
+                            this._saveCurrentPosition();
                         }
-                    });
-
-                    window.addEventListener("resize", () => {
-                        if(!this.running)
-                            return;
-
-                        let first = this.elems[0].getBoundingClientRect();
-                        this._highlightBox.classList.add("skip-animation");
-
-                        this._highlightBox.style.left = first.left - this._padding.left;
-                        this._highlightBox.style.top = first.top - this._padding.top;
-
-                        this._animateHighlightBox();
-
-                        //debounce to remove after 200ms
-                        this._highlightBox.classList.remove("skip-animation");
-                    });
-
-                    if (autoplay) {
-                        this.start();
                     }
+                });
+
+                if (autoplay) {
+                    window.addEventListener("load", this._eventHandler.load);
                 }
+            }
         }
 
         start() {
-            if(this.debug)
+            if (this.debug)
                 console.log("Tutorial started...");
 
-            if(this.running) {
+            if (this.running) {
                 console.warn("Tutorial instance already running");
             }
             else {
@@ -120,11 +118,13 @@
                 this._updateText();
 
                 this.running = true;
+
+                window.addEventListener("resize", this._eventHandler.resize);
             }
         }
 
         close() {
-            if(!this.running) {
+            if (!this.running) {
                 console.warn("Tutorial is not running");
                 return;
             }
@@ -137,24 +137,25 @@
             this._body.removeChild(this._blurElement);
             this._body.removeChild(this._highlightBox);
 
+            window.removeEventListener("resize", this._eventHandler.resize);
             this._reset();
         }
 
         prev() {
-            if(!this.running) {
+            if (!this.running) {
                 console.warn("Tutorial is not running");
                 return;
             }
-            else if(this.animating) {
+            else if (this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
 
-            if(this.debug)
+            if (this.debug)
                 console.log(`Going to previous element: #${this.step}`);
 
             //at first step
-            if(this.step === 0) {
+            if (this.step === 0) {
                 //or throw error;
                 this.close();
             }
@@ -170,20 +171,20 @@
         }
 
         next() {
-            if(!this.running) {
+            if (!this.running) {
                 console.warn("Tutorial is not running");
                 return;
             }
-            else if(this.animating) {
+            else if (this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
 
-            if(this.debug)
+            if (this.debug)
                 console.log(`Going to next element: #${this.step}`);
 
             //last step?
-            if(this.step === this.elems.length - 1) {
+            if (this.step === this.elems.length - 1) {
                 //or throw error;
                 this.close();
             }
@@ -200,14 +201,14 @@
 
         //even if is not running?
         goToStep(step) {
-            if(!this.running) {
+            if (!this.running) {
                 console.warn("Tutorial is not running.");
                 return;
             }
-            else if(!this._stepInBounds(step)) {
+            else if (!this._stepInBounds(step)) {
                 throw new Error("Step out of bounds.");
             }
-            else if(step === this.step) {
+            else if (step === this.step) {
                 return;
             }
 
@@ -230,6 +231,7 @@
 
             return el;
         }
+
         _createHighlightBox(tutorialBox) {
             let el = document.createElement("div");
             let background = document.createElement("div");
@@ -249,18 +251,19 @@
 
             return el;
         }
+
         _createTutorialBox() {
-            let wrapper   = document.createElement("div");
-            let edge      = wrapper.cloneNode(false);
+            let wrapper = document.createElement("div");
+            let edge = wrapper.cloneNode(false);
             let content_wrapper = wrapper.cloneNode(false);
-            let text      = document.createElement("p");
-            let position  = text.cloneNode();
+            let text = document.createElement("p");
+            let position = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
             let buttonbox_wrapper = wrapper.cloneNode(false);
-            let back      = document.createElement("a");
-            back.href     = "#";
-            let next      = back.cloneNode(false);
-            let close     = back.cloneNode(false);
+            let back = document.createElement("a");
+            back.href = "#";
+            let next = back.cloneNode(false);
+            let close = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
             edge.classList.add("tutorial-box-edge");
@@ -308,18 +311,18 @@
         }
 
         _moveHighlightBox() {
-            if(this.running && this.animate) {
+            if (this.running && this.animate) {
                 this.animating = true;
                 this._animateHighlightBox();
             }
             else {
                 //remove dup
-                let bounds  = this.elems[this.step].getBoundingClientRect();
+                let bounds = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top - this._padding.top;
-                this._highlightBox.style.left = bounds.left - this._padding.left;
+                this._highlightBox.style.top = bounds.top - this._padding.top + window.scrollY;
+                this._highlightBox.style.left = bounds.left - this._padding.left + window.scrollX;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + (2 * this._padding.top);
-                this._highlightBox.childNodes[0].style.width  = bounds.width + (2 * this._padding.left);
+                this._highlightBox.childNodes[0].style.width = bounds.width + (2 * this._padding.left);
 
                 this._tutorialBox.style.top = bounds.height + (2 * this._padding.top) + 6 + "px";
             }
@@ -327,27 +330,33 @@
             this._highlightBox.childNodes[1].textContent = this.step + 1;
             //this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
         }
+
         _animateHighlightBox() {
             //flip technique
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this.elems[0].getBoundingClientRect();
-            let last  = this.elems[this.step].getBoundingClientRect();
+            let first = this.elems[0];//.getBoundingClientRect();//_util.baseBoundings;//Util.getElementDimensions(this.elems[0]); //.getBoundingClientRect();
+            let last = this.elems[this.step];//.getBoundingClientRect();
             //let cur   = this._highlightBox.getBoundingClientRect();
 
-            this._transform.translateY = last.top - first.top;
-            this._transform.translateX = last.left - first.left;
+            this._transform.translateY = last.offsetTop - first.offsetTop;
+            this._transform.translateX = last.offsetLeft - first.offsetLeft;
             //this._transform.scaleY = ((last.height + 24)/(first.height + 24));
             //this._transform.scaleX = ((last.width + 24)/(first.width + 24));
 
             //use transform or not ?
-            this._tutorialBox.style.top = last.height + (2 * this._padding.top) + 6 + "px";
+            this._tutorialBox.style.top = last.offsetHeight + (2 * this._padding.top) + 6 + "px";
 
             this._highlightBox.style.transform = `translateX(${this._transform.translateX}px) translateY(${this._transform.translateY}px)`;
             //this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
-            this._highlightBox.childNodes[0].style.width = last.width + (2 * this._padding.top);
-            this._highlightBox.childNodes[0].style.height = last.height + (2 * this._padding.top);
+            this._highlightBox.childNodes[0].style.width = last.offsetWidth + (2 * this._padding.top);
+            this._highlightBox.childNodes[0].style.height = last.offsetHeight + (2 * this._padding.top);
+
+            window.requestAnimationFrame(nextTime => {
+                this._scroll(nextTime);
+            });
+
             this._highlightBox.addEventListener("transitionend", () => {
-                this.animating = ;
+                this.animating = false;
             })
         }
 
@@ -357,11 +366,11 @@
 
         _queryElementList(list) {
             let nodes = [];
-            let node  = null;
+            let node = null;
 
-            for(let elem of list) {
+            for (let elem of list) {
                 //get if getElement gets more than 1 elem
-                switch(elem.highlight.charAt(0)) {
+                switch (elem.highlight.charAt(0)) {
                     case ".":
                         node = document.getElementsByClassName(elem.highlight.substr(1, this.length))[0];
                         break;
@@ -384,21 +393,22 @@
                 localStorage.setItem("a", 1);
                 localStorage.removeItem("a");
                 return true;
-            } catch(e) {
+            } catch (e) {
                 return false;
             }
         }
 
         _saveCurrentPosition() {
-            if(this._advancedStorage) {
+            if (this._advancedStorage) {
                 window.localStorage.setItem(`tutorial-${this._name}`, this.step);
             }
             else {
                 document.cookie += `tutorial-${this._name}=${this.step};`;
             }
         }
+
         _getCurrentPosition() {
-            if(this._advancedStorage) {
+            if (this._advancedStorage) {
                 return window.localStorage.getItem(`tutorial-${this._name}`);
             }
             else {
@@ -407,6 +417,46 @@
                     .map(item => parseInt(item.replace(`tutorial-${this._name}=`, "")));
             }
         }
+
+        _scroll(timeStamp) {
+            let boxBounds = {
+                top: this._tutorialBox.offsetTop,
+                height: this._tutorialBox.offsetHeight
+            };
+            let curElement = {
+                top: this.elems[this.step].offsetTop,
+                height: this.elems[this.step].offsetHeight
+            };
+
+            if (!this._scrolling.timer) {
+                this._scrolling.timer = timeStamp;
+                this._scrolling.position = window.scrollY
+            }
+
+            let timeDiff = timeStamp - this._scrolling.timer;
+            let bottom = curElement.top + curElement.height + boxBounds.height + this._padding.top * 2;
+
+            let next = Math.ceil(Util.easeOutQuad(timeDiff, this._scrolling.position, (bottom - window.innerHeight) - this._scrolling.position, this._scrolling.speed));
+
+            if(next < 0) {
+                this._scrolling.timer = null;
+                return;
+            }
+
+            if (bottom !== window.innerHeight + window.scrollY) {
+                window.scrollTo(0, next)
+            }
+
+            if (timeDiff < this._scrolling.speed) {
+                window.requestAnimationFrame(nextTime => {
+                    this._scroll(nextTime);
+                });
+            } else {
+                this._scrolling.timer = null;
+            }
+
+        }
+
         _reset() {
             this.step = 0;
             this.running = false;
@@ -417,6 +467,27 @@
                 //scaleX: 0,
                 //scaleY: 0
             };
+        }
+
+        __load() {
+            return function handler() {
+                window.removeEventListener("load", this._eventHandler.load);
+                this.start();
+            }.bind(this)
+        }
+
+        __resize() {
+            return function handler() {
+                this._highlightBox.classList.add("skip-animation");
+
+                this._highlightBox.style.left = this.elems[0].offsetLeft - this._padding.left;
+                this._highlightBox.style.top = this.elems[0].offsetTop - this._padding.top;
+
+                this._animateHighlightBox();
+
+                //debounce to remove after 200ms
+                this._highlightBox.classList.remove("skip-animation");
+            }.bind(this);
         }
     }
 

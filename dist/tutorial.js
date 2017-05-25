@@ -6,7 +6,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-//v0.0.2
+//v0.0.3
 
 (function (window, document, undefined) {
     "use strict";
@@ -20,6 +20,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "mandatory",
             value: function mandatory(param) {
                 throw new Error(param + " is required.");
+            }
+
+            //https://github.com/jaxgeller/ez.js
+
+        }, {
+            key: "easeOutQuad",
+            value: function easeOutQuad(t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
             }
         }]);
 
@@ -45,7 +53,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _ref$debug = _ref.debug,
                 debug = _ref$debug === undefined ? false : _ref$debug,
                 _ref$autoplay = _ref.autoplay,
-                autoplay = _ref$autoplay === undefined ? false : _ref$autoplay;
+                autoplay = _ref$autoplay === undefined ? false : _ref$autoplay,
+                _ref$scrollSpeed = _ref.scrollSpeed,
+                scrollSpeed = _ref$scrollSpeed === undefined ? 500 : _ref$scrollSpeed;
 
             _classCallCheck(this, Tutorial);
 
@@ -82,9 +92,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._persistent = persistent;
                 this._advancedStorage = this._checkStorageSupport();
                 this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
+                this._scrolling = {
+                    speed: scrollSpeed,
+                    timer: null,
+                    position: window.scrollY
+                };
                 this._padding = {
                     top: padding.top === undefined ? 12 : buttons.close,
                     left: padding.left === undefined ? 12 : buttons.close
+                };
+                this._eventHandler = {
+                    load: this.__load(),
+                    resize: this.__resize()
                 };
                 //this._basePosition = this.elems[0].getBoundingClientRect();
 
@@ -124,23 +143,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 });
 
-                window.addEventListener("resize", function () {
-                    if (!_this.running) return;
-
-                    var first = _this.elems[0].getBoundingClientRect();
-                    _this._highlightBox.classList.add("skip-animation");
-
-                    _this._highlightBox.style.left = first.left - _this._padding.left;
-                    _this._highlightBox.style.top = first.top - _this._padding.top;
-
-                    _this._animateHighlightBox();
-
-                    //debounce to remove after 200ms
-                    _this._highlightBox.classList.remove("skip-animation");
-                });
-
                 if (autoplay) {
-                    this.start();
+                    window.addEventListener("load", this._eventHandler.load);
                 }
             }
         }
@@ -162,6 +166,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._updateText();
 
                     this.running = true;
+
+                    window.addEventListener("resize", this._eventHandler.resize);
                 }
             }
         }, {
@@ -180,6 +186,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._body.removeChild(this._blurElement);
                 this._body.removeChild(this._highlightBox);
 
+                window.removeEventListener("resize", this._eventHandler.resize);
                 this._reset();
             }
         }, {
@@ -366,8 +373,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //remove dup
                     var bounds = this.elems[this.step].getBoundingClientRect();
 
-                    this._highlightBox.style.top = bounds.top - this._padding.top;
-                    this._highlightBox.style.left = bounds.left - this._padding.left;
+                    this._highlightBox.style.top = bounds.top - this._padding.top + window.scrollY;
+                    this._highlightBox.style.left = bounds.left - this._padding.left + window.scrollX;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 2 * this._padding.top;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 2 * this._padding.left;
 
@@ -384,22 +391,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this.elems[0].getBoundingClientRect();
-                var last = this.elems[this.step].getBoundingClientRect();
+                var first = this.elems[0]; //.getBoundingClientRect();//_util.baseBoundings;//Util.getElementDimensions(this.elems[0]); //.getBoundingClientRect();
+                var last = this.elems[this.step]; //.getBoundingClientRect();
                 //let cur   = this._highlightBox.getBoundingClientRect();
 
-                this._transform.translateY = last.top - first.top;
-                this._transform.translateX = last.left - first.left;
+                this._transform.translateY = last.offsetTop - first.offsetTop;
+                this._transform.translateX = last.offsetLeft - first.offsetLeft;
                 //this._transform.scaleY = ((last.height + 24)/(first.height + 24));
                 //this._transform.scaleX = ((last.width + 24)/(first.width + 24));
 
                 //use transform or not ?
-                this._tutorialBox.style.top = last.height + 2 * this._padding.top + 6 + "px";
+                this._tutorialBox.style.top = last.offsetHeight + 2 * this._padding.top + 6 + "px";
 
                 this._highlightBox.style.transform = "translateX(" + this._transform.translateX + "px) translateY(" + this._transform.translateY + "px)";
                 //this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
-                this._highlightBox.childNodes[0].style.width = last.width + 2 * this._padding.top;
-                this._highlightBox.childNodes[0].style.height = last.height + 2 * this._padding.top;
+                this._highlightBox.childNodes[0].style.width = last.offsetWidth + 2 * this._padding.top;
+                this._highlightBox.childNodes[0].style.height = last.offsetHeight + 2 * this._padding.top;
+
+                window.requestAnimationFrame(function (nextTime) {
+                    _this4._scroll(nextTime);
+                });
+
                 this._highlightBox.addEventListener("transitionend", function () {
                     _this4.animating = false;
                 });
@@ -491,6 +503,47 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             }
         }, {
+            key: "_scroll",
+            value: function _scroll(timeStamp) {
+                var _this6 = this;
+
+                var boxBounds = {
+                    top: this._tutorialBox.offsetTop,
+                    height: this._tutorialBox.offsetHeight
+                };
+                var curElement = {
+                    top: this.elems[this.step].offsetTop,
+                    height: this.elems[this.step].offsetHeight
+                };
+
+                if (!this._scrolling.timer) {
+                    this._scrolling.timer = timeStamp;
+                    this._scrolling.position = window.scrollY;
+                }
+
+                var timeDiff = timeStamp - this._scrolling.timer;
+                var bottom = curElement.top + curElement.height + boxBounds.height + this._padding.top * 2;
+
+                var next = Math.ceil(Util.easeOutQuad(timeDiff, this._scrolling.position, bottom - window.innerHeight - this._scrolling.position, this._scrolling.speed));
+
+                if (next < 0) {
+                    this._scrolling.timer = null;
+                    return;
+                }
+
+                if (bottom !== window.innerHeight + window.scrollY) {
+                    window.scrollTo(0, next);
+                }
+
+                if (timeDiff < this._scrolling.speed) {
+                    window.requestAnimationFrame(function (nextTime) {
+                        _this6._scroll(nextTime);
+                    });
+                } else {
+                    this._scrolling.timer = null;
+                }
+            }
+        }, {
             key: "_reset",
             value: function _reset() {
                 this.step = 0;
@@ -502,6 +555,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //scaleX: 0,
                     //scaleY: 0
                 };
+            }
+        }, {
+            key: "__load",
+            value: function __load() {
+                return function handler() {
+                    window.removeEventListener("load", this._eventHandler.load);
+                    this.start();
+                }.bind(this);
+            }
+        }, {
+            key: "__resize",
+            value: function __resize() {
+                return function handler() {
+                    this._highlightBox.classList.add("skip-animation");
+
+                    this._highlightBox.style.left = this.elems[0].offsetLeft - this._padding.left;
+                    this._highlightBox.style.top = this.elems[0].offsetTop - this._padding.top;
+
+                    this._animateHighlightBox();
+
+                    //debounce to remove after 200ms
+                    this._highlightBox.classList.remove("skip-animation");
+                }.bind(this);
             }
         }]);
 
