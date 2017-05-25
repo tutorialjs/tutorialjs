@@ -21,6 +21,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function mandatory(param) {
                 throw new Error(param + " is required.");
             }
+        }, {
+            key: "getElementBounds",
+            value: function getElementBounds(el) {
+                return {
+                    top: el.offsetTop,
+                    left: el.offsetLeft,
+                    bottom: el.offsetTop + el.offsetHeight,
+                    width: el.offsetWidth,
+                    height: el.offsetHeight
+                };
+            }
 
             //https://github.com/jaxgeller/ez.js
 
@@ -35,15 +46,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }();
 
     var Tutorial = function () {
-        function Tutorial(_ref) {
+        function Tutorial() {
             var _this = this;
 
+            var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Util.mandatory("Name");
+            var _ref = arguments[1];
             var _ref$selector = _ref.selector,
                 selector = _ref$selector === undefined ? "tut-action" : _ref$selector,
                 _ref$steps = _ref.steps,
                 steps = _ref$steps === undefined ? [] : _ref$steps,
-                _ref$name = _ref.name,
-                name = _ref$name === undefined ? Util.mandatory("Name") : _ref$name,
                 _ref$persistent = _ref.persistent,
                 persistent = _ref$persistent === undefined ? false : _ref$persistent,
                 _ref$buttons = _ref.buttons,
@@ -105,7 +116,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     load: this.__load(),
                     resize: this.__resize()
                 };
-                //this._basePosition = this.elems[0].getBoundingClientRect();
 
                 this.selector = selector;
                 this.animate = true;
@@ -370,11 +380,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.animating = true;
                     this._animateHighlightBox();
                 } else {
-                    //remove dup
-                    var bounds = this.elems[this.step].getBoundingClientRect();
+                    var bounds = Util.getElementBounds(this.elems[this.step]);
 
-                    this._highlightBox.style.top = bounds.top - this._padding.top + window.scrollY;
-                    this._highlightBox.style.left = bounds.left - this._padding.left + window.scrollX;
+                    this._highlightBox.style.top = bounds.top - this._padding.top;
+                    this._highlightBox.style.left = bounds.left - this._padding.left;
                     this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 2 * this._padding.top;
                     this._highlightBox.childNodes[0].style.width = bounds.width + 2 * this._padding.left;
 
@@ -382,7 +391,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._highlightBox.childNodes[1].textContent = this.step + 1;
-                //this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
             }
         }, {
             key: "_animateHighlightBox",
@@ -391,9 +399,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this.elems[0]; //.getBoundingClientRect();//_util.baseBoundings;//Util.getElementDimensions(this.elems[0]); //.getBoundingClientRect();
-                var last = this.elems[this.step]; //.getBoundingClientRect();
-                //let cur   = this._highlightBox.getBoundingClientRect();
+                var first = this.elems[0];
+                var last = this.elems[this.step];
 
                 this._transform.translateY = last.offsetTop - first.offsetTop;
                 this._transform.translateX = last.offsetLeft - first.offsetLeft;
@@ -507,14 +514,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _scroll(timeStamp) {
                 var _this6 = this;
 
-                var boxBounds = {
-                    top: this._tutorialBox.offsetTop,
-                    height: this._tutorialBox.offsetHeight
-                };
-                var curElement = {
-                    top: this.elems[this.step].offsetTop,
-                    height: this.elems[this.step].offsetHeight
-                };
+                var boxBounds = Util.getElementBounds(this._tutorialBox);
+                var curElement = Util.getElementBounds(this.elems[this.step]);
 
                 if (!this._scrolling.timer) {
                     this._scrolling.timer = timeStamp;

@@ -1,4 +1,4 @@
-kb = new Tutorial({
+kb = new Tutorial("nico<3", {
     steps: [
         {
             highlight: ".first-step",
@@ -17,7 +17,6 @@ kb = new Tutorial({
             text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt"
         }],
     debug: true,
-    name: "nico<3",
     persistent: false,
     buttons: {close: "Schließen"},
     autoplay: true

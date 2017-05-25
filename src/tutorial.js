@@ -8,6 +8,16 @@
             throw new Error(`${param} is required.`);
         }
 
+        static getElementBounds(el) {
+            return {
+                top: el.offsetTop,
+                left: el.offsetLeft,
+                bottom: el.offsetTop + el.offsetHeight,
+                width: el.offsetWidth,
+                height: el.offsetHeight
+            };
+        }
+
         //https://github.com/jaxgeller/ez.js
         static easeOutQuad(t, b, c, d) {
             return -c * (t /= d) * (t - 2) + b;
@@ -15,10 +25,10 @@
     }
 
     class Tutorial {
-        constructor({
+        constructor(name = Util.mandatory("Name"),
+                    {
                         selector = "tut-action",
                         steps = [],
-                        name = Util.mandatory("Name"),
                         persistent = false,
                         buttons = {},
                         padding = {},
@@ -67,7 +77,6 @@
                     load: this.__load(),
                     resize: this.__resize()
                 };
-                //this._basePosition = this.elems[0].getBoundingClientRect();
 
                 this.selector = selector;
                 this.animate = true;
@@ -316,11 +325,10 @@
                 this._animateHighlightBox();
             }
             else {
-                //remove dup
-                let bounds = this.elems[this.step].getBoundingClientRect();
+                let bounds = Util.getElementBounds(this.elems[this.step]);
 
-                this._highlightBox.style.top = bounds.top - this._padding.top + window.scrollY;
-                this._highlightBox.style.left = bounds.left - this._padding.left + window.scrollX;
+                this._highlightBox.style.top = bounds.top - this._padding.top;
+                this._highlightBox.style.left = bounds.left - this._padding.left;
                 this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + (2 * this._padding.top);
                 this._highlightBox.childNodes[0].style.width = bounds.width + (2 * this._padding.left);
 
@@ -328,15 +336,13 @@
             }
 
             this._highlightBox.childNodes[1].textContent = this.step + 1;
-            //this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
         }
 
         _animateHighlightBox() {
             //flip technique
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this.elems[0];//.getBoundingClientRect();//_util.baseBoundings;//Util.getElementDimensions(this.elems[0]); //.getBoundingClientRect();
-            let last = this.elems[this.step];//.getBoundingClientRect();
-            //let cur   = this._highlightBox.getBoundingClientRect();
+            let first = this.elems[0];
+            let last = this.elems[this.step];
 
             this._transform.translateY = last.offsetTop - first.offsetTop;
             this._transform.translateX = last.offsetLeft - first.offsetLeft;
@@ -419,14 +425,8 @@
         }
 
         _scroll(timeStamp) {
-            let boxBounds = {
-                top: this._tutorialBox.offsetTop,
-                height: this._tutorialBox.offsetHeight
-            };
-            let curElement = {
-                top: this.elems[this.step].offsetTop,
-                height: this.elems[this.step].offsetHeight
-            };
+            let boxBounds = Util.getElementBounds(this._tutorialBox);
+            let curElement = Util.getElementBounds(this.elems[this.step]);
 
             if (!this._scrolling.timer) {
                 this._scrolling.timer = timeStamp;
@@ -438,7 +438,7 @@
 
             let next = Math.ceil(Util.easeOutQuad(timeDiff, this._scrolling.position, (bottom - window.innerHeight) - this._scrolling.position, this._scrolling.speed));
 
-            if(next < 0) {
+            if (next < 0) {
                 this._scrolling.timer = null;
                 return;
             }
