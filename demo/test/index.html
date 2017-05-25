@@ -14,11 +14,11 @@
     </head>
     <body>
         <div id="wrapper">
-            <div class="section center first-step">
+            <div class="section center first-step" t-step="1" t-text="1">
                 <h1>Tutorial.js</h1>
                 <p>A lightweight introductory tool for your application</p>
             </div>
-            <div class="section second-step">
+            <div class="section second-step" t-step="2" t-text="2">
                 <h2>How to</h2>
                 <pre>
                     <code>
@@ -27,7 +27,7 @@
                     </code>
                 </pre>
             </div>
-            <div class="section third-step">
+            <div class="section third-step" t-step="3" t-text="3">
                 <h2>Initialization</h2>
                 <pre>
                     <code>
@@ -47,13 +47,17 @@
                     </code>
                 </pre>
             </div>
-            <div class="section center more-links">
+            <div class="section center more-links" t-step="4"  t-text="4">
                 <a href="#"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
                 <a href="#"><i class="fa fa-file" aria-hidden="true"></i> Documentation</a>
             </div>
-            <div class="scroll-test">
+            <div class="section scroll-test" t-step="5"  t-text="5">
                 <p>Smooth scrolling is in, too</p>
             </div>
         </div>
     </body>
+
+    <script type="text/template" id="test-advanced">
+        <p>Hallo</p>
+    </script>
 </html>

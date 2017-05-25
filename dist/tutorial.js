@@ -6,7 +6,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-//v0.0.3
+//v0.1.0
 
 (function (window, document, undefined) {
     "use strict";
@@ -21,6 +21,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function mandatory(param) {
                 throw new Error(param + " is required.");
             }
+
+            //https://github.com/jaxgeller/ez.js
+
+        }, {
+            key: "easeOutQuad",
+            value: function easeOutQuad(t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            }
+        }, {
+            key: "checkStorageSupport",
+            value: function checkStorageSupport() {
+                try {
+                    localStorage.setItem("a", 1);
+                    localStorage.removeItem("a");
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
         }, {
             key: "getElementBounds",
             value: function getElementBounds(el) {
@@ -32,18 +51,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     height: el.offsetHeight
                 };
             }
-
-            //https://github.com/jaxgeller/ez.js
-
-        }, {
-            key: "easeOutQuad",
-            value: function easeOutQuad(t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            }
         }]);
 
         return Util;
     }();
+
+    var Step = function Step(node, text, title) {
+        _classCallCheck(this, Step);
+
+        this.type = "normal";
+        this.node = node;
+        this.text = text;
+        this.title = title;
+    };
+
+    var ActionStep = function ActionStep(htmlId) {
+        _classCallCheck(this, ActionStep);
+
+        this.type = "advanced";
+        this.html = document.getElementById(htmlId.substr(1)).childNodes;
+    };
 
     var Tutorial = function () {
         function Tutorial() {
@@ -70,26 +97,53 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             _classCallCheck(this, Tutorial);
 
-            if (steps.length > 0) {
-                this.elems = this._queryElementList(steps);
-                this.text = steps.map(function (item) {
-                    return item.text;
-                });
-            } else {
-                this.elems = Array.from(document.getElementsByClassName(selector));
+            this.elems = [];
 
-                if (!this.elems.every(function (el) {
+            if (steps.length > 0) {
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
+
+                try {
+                    for (var _iterator = steps[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var step = _step.value;
+
+                        if (step.hasOwnProperty("action")) {
+                            //create advanced tutorial
+                            new ActionStep(step.highlight);
+                        } else {
+                            this.elems.push(this._createTutorialSteps(step));
+                        }
+                    }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
+                    }
+                }
+            } else {
+                var elems = Array.from(document.getElementsByClassName(selector));
+
+                if (!elems.every(function (el) {
                     return el.getAttribute("t-step");
-                }) || !this.elems.every(function (el) {
+                }) || !elems.every(function (el) {
                     return el.getAttribute("t-text");
                 })) {
-                    throw new Error("Not all steps defined");
+                    throw new Error("Not all steps or texts defined");
                 } else {
-                    this.elems.sort(function (a, b) {
+                    elems.sort(function (a, b) {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    this.text = this.elems.map(function (item) {
-                        return item.getAttribute("t-text");
+                    this.elems = elems.map(function (item) {
+                        return new Step(item, item.getAttribute("t-text"), item.getAttribute("t-title"));
                     });
                 }
             }
@@ -101,7 +155,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this._name = name;
                 this._persistent = persistent;
-                this._advancedStorage = this._checkStorageSupport();
+                this._advancedStorage = Util.checkStorageSupport();
                 this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
                 this._scrolling = {
                     speed: scrollSpeed,
@@ -132,11 +186,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var _createTutorialBox2 = this._createTutorialBox();
 
-                var _createTutorialBox3 = _slicedToArray(_createTutorialBox2, 3);
+                var _createTutorialBox3 = _slicedToArray(_createTutorialBox2, 4);
 
                 this._tutorialBox = _createTutorialBox3[0];
-                this._tutorialText = _createTutorialBox3[1];
-                this._tutorialPosition = _createTutorialBox3[2];
+                this._tutorialTitle = _createTutorialBox3[1];
+                this._tutorialText = _createTutorialBox3[2];
+                this._tutorialPosition = _createTutorialBox3[3];
 
                 this._highlightBox = this._createHighlightBox(this._tutorialBox);
 
@@ -167,13 +222,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (this.running) {
                     console.warn("Tutorial instance already running");
                 } else {
-                    this.elems[this.step].classList.add("tutorial-highlight");
+                    this.elems[this.step].node.classList.add("tutorial-highlight");
 
                     this._body.appendChild(this._blurElement);
                     this._body.appendChild(this._highlightBox);
 
                     this._moveHighlightBox();
-                    this._updateText();
+                    this._updateTutorialBox();
 
                     this.running = true;
 
@@ -188,7 +243,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                this.elems[this.step].classList.remove("tutorial-highlight");
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
 
                 this._highlightBox.style.transform = "";
                 this._highlightBox.childNodes[0].style.transform = "";
@@ -217,13 +272,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //or throw error;
                     this.close();
                 } else {
-                    this.elems[this.step].classList.remove("tutorial-highlight");
-                    this.elems[--this.step].classList.add("tutorial-highlight");
+                    this.elems[this.step].node.classList.remove("tutorial-highlight");
+                    this.elems[--this.step].node.classList.add("tutorial-highlight");
 
                     this._moveHighlightBox();
                 }
 
-                this._updateText();
+                this._updateTutorialBox();
                 this._saveCurrentPosition();
             }
         }, {
@@ -244,13 +299,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     //or throw error;
                     this.close();
                 } else {
-                    this.elems[this.step].classList.remove("tutorial-highlight");
-                    this.elems[++this.step].classList.add("tutorial-highlight");
+                    this.elems[this.step].node.classList.remove("tutorial-highlight");
+                    this.elems[++this.step].node.classList.add("tutorial-highlight");
 
                     this._moveHighlightBox();
                 }
 
-                this._updateText();
+                this._updateTutorialBox();
                 this._saveCurrentPosition();
             }
 
@@ -268,9 +323,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                this.elems[this.step].classList.remove("tutorial-highlight");
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
                 this.step = step;
-                this.elems[this.step].classList.add("tutorial-highlight");
+                this.elems[this.step].node.classList.add("tutorial-highlight");
             }
         }, {
             key: "_stepInBounds",
@@ -318,8 +373,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this3 = this;
 
                 var wrapper = document.createElement("div");
-                var edge = wrapper.cloneNode(false);
                 var content_wrapper = wrapper.cloneNode(false);
+                var title = document.createElement("p");
                 var text = document.createElement("p");
                 var position = text.cloneNode();
                 var buttonbox = wrapper.cloneNode(false);
@@ -330,8 +385,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var close = back.cloneNode(false);
 
                 wrapper.classList.add("tutorial-box");
-                edge.classList.add("tutorial-box-edge");
                 content_wrapper.classList.add("tutorial-box-wrapper");
+                title.classList.add("tutorial-title");
                 text.classList.add("tutorial-description");
                 position.classList.add("tutorial-step-position");
                 buttonbox.classList.add("tutorial-buttons");
@@ -364,14 +419,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 buttonbox_wrapper.appendChild(back);
                 buttonbox_wrapper.appendChild(next);
 
+                content_wrapper.appendChild(title);
                 content_wrapper.appendChild(text);
                 //content_wrapper.appendChild(position);
                 content_wrapper.appendChild(buttonbox);
 
-                wrapper.appendChild(edge);
                 wrapper.appendChild(content_wrapper);
 
-                return [wrapper, text, position];
+                return [wrapper, title, text, position];
             }
         }, {
             key: "_moveHighlightBox",
@@ -380,7 +435,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.animating = true;
                     this._animateHighlightBox();
                 } else {
-                    var bounds = Util.getElementBounds(this.elems[this.step]);
+                    var bounds = Util.getElementBounds(this.elems[this.step].node);
 
                     this._highlightBox.style.top = bounds.top - this._padding.top;
                     this._highlightBox.style.left = bounds.left - this._padding.left;
@@ -399,8 +454,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //flip technique
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this.elems[0];
-                var last = this.elems[this.step];
+                var first = this.elems[0].node;
+                var last = this.elems[this.step].node;
 
                 this._transform.translateY = last.offsetTop - first.offsetTop;
                 this._transform.translateX = last.offsetLeft - first.offsetLeft;
@@ -424,66 +479,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
-            key: "_updateText",
-            value: function _updateText() {
-                this._tutorialText.textContent = this.text[this.step];
-            }
-        }, {
-            key: "_queryElementList",
-            value: function _queryElementList(list) {
-                var nodes = [];
-                var node = null;
-
-                var _iteratorNormalCompletion = true;
-                var _didIteratorError = false;
-                var _iteratorError = undefined;
-
-                try {
-                    for (var _iterator = list[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                        var elem = _step.value;
-
-                        //get if getElement gets more than 1 elem
-                        switch (elem.highlight.charAt(0)) {
-                            case ".":
-                                node = document.getElementsByClassName(elem.highlight.substr(1, this.length))[0];
-                                break;
-                            case "#":
-                                node = document.getElementById(elem.highlight.substr(1, this.length));
-                                break;
-                            default:
-                                throw new Error("Unknown selector. Please only use id or class.");
-                                break;
-                        }
-
-                        nodes.push(node);
-                    }
-                } catch (err) {
-                    _didIteratorError = true;
-                    _iteratorError = err;
-                } finally {
-                    try {
-                        if (!_iteratorNormalCompletion && _iterator.return) {
-                            _iterator.return();
-                        }
-                    } finally {
-                        if (_didIteratorError) {
-                            throw _iteratorError;
-                        }
-                    }
-                }
-
-                return nodes;
-            }
-        }, {
-            key: "_checkStorageSupport",
-            value: function _checkStorageSupport() {
-                try {
-                    localStorage.setItem("a", 1);
-                    localStorage.removeItem("a");
-                    return true;
-                } catch (e) {
-                    return false;
-                }
+            key: "_updateTutorialBox",
+            value: function _updateTutorialBox() {
+                this._tutorialText.textContent = this.elems[this.step].text;
+                this._tutorialTitle.textContent = this.elems[this.step].title;
             }
         }, {
             key: "_saveCurrentPosition",
@@ -515,7 +514,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this6 = this;
 
                 var boxBounds = Util.getElementBounds(this._tutorialBox);
-                var curElement = Util.getElementBounds(this.elems[this.step]);
+                var curElement = Util.getElementBounds(this.elems[this.step].node);
 
                 if (!this._scrolling.timer) {
                     this._scrolling.timer = timeStamp;
@@ -524,7 +523,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var timeDiff = timeStamp - this._scrolling.timer;
                 var bottom = curElement.top + curElement.height + boxBounds.height + this._padding.top * 2;
-
                 var next = Math.ceil(Util.easeOutQuad(timeDiff, this._scrolling.position, bottom - window.innerHeight - this._scrolling.position, this._scrolling.speed));
 
                 if (next < 0) {
@@ -543,6 +541,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 } else {
                     this._scrolling.timer = null;
                 }
+            }
+        }, {
+            key: "_createTutorialSteps",
+            value: function _createTutorialSteps(elem) {
+                var node = null;
+
+                switch (elem.highlight.charAt(0)) {
+                    case ".":
+                        node = document.getElementsByClassName(elem.highlight.substr(1))[0];
+                        break;
+                    case "#":
+                        node = document.getElementById(elem.highlight.substr(1));
+                        break;
+                    default:
+                        throw new Error("Unknown selector. Please only use id or class.");
+                        break;
+                }
+
+                if (!node) {
+                    throw new Error("Selector " + elem.highlight + " not found.");
+                }
+
+                return new Step(node, elem.text, elem.title);
             }
         }, {
             key: "_reset",
@@ -571,8 +592,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 return function handler() {
                     this._highlightBox.classList.add("skip-animation");
 
-                    this._highlightBox.style.left = this.elems[0].offsetLeft - this._padding.left;
-                    this._highlightBox.style.top = this.elems[0].offsetTop - this._padding.top;
+                    this._highlightBox.style.left = this.elems[0].node.offsetLeft - this._padding.left;
+                    this._highlightBox.style.top = this.elems[0].node.offsetTop - this._padding.top;
 
                     this._animateHighlightBox();
 

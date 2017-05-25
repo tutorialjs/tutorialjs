@@ -1,4 +1,4 @@
-//v0.0.3
+//v0.1.0
 
 (function (window, document, undefined) {
     "use strict";
@@ -6,6 +6,21 @@
     class Util {
         static mandatory(param) {
             throw new Error(`${param} is required.`);
+        }
+
+        //https://github.com/jaxgeller/ez.js
+        static easeOutQuad(t, b, c, d) {
+            return -c * (t /= d) * (t - 2) + b;
+        }
+
+        static checkStorageSupport() {
+            try {
+                localStorage.setItem("a", 1);
+                localStorage.removeItem("a");
+                return true;
+            } catch (e) {
+                return false;
+            }
         }
 
         static getElementBounds(el) {
@@ -17,10 +32,20 @@
                 height: el.offsetHeight
             };
         }
+    }
 
-        //https://github.com/jaxgeller/ez.js
-        static easeOutQuad(t, b, c, d) {
-            return -c * (t /= d) * (t - 2) + b;
+    class Step {
+        constructor(node, text, title) {
+            this.type  = "normal";
+            this.node  = node;
+            this.text  = text;
+            this.title = title;
+        }
+    }
+    class ActionStep {
+        constructor(htmlId) {
+            this.type = "advanced";
+            this.html = document.getElementById(htmlId.substr(1)).childNodes;
         }
     }
 
@@ -36,21 +61,29 @@
                         autoplay = false,
                         scrollSpeed = 500
                     }) {
+            this.elems = [];
+
             if (steps.length > 0) {
-                this.elems = this._queryElementList(steps);
-                this.text = steps.map(item => item.text);
+                for(let step of steps) {
+                    if(step.hasOwnProperty("action")) {
+                        //create advanced tutorial
+                        new ActionStep(step.highlight);
+                    } else {
+                        this.elems.push(this._createTutorialSteps(step));
+                    }
+                }
             }
             else {
-                this.elems = Array.from(document.getElementsByClassName(selector));
+                let elems = Array.from(document.getElementsByClassName(selector));
 
-                if (!this.elems.every(el => el.getAttribute("t-step")) || !this.elems.every(el => el.getAttribute("t-text"))) {
-                    throw new Error("Not all steps defined");
+                if (!elems.every(el => el.getAttribute("t-step")) || !elems.every(el => el.getAttribute("t-text"))) {
+                    throw new Error("Not all steps or texts defined");
                 }
                 else {
-                    this.elems.sort((a, b) => {
+                    elems.sort((a, b) => {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    this.text = this.elems.map(item => item.getAttribute("t-text"));
+                    this.elems = elems.map(item => new Step(item, item.getAttribute("t-text"), item.getAttribute("t-title")));
                 }
             }
 
@@ -62,7 +95,7 @@
 
                 this._name = name;
                 this._persistent = persistent;
-                this._advancedStorage = this._checkStorageSupport();
+                this._advancedStorage = Util.checkStorageSupport();
                 this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
                 this._scrolling = {
                     speed: scrollSpeed,
@@ -90,7 +123,7 @@
 
                 this._body = document.body;
                 this._blurElement = this._createBlurElement();
-                [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
+                [this._tutorialBox, this._tutorialTitle, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
                 this._highlightBox = this._createHighlightBox(this._tutorialBox);
 
                 Object.defineProperty(this, "step", {
@@ -118,13 +151,13 @@
                 console.warn("Tutorial instance already running");
             }
             else {
-                this.elems[this.step].classList.add("tutorial-highlight");
+                this.elems[this.step].node.classList.add("tutorial-highlight");
 
                 this._body.appendChild(this._blurElement);
                 this._body.appendChild(this._highlightBox);
 
                 this._moveHighlightBox();
-                this._updateText();
+                this._updateTutorialBox();
 
                 this.running = true;
 
@@ -138,7 +171,7 @@
                 return;
             }
 
-            this.elems[this.step].classList.remove("tutorial-highlight");
+            this.elems[this.step].node.classList.remove("tutorial-highlight");
 
             this._highlightBox.style.transform = "";
             this._highlightBox.childNodes[0].style.transform = "";
@@ -169,13 +202,13 @@
                 this.close();
             }
             else {
-                this.elems[this.step].classList.remove("tutorial-highlight");
-                this.elems[--this.step].classList.add("tutorial-highlight");
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
+                this.elems[--this.step].node.classList.add("tutorial-highlight");
 
                 this._moveHighlightBox();
             }
 
-            this._updateText();
+            this._updateTutorialBox();
             this._saveCurrentPosition();
         }
 
@@ -198,13 +231,13 @@
                 this.close();
             }
             else {
-                this.elems[this.step].classList.remove("tutorial-highlight");
-                this.elems[++this.step].classList.add("tutorial-highlight");
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
+                this.elems[++this.step].node.classList.add("tutorial-highlight");
 
                 this._moveHighlightBox();
             }
 
-            this._updateText();
+            this._updateTutorialBox();
             this._saveCurrentPosition();
         }
 
@@ -221,9 +254,9 @@
                 return;
             }
 
-            this.elems[this.step].classList.remove("tutorial-highlight");
+            this.elems[this.step].node.classList.remove("tutorial-highlight");
             this.step = step;
-            this.elems[this.step].classList.add("tutorial-highlight");
+            this.elems[this.step].node.classList.add("tutorial-highlight");
         }
 
         _stepInBounds(step) {
@@ -263,8 +296,8 @@
 
         _createTutorialBox() {
             let wrapper = document.createElement("div");
-            let edge = wrapper.cloneNode(false);
             let content_wrapper = wrapper.cloneNode(false);
+            let title = document.createElement("p");
             let text = document.createElement("p");
             let position = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
@@ -275,8 +308,8 @@
             let close = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
-            edge.classList.add("tutorial-box-edge");
             content_wrapper.classList.add("tutorial-box-wrapper");
+            title.classList.add("tutorial-title");
             text.classList.add("tutorial-description");
             position.classList.add("tutorial-step-position");
             buttonbox.classList.add("tutorial-buttons");
@@ -309,14 +342,14 @@
             buttonbox_wrapper.appendChild(back);
             buttonbox_wrapper.appendChild(next);
 
+            content_wrapper.appendChild(title);
             content_wrapper.appendChild(text);
             //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
 
-            wrapper.appendChild(edge);
             wrapper.appendChild(content_wrapper);
 
-            return [wrapper, text, position];
+            return [wrapper, title, text, position];
         }
 
         _moveHighlightBox() {
@@ -325,7 +358,7 @@
                 this._animateHighlightBox();
             }
             else {
-                let bounds = Util.getElementBounds(this.elems[this.step]);
+                let bounds = Util.getElementBounds(this.elems[this.step].node);
 
                 this._highlightBox.style.top = bounds.top - this._padding.top;
                 this._highlightBox.style.left = bounds.left - this._padding.left;
@@ -341,8 +374,8 @@
         _animateHighlightBox() {
             //flip technique
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this.elems[0];
-            let last = this.elems[this.step];
+            let first = this.elems[0].node;
+            let last = this.elems[this.step].node;
 
             this._transform.translateY = last.offsetTop - first.offsetTop;
             this._transform.translateX = last.offsetLeft - first.offsetLeft;
@@ -366,42 +399,9 @@
             })
         }
 
-        _updateText() {
-            this._tutorialText.textContent = this.text[this.step];
-        }
-
-        _queryElementList(list) {
-            let nodes = [];
-            let node = null;
-
-            for (let elem of list) {
-                //get if getElement gets more than 1 elem
-                switch (elem.highlight.charAt(0)) {
-                    case ".":
-                        node = document.getElementsByClassName(elem.highlight.substr(1, this.length))[0];
-                        break;
-                    case "#":
-                        node = document.getElementById(elem.highlight.substr(1, this.length));
-                        break;
-                    default:
-                        throw new Error("Unknown selector. Please only use id or class.");
-                        break;
-                }
-
-                nodes.push(node);
-            }
-
-            return nodes;
-        }
-
-        _checkStorageSupport() {
-            try {
-                localStorage.setItem("a", 1);
-                localStorage.removeItem("a");
-                return true;
-            } catch (e) {
-                return false;
-            }
+        _updateTutorialBox() {
+            this._tutorialText.textContent = this.elems[this.step].text;
+            this._tutorialTitle.textContent = this.elems[this.step].title;
         }
 
         _saveCurrentPosition() {
@@ -426,7 +426,7 @@
 
         _scroll(timeStamp) {
             let boxBounds = Util.getElementBounds(this._tutorialBox);
-            let curElement = Util.getElementBounds(this.elems[this.step]);
+            let curElement = Util.getElementBounds(this.elems[this.step].node);
 
             if (!this._scrolling.timer) {
                 this._scrolling.timer = timeStamp;
@@ -435,7 +435,6 @@
 
             let timeDiff = timeStamp - this._scrolling.timer;
             let bottom = curElement.top + curElement.height + boxBounds.height + this._padding.top * 2;
-
             let next = Math.ceil(Util.easeOutQuad(timeDiff, this._scrolling.position, (bottom - window.innerHeight) - this._scrolling.position, this._scrolling.speed));
 
             if (next < 0) {
@@ -455,6 +454,28 @@
                 this._scrolling.timer = null;
             }
 
+        }
+
+        _createTutorialSteps(elem) {
+            let node = null;
+
+            switch (elem.highlight.charAt(0)) {
+                case ".":
+                    node = document.getElementsByClassName(elem.highlight.substr(1))[0];
+                    break;
+                case "#":
+                    node = document.getElementById(elem.highlight.substr(1));
+                    break;
+                default:
+                    throw new Error("Unknown selector. Please only use id or class.");
+                    break;
+            }
+
+            if(!node) {
+                throw new Error(`Selector ${elem.highlight} not found.`);
+            }
+
+            return new Step(node, elem.text, elem.title);
         }
 
         _reset() {
@@ -480,8 +501,8 @@
             return function handler() {
                 this._highlightBox.classList.add("skip-animation");
 
-                this._highlightBox.style.left = this.elems[0].offsetLeft - this._padding.left;
-                this._highlightBox.style.top = this.elems[0].offsetTop - this._padding.top;
+                this._highlightBox.style.left = this.elems[0].node.offsetLeft - this._padding.left;
+                this._highlightBox.style.top = this.elems[0].node.offsetTop - this._padding.top;
 
                 this._animateHighlightBox();
 

@@ -49,17 +49,18 @@
   position: absolute;
   display: inline-block;
   z-index: 9998;
-  padding: 8px;
-  min-width: 250px;
+  min-width: 320px;
   width: 30%;
-  max-width: 320px;
+  max-width: 400px;
   border-radius: 4px;
   box-shadow: 0px 1px 2px #333;
   background-color: white;
   will-change: top; }
-  .tutorial-box > .tutorial-box-edge {
+  .tutorial-box:before {
+    content: "";
     position: absolute;
     top: -5px;
+    left: 10px;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-bottom: 5px solid white; }
@@ -67,15 +68,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
     position: relative; }
+    .tutorial-box > .tutorial-box-wrapper > .tutorial-title {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 15px;
+      border-radius: 3px; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-description {
       line-height: 1.1em;
-      margin: 0 0 1em 0; }
+      padding: 15px; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-step-position {
       display: inline; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons {
       display: flex;
       justify-content: space-between;
-      align-items: center; }
+      align-items: center;
+      padding: 15px; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a {
         text-decoration: none;
         background-color: #ffffff;
@@ -94,14 +101,14 @@
           border-left: none; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
         position: absolute;
-        top: 5px;
+        top: 20px;
         z-index: 1;
-        right: 0px;
+        right: 20px;
         width: 10px;
         height: 10px; }
         .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:before, .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:after {
           content: "";
-          width: 10px;
+          width: 15px;
           height: 2px;
           background: #444444;
           position: absolute;
