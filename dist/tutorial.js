@@ -56,13 +56,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return Util;
     }();
 
-    var Step = function Step(node, text, title) {
+    var Step = function Step(node, text, _ref) {
+        var _ref$title = _ref.title,
+            title = _ref$title === undefined ? "" : _ref$title,
+            _ref$callback = _ref.callback,
+            callback = _ref$callback === undefined ? {} : _ref$callback;
+
         _classCallCheck(this, Step);
 
         this.type = "normal";
         this.node = node;
         this.text = text;
         this.title = title;
+
+        if (!Object.keys(callback).length && typeof callback !== "function") {
+            this.callback = function () {};
+        } else if (callback.once) {
+            this.callback = function () {
+                if (this.run) {
+                    return;
+                }
+
+                callback.fn();
+                this.run = true;
+            };
+        } else {
+            this.callback = callback.fn || callback;
+        }
     };
 
     var ActionStep = function ActionStep(htmlId) {
@@ -77,23 +97,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var _this = this;
 
             var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : Util.mandatory("Name");
-            var _ref = arguments[1];
-            var _ref$selector = _ref.selector,
-                selector = _ref$selector === undefined ? "tut-action" : _ref$selector,
-                _ref$steps = _ref.steps,
-                steps = _ref$steps === undefined ? [] : _ref$steps,
-                _ref$persistent = _ref.persistent,
-                persistent = _ref$persistent === undefined ? false : _ref$persistent,
-                _ref$buttons = _ref.buttons,
-                buttons = _ref$buttons === undefined ? {} : _ref$buttons,
-                _ref$padding = _ref.padding,
-                padding = _ref$padding === undefined ? {} : _ref$padding,
-                _ref$debug = _ref.debug,
-                debug = _ref$debug === undefined ? false : _ref$debug,
-                _ref$autoplay = _ref.autoplay,
-                autoplay = _ref$autoplay === undefined ? false : _ref$autoplay,
-                _ref$scrollSpeed = _ref.scrollSpeed,
-                scrollSpeed = _ref$scrollSpeed === undefined ? 500 : _ref$scrollSpeed;
+            var _ref2 = arguments[1];
+            var _ref2$selector = _ref2.selector,
+                selector = _ref2$selector === undefined ? "tut-action" : _ref2$selector,
+                _ref2$steps = _ref2.steps,
+                steps = _ref2$steps === undefined ? [] : _ref2$steps,
+                _ref2$persistent = _ref2.persistent,
+                persistent = _ref2$persistent === undefined ? false : _ref2$persistent,
+                _ref2$buttons = _ref2.buttons,
+                buttons = _ref2$buttons === undefined ? {} : _ref2$buttons,
+                _ref2$padding = _ref2.padding,
+                padding = _ref2$padding === undefined ? {} : _ref2$padding,
+                _ref2$debug = _ref2.debug,
+                debug = _ref2$debug === undefined ? false : _ref2$debug,
+                _ref2$autoplay = _ref2.autoplay,
+                autoplay = _ref2$autoplay === undefined ? false : _ref2$autoplay,
+                _ref2$scrollSpeed = _ref2.scrollSpeed,
+                scrollSpeed = _ref2$scrollSpeed === undefined ? 500 : _ref2$scrollSpeed;
 
             _classCallCheck(this, Tutorial);
 
@@ -143,7 +163,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
                     this.elems = elems.map(function (item) {
-                        return new Step(item, item.getAttribute("t-text"), item.getAttribute("t-title"));
+                        return new Step(item, item.getAttribute("t-text"), {
+                            title: item.getAttribute("t-title")
+                        });
                     });
                 }
             }
@@ -269,8 +291,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 //at first step
                 if (this.step === 0) {
-                    //or throw error;
                     this.close();
+                    return;
                 } else {
                     this.elems[this.step].node.classList.remove("tutorial-highlight");
                     this.elems[--this.step].node.classList.add("tutorial-highlight");
@@ -279,7 +301,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._updateTutorialBox();
-                this._saveCurrentPosition();
             }
         }, {
             key: "next",
@@ -294,10 +315,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 if (this.debug) console.log("Going to next element: #" + this.step);
 
+                //run callback - good call position?
+                this.elems[this.step].callback();
+
                 //last step?
                 if (this.step === this.elems.length - 1) {
-                    //or throw error;
                     this.close();
+                    return;
                 } else {
                     this.elems[this.step].node.classList.remove("tutorial-highlight");
                     this.elems[++this.step].node.classList.add("tutorial-highlight");
@@ -306,7 +330,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._updateTutorialBox();
-                this._saveCurrentPosition();
             }
 
             //even if is not running?
@@ -563,7 +586,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     throw new Error("Selector " + elem.highlight + " not found.");
                 }
 
-                return new Step(node, elem.text, elem.title);
+                return new Step(node, elem.text, {
+                    title: elem.title,
+                    callback: elem.callback
+                });
             }
         }, {
             key: "_reset",

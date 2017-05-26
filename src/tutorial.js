@@ -35,13 +35,29 @@
     }
 
     class Step {
-        constructor(node, text, title) {
+        constructor(node, text, {title = "", callback = {}}) {
             this.type  = "normal";
             this.node  = node;
             this.text  = text;
             this.title = title;
+
+            if(!Object.keys(callback).length && typeof callback !== "function") {
+                this.callback = () => {};
+            } else if(callback.once) {
+                this.callback = function() {
+                    if(this.run) {
+                        return;
+                    }
+
+                    callback.fn();
+                    this.run = true;
+                }
+            } else {
+                this.callback = callback.fn || callback;
+            }
         }
     }
+
     class ActionStep {
         constructor(htmlId) {
             this.type = "advanced";
@@ -83,7 +99,9 @@
                     elems.sort((a, b) => {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    this.elems = elems.map(item => new Step(item, item.getAttribute("t-text"), item.getAttribute("t-title")));
+                    this.elems = elems.map(item => new Step(item, item.getAttribute("t-text"), {
+                        title: item.getAttribute("t-title")
+                    }));
                 }
             }
 
@@ -198,8 +216,8 @@
 
             //at first step
             if (this.step === 0) {
-                //or throw error;
                 this.close();
+                return;
             }
             else {
                 this.elems[this.step].node.classList.remove("tutorial-highlight");
@@ -209,7 +227,6 @@
             }
 
             this._updateTutorialBox();
-            this._saveCurrentPosition();
         }
 
         next() {
@@ -225,10 +242,13 @@
             if (this.debug)
                 console.log(`Going to next element: #${this.step}`);
 
+            //run callback - good call position?
+            this.elems[this.step].callback();
+
             //last step?
             if (this.step === this.elems.length - 1) {
-                //or throw error;
                 this.close();
+                return;
             }
             else {
                 this.elems[this.step].node.classList.remove("tutorial-highlight");
@@ -238,7 +258,6 @@
             }
 
             this._updateTutorialBox();
-            this._saveCurrentPosition();
         }
 
         //even if is not running?
@@ -475,7 +494,10 @@
                 throw new Error(`Selector ${elem.highlight} not found.`);
             }
 
-            return new Step(node, elem.text, elem.title);
+            return new Step(node, elem.text, {
+                title: elem.title,
+                callback: elem.callback
+            });
         }
 
         _reset() {
