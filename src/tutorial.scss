@@ -93,6 +93,12 @@
       border-right: 5px solid transparent;
       border-bottom: 5px solid white;
   }
+  
+  & > .custom-box {
+    padding: 15px;
+
+    overflow: hidden;
+  }
 
   & > .tutorial-box-wrapper {
     overflow: hidden;

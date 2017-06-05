@@ -58,6 +58,16 @@
     </body>
 
     <script type="text/template" id="test-advanced">
-        <p>Hallo</p>
+        <p t-close>Hallo</p>
+
+        <div>
+            <span>
+                <p>Nested</p>
+                <button t-next>Next</button>
+            </span>
+
+            <p>Hi</p>
+            <button t-prev>Prev</button>
+        </div>
     </script>
 </html>
