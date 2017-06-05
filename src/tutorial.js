@@ -62,6 +62,21 @@
             this.type = "normal";
             this.text = text;
             this.title = title;
+
+            if(!Object.keys(callback).length && typeof callback !== "function") {
+                this.callback = () => {};
+            } else if(callback.once) {
+                this.callback = function() {
+                    if(this.run) {
+                        return;
+                    }
+
+                    callback.fn();
+                    this.run = true;
+                }
+            } else {
+                this.callback = callback.fn || callback;
+            }
         }
     }
 
@@ -282,7 +297,6 @@
             }
 
             this._updateTutorialBox();
-
         }
 
         goToStep(step) {
@@ -501,7 +515,6 @@
 
             window.requestAnimationFrame(stamp => {
                 this.options.scrolling.timer = stamp;
-
                 this.__scrollMovement(stamp, bottom);
             });
         }

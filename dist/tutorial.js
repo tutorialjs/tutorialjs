@@ -98,6 +98,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             _this.type = "normal";
             _this.text = text;
             _this.title = title;
+
+            if (!Object.keys(callback).length && typeof callback !== "function") {
+                _this.callback = function () {};
+            } else if (callback.once) {
+                _this.callback = function () {
+                    if (this.run) {
+                        return;
+                    }
+
+                    callback.fn();
+                    this.run = true;
+                };
+            } else {
+                _this.callback = callback.fn || callback;
+            }
             return _this;
         }
 
@@ -666,7 +681,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 window.requestAnimationFrame(function (stamp) {
                     _this9.options.scrolling.timer = stamp;
-
                     _this9.__scrollMovement(stamp, bottom);
                 });
             }
