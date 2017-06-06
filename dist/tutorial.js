@@ -415,6 +415,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var wrapper = document.createElement("div");
                 var attr = Tutorial.actions.baseAttributes;
+                var custom = Tutorial.actions.custom;
 
                 wrapper.insertAdjacentHTML("afterbegin", step.template);
 
@@ -457,6 +458,61 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             } finally {
                                 if (_didIteratorError3) {
                                     throw _iteratorError3;
+                                }
+                            }
+                        }
+
+                        var _iteratorNormalCompletion4 = true;
+                        var _didIteratorError4 = false;
+                        var _iteratorError4 = undefined;
+
+                        try {
+                            for (var _iterator4 = custom[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                                var evt = _step4.value;
+                                var _iteratorNormalCompletion5 = true;
+                                var _didIteratorError5 = false;
+                                var _iteratorError5 = undefined;
+
+                                try {
+                                    var _loop2 = function _loop2() {
+                                        var cattr = _step5.value;
+
+                                        if (cattr.name.includes(evt.key)) {
+                                            elem.addEventListener(evt.event, function () {
+                                                window[cattr.value]();
+                                            });
+                                        }
+                                    };
+
+                                    for (var _iterator5 = Array.from(elem.attributes)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                        _loop2();
+                                    }
+                                } catch (err) {
+                                    _didIteratorError5 = true;
+                                    _iteratorError5 = err;
+                                } finally {
+                                    try {
+                                        if (!_iteratorNormalCompletion5 && _iterator5.return) {
+                                            _iterator5.return();
+                                        }
+                                    } finally {
+                                        if (_didIteratorError5) {
+                                            throw _iteratorError5;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            _didIteratorError4 = true;
+                            _iteratorError4 = err;
+                        } finally {
+                            try {
+                                if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                    _iterator4.return();
+                                }
+                            } finally {
+                                if (_didIteratorError4) {
+                                    throw _iteratorError4;
                                 }
                             }
                         }
@@ -630,20 +686,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_updateTutorialBox",
             value: function _updateTutorialBox() {
                 if (this.elems[this.step].type === "normal") {
-                    if (this.state.type === "custom") {
+                    if (this.state.type === "advanced") {
                         this.components._elements.tutorialBox.firstChild.remove();
                         this.components._elements.tutorialBox.appendChild(this.components._elements.tutorialWrapper);
-
-                        this.state.type = "normal";
                     }
                     this.components._elements.tutorialText.textContent = this.elems[this.step].text;
                     this.components._elements.tutorialTitle.textContent = this.elems[this.step].title;
                 } else {
                     this.components._elements.tutorialBox.firstChild.remove();
                     this.components._elements.tutorialBox.appendChild(this.elems[this.step].template);
-
-                    this.state.type = "custom";
                 }
+
+                this.state.type = this.elems[this.step].type;
             }
         }, {
             key: "_saveCurrentPosition",
@@ -750,14 +804,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
                     _ref4$key = _ref4.key,
                     key = _ref4$key === undefined ? Util.mandatory("Identifier") : _ref4$key,
-                    _ref4$action = _ref4.action,
-                    action = _ref4$action === undefined ? Util.mandatory("Function") : _ref4$action,
                     _ref4$event = _ref4.event,
                     event = _ref4$event === undefined ? Util.mandatory("Event") : _ref4$event;
 
                 Tutorial.actions.custom.push({
                     key: key,
-                    action: action,
                     event: event
                 });
             }

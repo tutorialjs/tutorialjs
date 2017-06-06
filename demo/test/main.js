@@ -1,3 +1,8 @@
+Tutorial.installCustomAction({
+    key: "dbl",
+    event: "dblclick"
+});
+
 kb = new Tutorial("nico<3", {
     steps: [
         {
@@ -34,5 +39,7 @@ kb = new Tutorial("nico<3", {
     autoplay: true
 });
 
-//Tutorial.installCustomAction()
+function sayHello() {
+    alert("yolo");
+}
 

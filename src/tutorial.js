@@ -317,6 +317,7 @@
         _parseAdvancedStep(step) {
             let wrapper = document.createElement("div");
             let attr = Tutorial.actions.baseAttributes;
+            let custom = Tutorial.actions.custom;
 
             wrapper.insertAdjacentHTML("afterbegin", step.template);
 
@@ -327,6 +328,17 @@
                         elem.addEventListener("click", () => {
                             mod[1].call(this);
                         });
+                    }
+                }
+
+                for (let evt of custom) {
+
+                    for(let cattr of Array.from(elem.attributes)) {
+                        if (cattr.name.includes(evt.key)) {
+                            elem.addEventListener(evt.event, () => {
+                                window[cattr.value]();
+                            });
+                        }
                     }
                 }
             }
@@ -472,11 +484,9 @@
 
         _updateTutorialBox() {
             if(this.elems[this.step].type === "normal") {
-                if(this.state.type === "custom") {
+                if(this.state.type === "advanced") {
                     this.components._elements.tutorialBox.firstChild.remove();
                     this.components._elements.tutorialBox.appendChild(this.components._elements.tutorialWrapper)
-
-                    this.state.type = "normal";
                 }
                 this.components._elements.tutorialText.textContent = this.elems[this.step].text;
                 this.components._elements.tutorialTitle.textContent = this.elems[this.step].title;
@@ -484,9 +494,9 @@
             } else {
                 this.components._elements.tutorialBox.firstChild.remove();
                 this.components._elements.tutorialBox.appendChild(this.elems[this.step].template)
-
-                this.state.type = "custom";
             }
+
+            this.state.type = this.elems[this.step].type;
         }
 
         _saveCurrentPosition() {
@@ -573,10 +583,9 @@
             }
         }
 
-        static installCustomAction({key = Util.mandatory("Identifier"), action = Util.mandatory("Function"), event = Util.mandatory("Event")} = {}) {
+        static installCustomAction({key = Util.mandatory("Identifier"),event = Util.mandatory("Event")} = {}) {
             Tutorial.actions.custom.push({
                 key,
-                action,
                 event
             });
         }
