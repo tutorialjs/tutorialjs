@@ -73,11 +73,9 @@
 
   z-index: 9998;
 
-  padding: 8px;
-
-  min-width: 250px;
+  min-width: 320px;
   width: 30%;
-  max-width: 320px;
+  max-width: 400px;
 
   border-radius: 4px;
   box-shadow: 0px 1px 2px #333;
@@ -86,14 +84,20 @@
 
   will-change: top;
 
-  & > .tutorial-box-edge {
-    position: absolute;
+  &:before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left:10px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid white;
+  }
+  
+  & > .custom-box {
+    padding: 15px;
 
-    top: -5px;
-
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid white;
+    overflow: hidden;
   }
 
   & > .tutorial-box-wrapper {
@@ -101,10 +105,16 @@
     text-overflow: ellipsis;
     position:relative;
 
+    & > .tutorial-title {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 15px;
+      border-radius: 3px;
+    }
+
     & > .tutorial-description {
       line-height: 1.1em;
-
-      margin: 0 0 1em 0;
+      padding:15px;
     }
 
     & > .tutorial-step-position {
@@ -115,6 +125,7 @@
       display: flex;
       justify-content:space-between;
       align-items:center;
+      padding:15px;
 
       & > div > a {
         text-decoration: none;
@@ -141,16 +152,16 @@
 
       & > .tutorial-close {
         position: absolute;
-        top: 0px;
+        top: 20px;
         z-index: 1;
-        right: 0px;
+        right: 20px;
         width: 10px;
         height: 10px;
 
         &:before,
         &:after {
           content: "";
-          width: 10px;
+          width: 15px;
           height: 2px;
           background: #444444;
           position: absolute;

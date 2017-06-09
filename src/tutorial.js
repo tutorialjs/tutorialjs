@@ -1,4 +1,4 @@
-//v0.0.2
+//v0.1.0
 
 (function (window, document, undefined) {
     "use strict";
@@ -7,214 +7,343 @@
         static mandatory(param) {
             throw new Error(`${param} is required.`);
         }
+
+        //https://github.com/jaxgeller/ez.js
+        static easeOutQuad(t, b, c, d) {
+            return -c * (t /= d) * (t - 2) + b;
+        }
+
+        static checkStorageSupport() {
+            try {
+                localStorage.setItem("a", 1);
+                localStorage.removeItem("a");
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        static getElementBounds(el) {
+            return {
+                top: el.offsetTop,
+                left: el.offsetLeft,
+                bottom: el.offsetTop + el.offsetHeight,
+                width: el.offsetWidth,
+                height: el.offsetHeight
+            };
+        }
+    }
+
+    class Step {
+        constructor(node, callback) {
+            this.node = node;
+
+            if (!Object.keys(callback).length && typeof callback !== "function") {
+                this.callback = () => {};
+            } else if (callback.once) {
+                this.callback = function () {
+                    if (this.run) {
+                        return;
+                    }
+
+                    callback.fn();
+                    this.run = true;
+                }
+            } else {
+                this.callback = callback.fn || callback;
+            }
+        }
+    }
+
+    class NormalStep extends Step{
+        constructor(node, text, {title = "", callback = {}} ={}) {
+            super(node, callback);
+
+            this.type = "normal";
+            this.text = text;
+            this.title = title;
+
+            if(!Object.keys(callback).length && typeof callback !== "function") {
+                this.callback = () => {};
+            } else if(callback.once) {
+                this.callback = function() {
+                    if(this.run) {
+                        return;
+                    }
+
+                    callback.fn();
+                    this.run = true;
+                }
+            } else {
+                this.callback = callback.fn || callback;
+            }
+        }
+    }
+
+    class ActionStep extends Step{
+        constructor(node, htmlId, {callback = {}} = {}) {
+            super(node, callback);
+
+            this.type = "advanced";
+            this.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
+        }
     }
 
     class Tutorial {
-        constructor(
-            {
-                selector     = "tut-action",
-                steps        = [],
-                name         = Util.mandatory("Name"),
-                persistent   = false,
-                buttons      = {},
-                padding      = {},
-                debug        = false,
-                autoplay     = false
-            }) {
-                if(steps.length > 0) {
-                    this.elems = this._queryElementList(steps);
-                    this.text  = steps.map(item => item.text);
-                }
-                else {
-                    this.elems = Array.from(document.getElementsByClassName(selector));
+        constructor(name = Util.mandatory("Name"),
+                    {
+                        selector = "tut-action",
+                        steps = [],
+                        persistent = false,
+                        buttons = {},
+                        padding = {},
+                        debug = false,
+                        autoplay = false,
+                        scrollSpeed = 800,
+                        animate = true
+                    }) {
+            this.elems = [];
 
-                    if (!this.elems.every(el => el.getAttribute("t-step")) || !this.elems.every(el => el.getAttribute("t-text"))) {
-                        throw new Error("Not all steps defined");
+            if (steps.length > 0) {
+                for (let step of steps) {
+                    let node = document.querySelector(step.highlight);
+
+                    if (!node) {
+                        throw new Error(`Selector ${step.highlight} not found.`);
                     }
-                    else {
-                        this.elems.sort((a, b) => {
-                            return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
-                        });
-                        this.text = this.elems.map(item => item.getAttribute("t-text"));
+
+                    if (step.hasOwnProperty("action")) {
+                        let action = new ActionStep(node, step.action.template);
+
+                        action.template = this._parseAdvancedStep(action);
+                        action.template.classList.add("custom-box");
+
+                        this.elems.push(action);
+                    } else {
+                        this.elems.push(new NormalStep(node, step.text, {
+                            title: step.title,
+                            callback: step.callback
+                        }));
                     }
                 }
+            } else {
+                let elems = Array.from(document.getElementsByClassName(selector));
 
-                if (this.elems.length === 0) {
-                    throw new Error("No activities point defined");
+                if (!elems.every(el => el.getAttribute("t-step")) || !elems.every(el => el.getAttribute("t-text"))) {
+                    throw new Error("Not all steps or texts defined");
+                } else {
+                    elems.sort((a, b) => {
+                        return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
+                    });
+                    this.elems = elems.map(item => new Step(item, item.getAttribute("t-text"), {
+                        title: item.getAttribute("t-title")
+                    }));
                 }
-                else {
-                    this._reset();
+            }
 
-                    this._name = name;
-                    this._persistent = persistent;
-                    this._advancedStorage = this._checkStorageSupport();
-                    this._step = parseInt(this._persistent ? this._getCurrentPosition() || 0 : 0);
-                    this._padding = {
-                        top   : padding.top === undefined ? 12 : buttons.close,
-                        left  : padding.left === undefined ? 12 : buttons.close
-                    };
-                    //this._basePosition = this.elems[0].getBoundingClientRect();
+            if (this.elems.length === 0) {
+                throw new Error("No activities point defined");
+            } else {
+                this.name = name;
 
-                    this.selector  = selector;
-                    this.buttons   = buttons;
-                    this.animate   = true;
-                    this.animating = false;
-                    this.buttons = {
-                        //close   : buttons.close === undefined ? 'Close' : buttons.close,
+                this.options = {
+                    selector: selector,
+                    persistent: persistent,
+                    advancedStorage: Util.checkStorageSupport(),
+                    scrolling: {
+                        speed: scrollSpeed,
+                        timer: null,
+                        position: window.scrollY
+                    },
+                    padding: {
+                        top: padding.top === undefined ? 12 : buttons.close,
+                        left: padding.left === undefined ? 12 : buttons.close
+                    },
+                    buttons: {
                         previous: buttons.previous === undefined ? 'Back' : buttons.close,
-                        next    : buttons.next === undefined ? 'Next' : buttons.close
-                    };
-                    this.debug = debug;
+                        next: buttons.next === undefined ? 'Next' : buttons.close
+                    },
+                    animate: animate,
+                    debug: debug
+                };
 
-                    this._body = document.body;
-                    this._blurElement = this._createBlurElement();
-                    [this._tutorialBox, this._tutorialText, this._tutorialPosition] = this._createTutorialBox();
-                    this._highlightBox = this._createHighlightBox(this._tutorialBox);
+                this.state = {
+                    running: false,
+                    animation: false,
+                    type: this.elems[0].type
+                };
 
-                    Object.defineProperty(this, "step", {
-                        get: () => this._step,
-                        set: x => {
-                            this._step = x;
-
-                            if(this._persistent) {
-                                this._saveCurrentPosition();
-                            }
-                        }
-                    });
-
-                    window.addEventListener("resize", () => {
-                        if(!this.running)
-                            return;
-
-                        let first = this.elems[0].getBoundingClientRect();
-                        this._highlightBox.classList.add("skip-animation");
-
-                        this._highlightBox.style.left = first.left - this._padding.left;
-                        this._highlightBox.style.top = first.top - this._padding.top;
-
-                        this._animateHighlightBox();
-
-                        //debounce to remove after 200ms
-                        this._highlightBox.classList.remove("skip-animation");
-                    });
-
-                    if (autoplay) {
-                        this.start();
+                this.components = {
+                    _step: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0),
+                    _eventHandler: {
+                        load: this.__load(),
+                        resize: this.__resize()
+                    },
+                    _elements: {
+                        blur: this._createBlurElement(),
+                        ...this._createTutorialBox()
                     }
+                };
+                this.components._elements.highlightBox = this._createHighlightBox(this.components._elements.tutorialBox);
+
+                this._reset();
+
+                Object.defineProperty(this, "step", {
+                    get: () => this.components._step,
+                    set: x => {
+                        this.components._step = x;
+
+                        if (this.options.persistent) {
+                            this._saveCurrentPosition();
+                        }
+                    }
+                });
+
+                if (autoplay) {
+                    window.addEventListener("load", this.components._eventHandler.load);
                 }
+            }
         }
 
         start() {
-            if(this.debug)
+            if (this.options.debug)
                 console.log("Tutorial started...");
 
-            if(this.running) {
+            if (this.state.running) {
                 console.warn("Tutorial instance already running");
-            }
-            else {
-                this.elems[this.step].classList.add("tutorial-highlight");
+            } else {
+                this.elems[this.step].node.classList.add("tutorial-highlight");
 
-                this._body.appendChild(this._blurElement);
-                this._body.appendChild(this._highlightBox);
+                document.body.appendChild(this.components._elements.blur);
+                document.body.appendChild(this.components._elements.highlightBox);
 
                 this._moveHighlightBox();
-                this._updateText();
+                this._updateTutorialBox();
 
-                this.running = true;
+                this.state.running = true;
+
+                window.addEventListener("resize", this.components._eventHandler.resize);
             }
         }
 
         close() {
-            if(!this.running) {
+            if (!this.state.running) {
                 console.warn("Tutorial is not running");
                 return;
             }
 
-            this.elems[this.step].classList.remove("tutorial-highlight");
+            this.elems[this.step].node.classList.remove("tutorial-highlight");
 
-            this._highlightBox.style.transform = "";
-            this._highlightBox.childNodes[0].style.transform = "";
+            this.components._elements.highlightBox.style.transform = "";
+            this.components._elements.highlightBox.childNodes[0].style.transform = "";
 
-            this._body.removeChild(this._blurElement);
-            this._body.removeChild(this._highlightBox);
+            document.body.removeChild(this.components._elements.blur);
+            document.body.removeChild(this.components._elements.highlightBox);
 
+            window.removeEventListener("resize", this.components._eventHandler.resize);
             this._reset();
         }
 
         prev() {
-            if(!this.running) {
+            if (!this.state.running) {
                 console.warn("Tutorial is not running");
                 return;
-            }
-            else if(this.animating) {
+            } else if (this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
 
-            if(this.debug)
+            if (this.options.debug)
                 console.log(`Going to previous element: #${this.step}`);
 
             //at first step
-            if(this.step === 0) {
-                //or throw error;
+            if (this.step === 0) {
                 this.close();
-            }
-            else {
-                this.elems[this.step].classList.remove("tutorial-highlight");
-                this.elems[--this.step].classList.add("tutorial-highlight");
+                return;
+            } else {
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
+                this.elems[--this.step].node.classList.add("tutorial-highlight");
 
                 this._moveHighlightBox();
             }
 
-            this._updateText();
-            this._saveCurrentPosition();
+            this._updateTutorialBox();
         }
 
         next() {
-            if(!this.running) {
+            if (!this.state.running) {
                 console.warn("Tutorial is not running");
                 return;
-            }
-            else if(this.animating) {
+            } else if (this.animating) {
                 console.warn("Animation is already running");
                 return;
             }
 
-            if(this.debug)
+            if (this.options.debug)
                 console.log(`Going to next element: #${this.step}`);
 
+            //run callback - good call position?
+            this.elems[this.step].callback();
+
             //last step?
-            if(this.step === this.elems.length - 1) {
-                //or throw error;
+            if (this.step === this.elems.length - 1) {
                 this.close();
-            }
-            else {
-                this.elems[this.step].classList.remove("tutorial-highlight");
-                this.elems[++this.step].classList.add("tutorial-highlight");
+                return;
+            } else {
+                this.elems[this.step].node.classList.remove("tutorial-highlight");
+                this.elems[++this.step].node.classList.add("tutorial-highlight");
 
                 this._moveHighlightBox();
             }
 
-            this._updateText();
-            this._saveCurrentPosition();
+            this._updateTutorialBox();
         }
 
-        //even if is not running?
         goToStep(step) {
-            if(!this.running) {
+            if (!this.state.running) {
                 console.warn("Tutorial is not running.");
                 return;
-            }
-            else if(!this._stepInBounds(step)) {
+            } else if (!this._stepInBounds(step)) {
                 throw new Error("Step out of bounds.");
-            }
-            else if(step === this.step) {
+            } else if (step === this.step) {
                 return;
             }
 
-            this.elems[this.step].classList.remove("tutorial-highlight");
+            this.elems[this.step].node.classList.remove("tutorial-highlight");
             this.step = step;
-            this.elems[this.step].classList.add("tutorial-highlight");
+            this.elems[this.step].node.classList.add("tutorial-highlight");
+        }
+
+        _parseAdvancedStep(step) {
+            let wrapper = document.createElement("div");
+            let attr = Tutorial.actions.baseAttributes;
+            let custom = Tutorial.actions.custom;
+
+            wrapper.insertAdjacentHTML("afterbegin", step.template);
+
+            for (let elem of wrapper.getElementsByTagName("*")) {
+                for (let mod of Object.entries(attr)) {
+
+                    if (Array.from(elem.attributes).some(item => item.name.includes(mod[0]))) {
+                        elem.addEventListener("click", () => {
+                            mod[1].call(this);
+                        });
+                    }
+                }
+
+                for (let evt of custom) {
+
+                    for(let cattr of Array.from(elem.attributes)) {
+                        if (cattr.name.includes(evt.key)) {
+                            elem.addEventListener(evt.event, () => {
+                                window[cattr.value]();
+                            });
+                        }
+                    }
+                }
+            }
+
+            return wrapper;
         }
 
         _stepInBounds(step) {
@@ -225,24 +354,25 @@
             let el = document.createElement("div");
             el.classList.add("tutorial-blur");
 
-            el.onclick = () => {
+            el.addEventListener("click", e => {
                 this.close();
-            }
+            });
 
             return el;
         }
+
         _createHighlightBox(tutorialBox) {
             let el = document.createElement("div");
-            let background = document.createElement("div");
+            let background = el.cloneNode();
             let index = document.createElement("i");
 
             el.classList.add("tutorial-wrapper");
             background.classList.add("tutorial-background");
             index.classList.add("tutorial-index");
 
-            el.onlick = e => {
-                e.preventPropagation();
-            }
+            el.addEventListener("click", e => {
+                e.stopPropagation();
+            });
 
             el.appendChild(background);
             el.appendChild(index);
@@ -250,47 +380,40 @@
 
             return el;
         }
+
         _createTutorialBox() {
-            let wrapper   = document.createElement("div");
-            let edge      = wrapper.cloneNode(false);
+            let wrapper = document.createElement("div");
             let content_wrapper = wrapper.cloneNode(false);
-            let text      = document.createElement("p");
-            let position  = text.cloneNode();
+            let title = document.createElement("p");
+            let text = document.createElement("p");
+            let position = text.cloneNode();
             let buttonbox = wrapper.cloneNode(false);
             let buttonbox_wrapper = wrapper.cloneNode(false);
-            let back      = document.createElement("a");
-            back.href     = "#";
-            let next      = back.cloneNode(false);
-            let close     = back.cloneNode(false);
+            let back = document.createElement("a");
+            back.href = "#";
+            let next = back.cloneNode(false);
+            let close = back.cloneNode(false);
 
             wrapper.classList.add("tutorial-box");
-            edge.classList.add("tutorial-box-edge");
             content_wrapper.classList.add("tutorial-box-wrapper");
+            title.classList.add("tutorial-title");
             text.classList.add("tutorial-description");
             position.classList.add("tutorial-step-position");
             buttonbox.classList.add("tutorial-buttons");
             close.classList.add("tutorial-close");
 
-            //close.textContent = this.buttons.close;
-            back.textContent = this.buttons.previous;
-            next.textContent = this.buttons.next;
+            back.textContent = this.options.buttons.previous;
+            next.textContent = this.options.buttons.next;
 
-            close.onclick = e => {
-                e.preventDefault();
-
+            close.addEventListener("click", e => {
                 this.close();
-            }
-            back.onclick = e => {
-                e.preventDefault();
-
+            }, false);
+            back.addEventListener("click", e => {
                 this.prev();
-            }
-
-            next.onclick = e => {
-                e.preventDefault();
-
+            }, false);
+            next.addEventListener("click", e => {
                 this.next();
-            }
+            }, false);
 
             buttonbox.appendChild(position);
             buttonbox.appendChild(close);
@@ -298,128 +421,184 @@
             buttonbox_wrapper.appendChild(back);
             buttonbox_wrapper.appendChild(next);
 
+            content_wrapper.appendChild(title);
             content_wrapper.appendChild(text);
-            //content_wrapper.appendChild(position);
             content_wrapper.appendChild(buttonbox);
 
-            wrapper.appendChild(edge);
             wrapper.appendChild(content_wrapper);
 
-            return [wrapper, text, position];
+            return {
+                tutorialBox: wrapper,
+                tutorialWrapper: content_wrapper,
+                tutorialTitle: title,
+                tutorialText: text,
+                tutorialPosition: position
+            };
         }
 
         _moveHighlightBox() {
-            if(this.running && this.animate) {
-                this.animating = true;
-                this._animateHighlightBox();
+            if (this.state.running && this.options.animate) {
+                this.state.animating = true;
+
+                window.requestAnimationFrame(this._animateHighlightBox.bind(this));
+            } else {
+                let bounds = Util.getElementBounds(this.elems[this.step].node);
+                let bottom = bounds.top + bounds.height + this.components._elements.tutorialBox.offsetHeight + this.options.padding.top * 2;
+
+                this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
+                this.components._elements.highlightBox.style.left = bounds.left - this.options.padding.left;
+                this.components._elements.highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + (2 * this.options.padding.top);
+                this.components._elements.highlightBox.childNodes[0].style.width = bounds.width + (2 * this.options.padding.left);
+
+                this.components._elements.tutorialBox.style.top = bounds.height + (2 * this.options.padding.top) + 6 + "px";
+
+                window.requestAnimationFrame(() => {
+                    window.scrollTo(0, bottom - (window.scrollY + window.innerHeight + window.scrollY));
+                });
             }
-            else {
-                //remove dup
-                let bounds  = this.elems[this.step].getBoundingClientRect();
 
-                this._highlightBox.style.top = bounds.top - this._padding.top;
-                this._highlightBox.style.left = bounds.left - this._padding.left;
-                this._highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + (2 * this._padding.top);
-                this._highlightBox.childNodes[0].style.width  = bounds.width + (2 * this._padding.left);
-
-                this._tutorialBox.style.top = bounds.height + (2 * this._padding.top) + 6 + "px";
-            }
-
-            this._highlightBox.childNodes[1].textContent = this.step + 1;
-            //this._tutorialPosition.textContent = `${this.step + 1}/${this.elems.length}`;
+            this.components._elements.highlightBox.childNodes[1].textContent = this.step + 1;
         }
+
         _animateHighlightBox() {
-            //flip technique
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this.elems[0].getBoundingClientRect();
-            let last  = this.elems[this.step].getBoundingClientRect();
-            //let cur   = this._highlightBox.getBoundingClientRect();
+            let first = this.elems[0].node;
+            let last = this.elems[this.step].node;
 
-            this._transform.translateY = last.top - first.top;
-            this._transform.translateX = last.left - first.left;
-            //this._transform.scaleY = ((last.height + 24)/(first.height + 24));
-            //this._transform.scaleX = ((last.width + 24)/(first.width + 24));
+            this.state.transform.translateY = last.offsetTop - first.offsetTop;
+            this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
 
-            //use transform or not ?
-            this._tutorialBox.style.top = last.height + (2 * this._padding.top) + 6 + "px";
+            this.components._elements.tutorialBox.style.top = last.offsetHeight + (2 * this.options.padding.top) + 6 + "px";
 
-            this._highlightBox.style.transform = `translateX(${this._transform.translateX}px) translateY(${this._transform.translateY}px)`;
-            //this._highlightBox.childNodes[0].style.transform = `scaleX(${this._transform.scaleX}) scaleY(${this._transform.scaleY})`;
-            this._highlightBox.childNodes[0].style.width = last.width + (2 * this._padding.top);
-            this._highlightBox.childNodes[0].style.height = last.height + (2 * this._padding.top);
-            this._highlightBox.addEventListener("transitionend", () => {
-                this.animating = false;
+            this.components._elements.highlightBox.style.transform = `translateX(${this.state.transform.translateX}px) translateY(${this.state.transform.translateY}px)`;
+
+            this.components._elements.highlightBox.childNodes[0].style.width = last.offsetWidth + (2 * this.options.padding.top);
+            this.components._elements.highlightBox.childNodes[0].style.height = last.offsetHeight + (2 * this.options.padding.top);
+
+            this._scroll();
+
+            this.components._elements.highlightBox.addEventListener("transitionend", () => {
+                this.state.animating = false;
             })
         }
 
-        _updateText() {
-            this._tutorialText.textContent = this.text[this.step];
-        }
-
-        _queryElementList(list) {
-            let nodes = [];
-            let node  = null;
-
-            for(let elem of list) {
-                //get if getElement gets more than 1 elem
-                switch(elem.highlight.charAt(0)) {
-                    case ".":
-                        node = document.getElementsByClassName(elem.highlight.substr(1, this.length))[0];
-                        break;
-                    case "#":
-                        node = document.getElementById(elem.highlight.substr(1, this.length));
-                        break;
-                    default:
-                        throw new Error("Unknown selector. Please only use id or class.");
-                        break;
+        _updateTutorialBox() {
+            if(this.elems[this.step].type === "normal") {
+                if(this.state.type === "advanced") {
+                    this.components._elements.tutorialBox.firstChild.remove();
+                    this.components._elements.tutorialBox.appendChild(this.components._elements.tutorialWrapper)
                 }
+                this.components._elements.tutorialText.textContent = this.elems[this.step].text;
+                this.components._elements.tutorialTitle.textContent = this.elems[this.step].title;
 
-                nodes.push(node);
+            } else {
+                this.components._elements.tutorialBox.firstChild.remove();
+                this.components._elements.tutorialBox.appendChild(this.elems[this.step].template)
             }
 
-            return nodes;
-        }
-
-        _checkStorageSupport() {
-            try {
-                localStorage.setItem("a", 1);
-                localStorage.removeItem("a");
-                return true;
-            } catch(e) {
-                return false;
-            }
+            this.state.type = this.elems[this.step].type;
         }
 
         _saveCurrentPosition() {
-            if(this._advancedStorage) {
-                window.localStorage.setItem(`tutorial-${this._name}`, this.step);
-            }
-            else {
-                document.cookie += `tutorial-${this._name}=${this.step};`;
+            if (this.options.advancedStorage) {
+                window.localStorage.setItem(`tutorial-${this.name}`, this.step);
+            } else {
+                document.cookie += `tutorial-${this.name}=${this.step};`;
             }
         }
+
         _getCurrentPosition() {
-            if(this._advancedStorage) {
-                return window.localStorage.getItem(`tutorial-${this._name}`);
-            }
-            else {
+            if (this.options.advancedStorage) {
+                return window.localStorage.getItem(`tutorial-${this.name}`);
+            } else {
                 return document.cookie.split(",")
-                    .filter(item => item.includes(`tutorial-${this._name}`))
-                    .map(item => parseInt(item.replace(`tutorial-${this._name}=`, "")));
+                    .filter(item => item.includes(`tutorial-${this.name}`))
+                    .map(item => parseInt(item.replace(`tutorial-${this.name}=`, "")));
             }
         }
+
+        _scroll() {
+            let boxBounds = Util.getElementBounds(this.components._elements.tutorialBox);
+            let curElement = Util.getElementBounds(this.elems[this.step].node);
+
+            let bottom = curElement.top + curElement.height + boxBounds.height + this.options.padding.top * 2;
+
+            window.requestAnimationFrame(stamp => {
+                this.options.scrolling.timer = stamp;
+                this.__scrollMovement(stamp, bottom);
+            });
+        }
+
         _reset() {
             this.step = 0;
-            this.running = false;
+            this.state.running = false;
 
-            this._transform = {
+            this.state.transform = {
                 translateY: 0,
-                translateX: 0//,
-                //scaleX: 0,
-                //scaleY: 0
+                translateX: 0
             };
         }
+
+        __load() {
+            return function handler() {
+                window.removeEventListener("load", this.components._eventHandler.load);
+                this.start();
+            }.bind(this)
+        }
+
+        __resize() {
+            return function handler() {
+                this.components._elements.highlightBox.classList.add("skip-animation");
+
+                this.components._elements.highlightBox.style.left = this.elems[0].node.offsetLeft - this.options.padding.left;
+                this.components._elements.highlightBox.style.top = this.elems[0].node.offsetTop - this.options.padding.top;
+
+                this._animateHighlightBox();
+
+                //debounce to remove after 200ms
+                this.components._elements.highlightBox.classList.remove("skip-animation");
+            }.bind(this);
+        }
+
+        __scrollMovement(timeStamp, bottom) {
+            let timeDiff = timeStamp - this.options.scrolling.timer;
+            let next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, (bottom - window.innerHeight) - this.options.scrolling.position, this.options.scrolling.speed));
+
+            if(next < 0) {
+                this.options.scrolling.position = window.scrollY;
+                this.options.scrolling.timer = null;
+
+                return
+            } else if (bottom !== window.innerHeight + window.scrollY) {
+                window.scrollTo(0, next);
+            }
+
+            if (timeDiff < this.options.scrolling.speed) {
+                window.requestAnimationFrame(stamp => {
+                    this.__scrollMovement(stamp, bottom);
+                });
+            } else {
+                this.options.scrolling.position = window.scrollY;
+                this.options.scrolling.timer = null;
+            }
+        }
+
+        static installCustomAction({key = Util.mandatory("Identifier"),event = Util.mandatory("Event")} = {}) {
+            Tutorial.actions.custom.push({
+                key,
+                event
+            });
+        }
     }
+
+    Tutorial.actions = {
+        baseAttributes: {
+            next: Tutorial.prototype.next,
+            prev: Tutorial.prototype.prev,
+            close: Tutorial.prototype.close
+        },
+        custom: []
+    };
 
     if (!window.Tutorial) {
         window.Tutorial = Tutorial;
