@@ -87,3 +87,4 @@ gulp.task("wdio", ['http'], () => {
 gulp.task('test', ['wdio'], () => {
     httpServer.close();
 });
+
