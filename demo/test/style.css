@@ -28,23 +28,11 @@ h1, h2 {
     margin-bottom:15px;
 }
 
-code {
-    font-family:"Fira Mono";
-    font-size: 14px;
-    line-height:1.7;
-    white-space:pre-line;
-}
-
 pre {
     margin: 0px;
-    padding: 0px 20px 20px 20px;
-    background: #fafbfd;
-    white-space: initial;
-    border: 1px solid #eceef3;
-}
-
-code span {
-    white-space: pre-wrap;
+    padding: 20px 20px !important;
+    background: #fafbfd !important;
+    border: 1px solid #eceef3 !important;
 }
 
 .section {
