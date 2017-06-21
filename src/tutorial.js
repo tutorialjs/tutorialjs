@@ -100,7 +100,8 @@
                         debug = false,
                         autoplay = false,
                         scrollSpeed = 800,
-                        animate = true
+                        animate = true,
+                        progressbar = false
                     }) {
             this.elems = [];
 
@@ -186,6 +187,10 @@
                 };
                 this.components._elements.highlightBox = this._createHighlightBox(this.components._elements.tutorialBox);
 
+                if (progressbar) {
+                    this.components._elements.progressBar = this._createProgressbar();
+                }
+
                 this._reset();
 
                 Object.defineProperty(this, "step", {
@@ -216,9 +221,11 @@
 
                 document.body.appendChild(this.components._elements.blur);
                 document.body.appendChild(this.components._elements.highlightBox);
+                document.body.appendChild(this.components._elements.progressBar);
 
                 this._moveHighlightBox();
                 this._updateTutorialBox();
+                this._updateProgressBar();
 
                 this.state.running = true;
 
@@ -268,6 +275,7 @@
             }
 
             this._updateTutorialBox();
+            this._updateProgressBar();
         }
 
         next() {
@@ -297,6 +305,7 @@
             }
 
             this._updateTutorialBox();
+            this._updateProgressBar();
         }
 
         goToStep(step) {
@@ -434,6 +443,34 @@
                 tutorialText: text,
                 tutorialPosition: position
             };
+        }
+
+        _createProgressbar() {
+            let progressBarWrapper = document.createElement("div");
+            let stepList = document.createElement("ul");
+
+            progressBarWrapper.classList.add("progressbar-wrapper");
+
+            for (let step = 1; step <= this.elems.length; step++) {
+                let currentStep = document.createElement("li");
+                let currentStepText = document.createElement("span");
+                currentStepText.textContent = step;
+                currentStep.appendChild(currentStepText);
+                stepList.appendChild(currentStep);
+            }
+
+            progressBarWrapper.appendChild(stepList);
+
+            return progressBarWrapper;
+        }
+
+        _updateProgressBar() {
+            if (this.step === this.elems.length-1) {
+                this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
+            } else {
+                this.components._elements.progressBar.childNodes[0].childNodes[this.step + 1].classList.remove("active");
+                this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
+            }
         }
 
         _moveHighlightBox() {

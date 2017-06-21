@@ -36,7 +36,8 @@ kb = new Tutorial("nico<3", {
     debug: true,
     persistent: false,
     buttons: {close: "Schließen"},
-    autoplay: true
+    autoplay: true,
+    progressbar: true
 });
 
 function sayHello() {

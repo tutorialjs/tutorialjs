@@ -162,7 +162,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _ref3$scrollSpeed = _ref3.scrollSpeed,
                 scrollSpeed = _ref3$scrollSpeed === undefined ? 800 : _ref3$scrollSpeed,
                 _ref3$animate = _ref3.animate,
-                animate = _ref3$animate === undefined ? true : _ref3$animate;
+                animate = _ref3$animate === undefined ? true : _ref3$animate,
+                _ref3$progressbar = _ref3.progressbar,
+                progressbar = _ref3$progressbar === undefined ? false : _ref3$progressbar;
 
             _classCallCheck(this, Tutorial);
 
@@ -276,6 +278,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 };
                 this.components._elements.highlightBox = this._createHighlightBox(this.components._elements.tutorialBox);
 
+                if (progressbar) {
+                    this.components._elements.progressBar = this._createProgressbar();
+                }
+
                 this._reset();
 
                 Object.defineProperty(this, "step", {
@@ -309,9 +315,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     document.body.appendChild(this.components._elements.blur);
                     document.body.appendChild(this.components._elements.highlightBox);
+                    document.body.appendChild(this.components._elements.progressBar);
 
                     this._moveHighlightBox();
                     this._updateTutorialBox();
+                    this._updateProgressBar();
 
                     this.state.running = true;
 
@@ -362,6 +370,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._updateTutorialBox();
+                this._updateProgressBar();
             }
         }, {
             key: "next",
@@ -391,6 +400,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this._updateTutorialBox();
+                this._updateProgressBar();
             }
         }, {
             key: "goToStep",
@@ -631,6 +641,36 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     tutorialText: text,
                     tutorialPosition: position
                 };
+            }
+        }, {
+            key: "_createProgressbar",
+            value: function _createProgressbar() {
+                var progressBarWrapper = document.createElement("div");
+                var stepList = document.createElement("ul");
+
+                progressBarWrapper.classList.add("progressbar-wrapper");
+
+                for (var step = 1; step <= this.elems.length; step++) {
+                    var currentStep = document.createElement("li");
+                    var currentStepText = document.createElement("span");
+                    currentStepText.textContent = step;
+                    currentStep.appendChild(currentStepText);
+                    stepList.appendChild(currentStep);
+                }
+
+                progressBarWrapper.appendChild(stepList);
+
+                return progressBarWrapper;
+            }
+        }, {
+            key: "_updateProgressBar",
+            value: function _updateProgressBar() {
+                if (this.step === this.elems.length - 1) {
+                    this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
+                } else {
+                    this.components._elements.progressBar.childNodes[0].childNodes[this.step + 1].classList.remove("active");
+                    this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
+                }
             }
         }, {
             key: "_moveHighlightBox",
