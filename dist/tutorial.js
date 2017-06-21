@@ -341,6 +341,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 document.body.removeChild(this.components._elements.blur);
                 document.body.removeChild(this.components._elements.highlightBox);
+                document.body.removeChild(this.components._elements.progressBar);
 
                 window.removeEventListener("resize", this.components._eventHandler.resize);
                 this._reset();
@@ -665,12 +666,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_updateProgressBar",
             value: function _updateProgressBar() {
-                if (this.step === this.elems.length - 1) {
-                    this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
-                } else {
+                if (!(this.step === this.elems.length - 1)) {
                     this.components._elements.progressBar.childNodes[0].childNodes[this.step + 1].classList.remove("active");
-                    this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
                 }
+                this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
             }
         }, {
             key: "_moveHighlightBox",
