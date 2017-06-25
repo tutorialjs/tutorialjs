@@ -46,6 +46,22 @@ var guide = new Tutorial({
 )};
 </pre>
             </div>
+            <div class="section fourth-step">
+                <h2>Advanced</h2>
+                <h3>Use your own template</h3>
+<pre class="prettyprint">
+var guide = new Tutorial({
+    steps: [
+        {
+            highlight: ".myclass1",
+            text: "my first text",
+            action: {
+                template: '#myowntemplate'
+            }
+        }]
+)};
+</pre>
+            </div>
             <div class="section center more-links" t-step="4"  t-text="4">
                 <a href="#"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
                 <a href="#"><i class="fa fa-file" aria-hidden="true"></i> Documentation</a>

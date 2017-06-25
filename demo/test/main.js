@@ -27,15 +27,19 @@ kb = new Tutorial("nico<3", {
             }
         },
         {
-            highlight: ".scroll-test",
+            highlight: ".fourth-step",
+            text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
             action: {
-                template: "#test-advanced"
+                template: '#test-advanced'
             }
+        },
+        {
+            highlight: ".scroll-test",
+            text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
         }],
-    //selector: "section",
     debug: true,
     persistent: false,
-    buttons: {close: "Schließen"},
+    buttons: {next: "Weiter"},
     autoplay: true,
     progressbar: true
 });

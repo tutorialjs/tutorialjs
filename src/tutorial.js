@@ -161,8 +161,8 @@
                         left: padding.left === undefined ? 12 : buttons.close
                     },
                     buttons: {
-                        previous: buttons.previous === undefined ? 'Back' : buttons.close,
-                        next: buttons.next === undefined ? 'Next' : buttons.close
+                        previous: buttons.previous === undefined ? 'Back' : buttons.previous,
+                        next: buttons.next === undefined ? 'Next' : buttons.next
                     },
                     animate: animate,
                     debug: debug
