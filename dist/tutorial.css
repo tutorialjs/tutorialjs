@@ -151,12 +151,12 @@
         line-height: 25px;
         background: white;
         transition: 0.2s; }
-      .progressbar-wrapper > ul > li.active {
+      .progressbar-wrapper > ul > li.active, .progressbar-wrapper > ul > li.finished {
         color: white; }
-        .progressbar-wrapper > ul > li.active > span {
+        .progressbar-wrapper > ul > li.active > span, .progressbar-wrapper > ul > li.finished > span {
           background: #79d679;
           border: 1px solid #79d679; }
-        .progressbar-wrapper > ul > li.active:before {
+        .progressbar-wrapper > ul > li.active:before, .progressbar-wrapper > ul > li.finished:before {
           width: 100%; }
       .progressbar-wrapper > ul > li:before {
         content: "";

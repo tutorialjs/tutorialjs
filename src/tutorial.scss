@@ -213,7 +213,8 @@
         transition:0.2s;
       }
 
-      &.active {
+      &.active,
+      &.finished {
         color:white;
 
         & > span {

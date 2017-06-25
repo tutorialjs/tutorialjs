@@ -322,6 +322,10 @@
             this.elems[this.step].node.classList.remove("tutorial-highlight");
             this.step = step;
             this.elems[this.step].node.classList.add("tutorial-highlight");
+
+            this._moveHighlightBox();
+            this._updateTutorialBox();
+            this._updateProgressBar();
         }
 
         _parseAdvancedStep(step) {
@@ -466,8 +470,18 @@
         }
 
         _updateProgressBar() {
+
+            for (var i = 0; i <= this.elems.length-1; i++) {
+                this.components._elements.progressBar.childNodes[0].childNodes[i].classList.remove("active");
+            }
+
+            for (var j = 0; j <= this.step-1; j++) {
+                this.components._elements.progressBar.childNodes[0].childNodes[j].classList.add("finished");
+            }
+
             if (!(this.step === this.elems.length-1)) {
                 this.components._elements.progressBar.childNodes[0].childNodes[this.step + 1].classList.remove("active");
+                this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.remove("finished");
             }
             this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
         }
