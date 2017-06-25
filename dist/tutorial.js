@@ -652,17 +652,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _createProgressbar() {
                 var progressBarWrapper = document.createElement("div");
                 var stepList = document.createElement("ul");
+                var progressTrack = document.createElement("div");
+                var currentProgressTrack = document.createElement("span");
 
                 progressBarWrapper.classList.add("progressbar-wrapper");
+                progressTrack.classList.add("progressbar-track");
 
-                for (var step = 1; step <= this.elems.length; step++) {
+                for (var step = 0; step <= this.elems.length - 1; step++) {
                     var currentStep = document.createElement("li");
                     var currentStepText = document.createElement("span");
-                    currentStepText.textContent = step;
+                    currentStepText.textContent = step + 1;
                     currentStep.appendChild(currentStepText);
+                    currentStep.style.left = 100 / (this.elems.length - 1) * step + '%';
                     stepList.appendChild(currentStep);
                 }
 
+                progressTrack.appendChild(currentProgressTrack);
+                progressBarWrapper.appendChild(progressTrack);
                 progressBarWrapper.appendChild(stepList);
 
                 return progressBarWrapper;
@@ -671,19 +677,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_updateProgressBar",
             value: function _updateProgressBar() {
 
+                var progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
+
+                progressTrack.style.width = 100 / (this.elems.length - 1) * this.step + '%';
+
                 for (var i = 0; i <= this.elems.length - 1; i++) {
-                    this.components._elements.progressBar.childNodes[0].childNodes[i].classList.remove("active");
+                    this.components._elements.progressBar.childNodes[1].childNodes[i].classList.remove("active");
                 }
 
                 for (var j = 0; j <= this.step - 1; j++) {
-                    this.components._elements.progressBar.childNodes[0].childNodes[j].classList.add("finished");
+                    this.components._elements.progressBar.childNodes[1].childNodes[j].classList.add("finished");
                 }
 
                 if (!(this.step === this.elems.length - 1)) {
-                    this.components._elements.progressBar.childNodes[0].childNodes[this.step + 1].classList.remove("active");
-                    this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.remove("finished");
+                    this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
+                    this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
                 }
-                this.components._elements.progressBar.childNodes[0].childNodes[this.step].classList.add("active");
+                this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
             }
         }, {
             key: "_moveHighlightBox",
