@@ -533,22 +533,21 @@
             let body = document.body,
                 html = document.documentElement;
 
-            let height = Math.max( body.scrollHeight, body.offsetHeight,
-                html.clientHeight, html.scrollHeight, html.offsetHeight );
-            console.log(height);
-            console.log(this.components._elements.tutorialBox.offsetHeight);
-            console.log(this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.tutorialBox.offsetHeight + window.scrollY);
-            console.log(this.components._elements.highlightBox.getBoundingClientRect().top +
-                this.components._elements.highlightBox.offsetHeight + window.scrollY +
-                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset);
+            let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
 
-            if (this.components._elements.highlightBox.getBoundingClientRect().top +
+            let windowHeight = Math.max( body.scrollHeight, body.offsetHeight,
+                html.clientHeight, html.scrollHeight, html.offsetHeight ) - progressBarHeight;
+
+            let calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top +
                 this.components._elements.highlightBox.offsetHeight + window.scrollY +
-                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset < height )
+                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
+
+            if (calculatedHeight < windowHeight )
             {
                 this.components._elements.tutorialBox.style.top = tutorialBoxOffset + "px"
             } else {
-                this.components._elements.tutorialBox.style.top = - tutorialBoxOffset + "px"
+                this.components._elements.tutorialBox.style.top = - tutorialBoxOffset - this.components._elements.tutorialWrapper.offsetHeight  + 2 * this.options.padding.top + 6 + "px"
+                // TODO: How can we change the pseudo Element to get a down arrow
             }
 
             this.components._elements.highlightBox.style.transform = `translateX(${this.state.transform.translateX}px) translateY(${this.state.transform.translateY}px)`;
@@ -601,8 +600,9 @@
         _scroll() {
             let boxBounds = Util.getElementBounds(this.components._elements.tutorialBox);
             let curElement = Util.getElementBounds(this.elems[this.step].node);
+            let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
 
-            let bottom = curElement.top + curElement.height + boxBounds.height + this.options.padding.top * 2;
+            let bottom = curElement.top + curElement.height + boxBounds.height + this.options.padding.top * 2 + progressBarHeight;
 
             window.requestAnimationFrame(stamp => {
                 this.options.scrolling.timer = stamp;
