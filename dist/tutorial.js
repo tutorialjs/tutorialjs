@@ -732,7 +732,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.state.transform.translateY = last.offsetTop - first.offsetTop;
                 this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
 
-                this.components._elements.tutorialBox.style.top = last.offsetHeight + 2 * this.options.padding.top + 6 + "px";
+                var tutorialBoxOffset = last.offsetHeight + 2 * this.options.padding.top + 6;
+                var body = document.body,
+                    html = document.documentElement;
+
+                var height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+                console.log(height);
+                console.log(this.components._elements.tutorialBox.offsetHeight);
+                console.log(this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.tutorialBox.offsetHeight + window.scrollY);
+                console.log(this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset);
+
+                if (this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset < height) {
+                    this.components._elements.tutorialBox.style.top = tutorialBoxOffset + "px";
+                } else {
+                    this.components._elements.tutorialBox.style.top = -tutorialBoxOffset + "px";
+                }
 
                 this.components._elements.highlightBox.style.transform = "translateX(" + this.state.transform.translateX + "px) translateY(" + this.state.transform.translateY + "px)";
 
