@@ -60,7 +60,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return Util;
     }();
 
-    var Step = function Step(node, callback) {
+    var Step = function Step(ctx, node, callback) {
         _classCallCheck(this, Step);
 
         this.node = node;
@@ -73,19 +73,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                callback.fn();
+                callback.fn.call(this, ctx);
                 this.run = true;
             };
         } else {
-            this.callback = callback.fn || callback;
+            this.callback = (callback.fn || callback).bind(this, ctx);
         }
     };
 
     var NormalStep = function (_Step) {
         _inherits(NormalStep, _Step);
 
-        function NormalStep(node, text) {
-            var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        function NormalStep(ctx, node, text) {
+            var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
                 _ref$title = _ref.title,
                 title = _ref$title === undefined ? "" : _ref$title,
                 _ref$callback = _ref.callback,
@@ -93,26 +93,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             _classCallCheck(this, NormalStep);
 
-            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, node, callback));
+            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, ctx, node, callback));
 
             _this.type = "normal";
             _this.text = text;
             _this.title = title;
-
-            if (!Object.keys(callback).length && typeof callback !== "function") {
-                _this.callback = function () {};
-            } else if (callback.once) {
-                _this.callback = function () {
-                    if (this.run) {
-                        return;
-                    }
-
-                    callback.fn();
-                    this.run = true;
-                };
-            } else {
-                _this.callback = callback.fn || callback;
-            }
             return _this;
         }
 
@@ -122,14 +107,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var ActionStep = function (_Step2) {
         _inherits(ActionStep, _Step2);
 
-        function ActionStep(node, htmlId) {
-            var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        function ActionStep(ctx, node, htmlId) {
+            var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
                 _ref2$callback = _ref2.callback,
                 callback = _ref2$callback === undefined ? {} : _ref2$callback;
 
             _classCallCheck(this, ActionStep);
 
-            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, node, callback));
+            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, ctx, node, callback));
 
             _this2.type = "advanced";
             _this2.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
@@ -186,14 +171,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
 
                         if (step.hasOwnProperty("action")) {
-                            var action = new ActionStep(node, step.action.template);
+                            var action = new ActionStep(this, node, step.action.template);
 
                             action.template = this._parseAdvancedStep(action);
                             action.template.classList.add("custom-box");
 
                             this.elems.push(action);
                         } else {
-                            this.elems.push(new NormalStep(node, step.text, {
+                            this.elems.push(new NormalStep(this, node, step.text, {
                                 title: step.title,
                                 callback: step.callback
                             }));
@@ -227,7 +212,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
                     this.elems = elems.map(function (item) {
-                        return new Step(item, item.getAttribute("t-text"), {
+                        return new NormalStep(_this3, item, item.getAttribute("t-text"), {
                             title: item.getAttribute("t-title")
                         });
                     });
@@ -238,6 +223,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 throw new Error("No activities point defined");
             } else {
                 this.name = name;
+                this.buttonText = {};
 
                 this.options = {
                     selector: selector,
@@ -263,7 +249,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.state = {
                     running: false,
                     animation: false,
-                    type: this.elems[0].type
+                    type: this.elems[0].type,
+                    _firstStep: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0)
                 };
 
                 this.components = {
@@ -289,7 +276,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         return _this3.components._step;
                     },
                     set: function set(x) {
+                        _this3.elems[_this3.components._step].node.classList.remove("tutorial-highlight");
                         _this3.components._step = x;
+                        _this3.elems[x].node.classList.add("tutorial-highlight");
+
+                        _this3._updateTutorialBox();
+                        _this3._updateProgressBar();
+                        _this3._moveHighlightBox();
 
                         if (_this3.options.persistent) {
                             _this3._saveCurrentPosition();
@@ -364,14 +357,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.close();
                     return;
                 } else {
-                    this.elems[this.step].node.classList.remove("tutorial-highlight");
-                    this.elems[--this.step].node.classList.add("tutorial-highlight");
-
-                    this._moveHighlightBox();
+                    this.step--;
                 }
-
-                this._updateTutorialBox();
-                this._updateProgressBar();
             }
         }, {
             key: "next",
@@ -394,14 +381,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.close();
                     return;
                 } else {
-                    this.elems[this.step].node.classList.remove("tutorial-highlight");
-                    this.elems[++this.step].node.classList.add("tutorial-highlight");
-
-                    this._moveHighlightBox();
+                    this.step++;
                 }
-
-                this._updateTutorialBox();
-                this._updateProgressBar();
             }
         }, {
             key: "goToStep",
@@ -415,13 +396,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                this.elems[this.step].node.classList.remove("tutorial-highlight");
                 this.step = step;
-                this.elems[this.step].node.classList.add("tutorial-highlight");
-
-                this._moveHighlightBox();
-                this._updateTutorialBox();
-                this._updateProgressBar();
             }
         }, {
             key: "_parseAdvancedStep",
@@ -627,6 +602,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _this6.next();
                 }, false);
 
+                Object.defineProperties(this.buttonText, {
+                    "next": {
+                        get: function get() {
+                            return _this6.options.buttons.next;
+                        },
+                        set: function set(x) {
+                            _this6.options.buttons.next = x;
+                            next.textContent = x;
+                        }
+                    },
+                    "prev": {
+                        get: function get() {
+                            return _this6.options.buttons.previous;
+                        },
+                        set: function set(x) {
+                            _this6.options.buttons.previous = x;
+                            back.textContent = x;
+                        }
+                    }
+                });
+
                 buttonbox.appendChild(position);
                 buttonbox.appendChild(close);
                 buttonbox.appendChild(buttonbox_wrapper);
@@ -726,7 +722,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _this7 = this;
 
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this.elems[0].node;
+                var first = this.elems[this.state._firstStep].node;
                 var last = this.elems[this.step].node;
 
                 this.state.transform.translateY = last.offsetTop - first.offsetTop;

@@ -35,7 +35,7 @@
     }
 
     class Step {
-        constructor(node, callback) {
+        constructor(ctx, node, callback) {
             this.node = node;
 
             if (!Object.keys(callback).length && typeof callback !== "function") {
@@ -46,43 +46,28 @@
                         return;
                     }
 
-                    callback.fn();
+                    callback.fn.call(this, ctx);
                     this.run = true;
                 }
             } else {
-                this.callback = callback.fn || callback;
+                this.callback = (callback.fn || callback).bind(this, ctx);
             }
         }
     }
 
     class NormalStep extends Step{
-        constructor(node, text, {title = "", callback = {}} ={}) {
-            super(node, callback);
+        constructor(ctx, node, text, {title = "", callback = {}} ={}) {
+            super(ctx, node, callback);
 
             this.type = "normal";
             this.text = text;
             this.title = title;
-
-            if(!Object.keys(callback).length && typeof callback !== "function") {
-                this.callback = () => {};
-            } else if(callback.once) {
-                this.callback = function() {
-                    if(this.run) {
-                        return;
-                    }
-
-                    callback.fn();
-                    this.run = true;
-                }
-            } else {
-                this.callback = callback.fn || callback;
-            }
         }
     }
 
     class ActionStep extends Step{
-        constructor(node, htmlId, {callback = {}} = {}) {
-            super(node, callback);
+        constructor(ctx, node, htmlId, {callback = {}} = {}) {
+            super(ctx, node, callback);
 
             this.type = "advanced";
             this.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
@@ -114,14 +99,14 @@
                     }
 
                     if (step.hasOwnProperty("action")) {
-                        let action = new ActionStep(node, step.action.template);
+                        let action = new ActionStep(this, node, step.action.template);
 
                         action.template = this._parseAdvancedStep(action);
                         action.template.classList.add("custom-box");
 
                         this.elems.push(action);
                     } else {
-                        this.elems.push(new NormalStep(node, step.text, {
+                        this.elems.push(new NormalStep(this, node, step.text, {
                             title: step.title,
                             callback: step.callback
                         }));
@@ -136,7 +121,7 @@
                     elems.sort((a, b) => {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    this.elems = elems.map(item => new Step(item, item.getAttribute("t-text"), {
+                    this.elems = elems.map(item => new NormalStep(this, item, item.getAttribute("t-text"), {
                         title: item.getAttribute("t-title")
                     }));
                 }
@@ -146,6 +131,7 @@
                 throw new Error("No activities point defined");
             } else {
                 this.name = name;
+                this.buttonText = {};
 
                 this.options = {
                     selector: selector,
@@ -171,7 +157,8 @@
                 this.state = {
                     running: false,
                     animation: false,
-                    type: this.elems[0].type
+                    type: this.elems[0].type,
+                    _firstStep: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0)
                 };
 
                 this.components = {
@@ -196,7 +183,13 @@
                 Object.defineProperty(this, "step", {
                     get: () => this.components._step,
                     set: x => {
+                        this.elems[this.components._step].node.classList.remove("tutorial-highlight");
                         this.components._step = x;
+                        this.elems[x].node.classList.add("tutorial-highlight");
+
+                        this._updateTutorialBox();
+                        this._updateProgressBar();
+                        this._moveHighlightBox();
 
                         if (this.options.persistent) {
                             this._saveCurrentPosition();
@@ -269,14 +262,8 @@
                 this.close();
                 return;
             } else {
-                this.elems[this.step].node.classList.remove("tutorial-highlight");
-                this.elems[--this.step].node.classList.add("tutorial-highlight");
-
-                this._moveHighlightBox();
+                this.step--;
             }
-
-            this._updateTutorialBox();
-            this._updateProgressBar();
         }
 
         next() {
@@ -299,14 +286,8 @@
                 this.close();
                 return;
             } else {
-                this.elems[this.step].node.classList.remove("tutorial-highlight");
-                this.elems[++this.step].node.classList.add("tutorial-highlight");
-
-                this._moveHighlightBox();
+                this.step++;
             }
-
-            this._updateTutorialBox();
-            this._updateProgressBar();
         }
 
         goToStep(step) {
@@ -319,13 +300,7 @@
                 return;
             }
 
-            this.elems[this.step].node.classList.remove("tutorial-highlight");
             this.step = step;
-            this.elems[this.step].node.classList.add("tutorial-highlight");
-
-            this._moveHighlightBox();
-            this._updateTutorialBox();
-            this._updateProgressBar();
         }
 
         _parseAdvancedStep(step) {
@@ -429,6 +404,23 @@
                 this.next();
             }, false);
 
+            Object.defineProperties(this.buttonText, {
+                "next": {
+                    get: () => this.options.buttons.next,
+                    set: x => {
+                        this.options.buttons.next = x;
+                        next.textContent = x;
+                    }
+                },
+                "prev": {
+                    get: () => this.options.buttons.previous,
+                    set: x => {
+                        this.options.buttons.previous = x;
+                        back.textContent = x;
+                    }
+                }
+            });
+
             buttonbox.appendChild(position);
             buttonbox.appendChild(close);
             buttonbox.appendChild(buttonbox_wrapper);
@@ -522,7 +514,7 @@
 
         _animateHighlightBox() {
             //https://aerotwist.com/blog/flip-your-animations/
-            let first = this.elems[0].node;
+            let first = this.elems[this.state._firstStep].node;
             let last = this.elems[this.step].node;
 
             this.state.transform.translateY = last.offsetTop - first.offsetTop;
