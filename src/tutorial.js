@@ -260,7 +260,6 @@
             //at first step
             if (this.step === 0) {
                 this.close();
-                return;
             } else {
                 this.step--;
             }
@@ -284,7 +283,6 @@
             //last step?
             if (this.step === this.elems.length - 1) {
                 this.close();
-                return;
             } else {
                 this.step++;
             }
@@ -470,7 +468,6 @@
         _updateProgressBar() {
 
             let progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
-
             progressTrack.style.width = (100/(this.elems.length-1)*this.step) + '%';
 
             for (var i = 0; i <= this.elems.length-1; i++) {
