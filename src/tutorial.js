@@ -530,10 +530,10 @@
 
 
             let tutorialBoxOffset = last.offsetHeight + (2 * this.options.padding.top) + 6;
-            let body = document.body,
-                html = document.documentElement;
 
             let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
+            let body = document.body,
+                html = document.documentElement;
 
             let windowHeight = Math.max( body.scrollHeight, body.offsetHeight,
                 html.clientHeight, html.scrollHeight, html.offsetHeight ) - progressBarHeight;
