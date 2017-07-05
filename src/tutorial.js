@@ -287,6 +287,7 @@
 
             if (this.options.debug)
                 console.log(`Going to next element: #${this.step === -1 ? 'Finished' : this.step}`);
+
         }
 
         goToStep(step) {
@@ -480,7 +481,6 @@
                 return;
 
             let progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
-
             progressTrack.style.width = (100/(this.elems.length-1)*this.step) + '%';
 
             for (var i = 0; i <= this.elems.length-1; i++) {
