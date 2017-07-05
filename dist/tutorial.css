@@ -102,6 +102,9 @@
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
           border-left: none; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a.disabled {
+          pointer-events: none;
+          color: #aaaaaa; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
         position: absolute;
         top: 20px;

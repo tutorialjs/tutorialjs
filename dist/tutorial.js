@@ -232,7 +232,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     scrolling: {
                         speed: scrollSpeed,
                         timer: null,
-                        position: window.scrollY
+                        position: 0
                     },
                     padding: {
                         top: padding.top === undefined ? 12 : buttons.close,
@@ -246,43 +246,64 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     debug: debug
                 };
 
+                var curPosition = this._getCurrentPosition() || 0;
+
                 this.state = {
                     running: false,
+                    completed: curPosition === -1,
                     animation: false,
+                    transform: {
+                        translateY: 0,
+                        translateX: 0
+                    },
                     type: this.elems[0].type,
-                    _firstStep: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0)
+                    _firstStep: parseInt(this.options.persistent ? curPosition : 0)
                 };
 
                 this.components = {
-                    _step: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0),
+                    _step: parseInt(this.options.persistent ? curPosition : 0),
                     _eventHandler: {
                         load: this.__load(),
                         resize: this.__resize()
                     },
                     _elements: _extends({
+                        progressBar: progressbar ? this._createProgressbar() : false,
                         blur: this._createBlurElement()
                     }, this._createTutorialBox())
                 };
                 this.components._elements.highlightBox = this._createHighlightBox(this.components._elements.tutorialBox);
-
-                if (progressbar) {
-                    this.components._elements.progressBar = this._createProgressbar();
-                }
-
-                this._reset();
 
                 Object.defineProperty(this, "step", {
                     get: function get() {
                         return _this3.components._step;
                     },
                     set: function set(x) {
-                        _this3.elems[_this3.components._step].node.classList.remove("tutorial-highlight");
-                        _this3.components._step = x;
-                        _this3.elems[x].node.classList.add("tutorial-highlight");
+                        if (!_this3.state.running) {
+                            console.warn("Tutorial is not running");
+                            return;
+                        }
 
-                        _this3._updateTutorialBox();
-                        _this3._updateProgressBar();
-                        _this3._moveHighlightBox();
+                        if (_this3.animating) {
+                            console.warn("Animation is already running");
+                            return;
+                        }
+
+                        if (x < 0) {
+                            _this3.close();
+                        }
+                        if (x === _this3.elems.length) {
+                            _this3.close();
+
+                            _this3.components._step = -1;
+                        } else {
+                            _this3.elems[_this3.components._step].node.classList.remove("tutorial-highlight");
+                            _this3.components._step = x;
+                            _this3.elems[x].node.classList.add("tutorial-highlight");
+
+                            _this3._updateTutorialBox();
+                            _this3._updateProgressBar();
+                            _this3._moveHighlightBox();
+                        }
 
                         if (_this3.options.persistent) {
                             _this3._saveCurrentPosition();
@@ -303,12 +324,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 if (this.state.running) {
                     console.warn("Tutorial instance already running");
+                } else if (this.step === -1) {
+                    console.warn("Tutoral already completed. Please reset steps.");
                 } else {
                     this.elems[this.step].node.classList.add("tutorial-highlight");
 
                     document.body.appendChild(this.components._elements.blur);
                     document.body.appendChild(this.components._elements.highlightBox);
-                    document.body.appendChild(this.components._elements.progressBar);
+
+                    if (this.components._elements.progressBar) document.body.appendChild(this.components._elements.progressBar);
 
                     this._moveHighlightBox();
                     this._updateTutorialBox();
@@ -327,62 +351,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
+                this.state.running = false;
+
                 this.elems[this.step].node.classList.remove("tutorial-highlight");
 
                 this.components._elements.highlightBox.style.transform = "";
-                this.components._elements.highlightBox.childNodes[0].style.transform = "";
+                this.components._elements.highlightBox.firstChild.style.transform = "";
 
                 document.body.removeChild(this.components._elements.blur);
                 document.body.removeChild(this.components._elements.highlightBox);
-                document.body.removeChild(this.components._elements.progressBar);
+
+                if (this.components._elements.progressBar) document.body.removeChild(this.components._elements.progressBar);
 
                 window.removeEventListener("resize", this.components._eventHandler.resize);
-                this._reset();
             }
         }, {
             key: "prev",
             value: function prev() {
-                if (!this.state.running) {
-                    console.warn("Tutorial is not running");
-                    return;
-                } else if (this.animating) {
-                    console.warn("Animation is already running");
-                    return;
-                }
+                this.step--;
 
                 if (this.options.debug) console.log("Going to previous element: #" + this.step);
-
-                //at first step
-                if (this.step === 0) {
-                    this.close();
-                    return;
-                } else {
-                    this.step--;
-                }
             }
         }, {
             key: "next",
             value: function next() {
-                if (!this.state.running) {
-                    console.warn("Tutorial is not running");
-                    return;
-                } else if (this.animating) {
-                    console.warn("Animation is already running");
-                    return;
-                }
-
-                if (this.options.debug) console.log("Going to next element: #" + this.step);
-
-                //run callback - good call position?
                 this.elems[this.step].callback();
 
-                //last step?
-                if (this.step === this.elems.length - 1) {
-                    this.close();
-                    return;
-                } else {
-                    this.step++;
-                }
+                this.step++;
+
+                if (this.options.debug) console.log("Going to next element: #" + (this.step === -1 ? 'Finished' : this.step));
             }
         }, {
             key: "goToStep",
@@ -397,6 +394,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
 
                 this.step = step;
+            }
+        }, {
+            key: "reset",
+            value: function reset() {
+                this.components._step = 0;
+                this.state._firstStep = 0;
+                this.state.transform.translateX = 0;
+                this.state.transform.translateY = 0;
             }
         }, {
             key: "_parseAdvancedStep",
@@ -640,7 +645,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     tutorialWrapper: content_wrapper,
                     tutorialTitle: title,
                     tutorialText: text,
-                    tutorialPosition: position
+                    tutorialPosition: position,
+                    tutorialButtonNext: next,
+                    tutorialButtonPrev: back
                 };
             }
         }, {
@@ -672,6 +679,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_updateProgressBar",
             value: function _updateProgressBar() {
+                if (!this.components._elements.progressBar) return;
 
                 var progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
 
@@ -694,23 +702,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_moveHighlightBox",
             value: function _moveHighlightBox() {
+                var _this7 = this;
+
                 if (this.state.running && this.options.animate) {
                     this.state.animating = true;
 
                     window.requestAnimationFrame(this._animateHighlightBox.bind(this));
                 } else {
                     var bounds = Util.getElementBounds(this.elems[this.step].node);
-                    var bottom = bounds.top + bounds.height + this.components._elements.tutorialBox.offsetHeight + this.options.padding.top * 2;
 
                     this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
                     this.components._elements.highlightBox.style.left = bounds.left - this.options.padding.left;
-                    this.components._elements.highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
-                    this.components._elements.highlightBox.childNodes[0].style.width = bounds.width + 2 * this.options.padding.left;
+                    this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
+                    this.components._elements.highlightBox.firstChild.style.width = bounds.width + 2 * this.options.padding.left;
 
                     this.components._elements.tutorialBox.style.top = bounds.height + 2 * this.options.padding.top + 6 + "px";
 
                     window.requestAnimationFrame(function () {
-                        window.scrollTo(0, bottom - (window.scrollY + window.innerHeight + window.scrollY));
+                        window.scrollTo(0, bounds.top - (window.innerHeight - (_this7.components._elements.tutorialBox.offsetHeight + _this7.components._elements.highlightBox.firstChild.offsetHeight)) / 2);
                     });
                 }
 
@@ -719,7 +728,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_animateHighlightBox",
             value: function _animateHighlightBox() {
-                var _this7 = this;
+                var _this8 = this;
 
                 //https://aerotwist.com/blog/flip-your-animations/
                 var first = this.elems[this.state._firstStep].node;
@@ -732,13 +741,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.components._elements.highlightBox.style.transform = "translateX(" + this.state.transform.translateX + "px) translateY(" + this.state.transform.translateY + "px)";
 
-                this.components._elements.highlightBox.childNodes[0].style.width = last.offsetWidth + 2 * this.options.padding.top;
-                this.components._elements.highlightBox.childNodes[0].style.height = last.offsetHeight + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.height = last.offsetHeight + 2 * this.options.padding.top;
 
                 this._scroll();
 
                 this.components._elements.highlightBox.addEventListener("transitionend", function () {
-                    _this7.state.animating = false;
+                    _this8.state.animating = false;
                 });
             }
         }, {
@@ -762,51 +771,39 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_saveCurrentPosition",
             value: function _saveCurrentPosition() {
                 if (this.options.advancedStorage) {
-                    window.localStorage.setItem("tutorial-" + this.name, this.step);
+                    window.localStorage.setItem("tutorial-" + this.name, this.components._step);
                 } else {
+                    //wrong - has to replace too
                     document.cookie += "tutorial-" + this.name + "=" + this.step + ";";
                 }
             }
         }, {
             key: "_getCurrentPosition",
             value: function _getCurrentPosition() {
-                var _this8 = this;
+                var _this9 = this;
 
                 if (this.options.advancedStorage) {
                     return window.localStorage.getItem("tutorial-" + this.name);
                 } else {
                     return document.cookie.split(",").filter(function (item) {
-                        return item.includes("tutorial-" + _this8.name);
+                        return item.includes("tutorial-" + _this9.name);
                     }).map(function (item) {
-                        return parseInt(item.replace("tutorial-" + _this8.name + "=", ""));
+                        return parseInt(item.replace("tutorial-" + _this9.name + "=", ""));
                     });
                 }
             }
         }, {
             key: "_scroll",
             value: function _scroll() {
-                var _this9 = this;
+                var _this10 = this;
 
-                var boxBounds = Util.getElementBounds(this.components._elements.tutorialBox);
-                var curElement = Util.getElementBounds(this.elems[this.step].node);
-
-                var bottom = curElement.top + curElement.height + boxBounds.height + this.options.padding.top * 2;
+                var center = this.elems[this.step].node.offsetTop - (window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) / 2;
 
                 window.requestAnimationFrame(function (stamp) {
-                    _this9.options.scrolling.timer = stamp;
-                    _this9.__scrollMovement(stamp, bottom);
-                });
-            }
-        }, {
-            key: "_reset",
-            value: function _reset() {
-                this.step = 0;
-                this.state.running = false;
+                    _this10.options.scrolling.timer = stamp;
 
-                this.state.transform = {
-                    translateY: 0,
-                    translateX: 0
-                };
+                    _this10.__scrollMovement(stamp, center);
+                });
             }
         }, {
             key: "__load",
@@ -833,28 +830,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: "__scrollMovement",
-            value: function __scrollMovement(timeStamp, bottom) {
-                var _this10 = this;
+            value: function __scrollMovement(timeStamp, center) {
+                var _this11 = this;
 
                 var timeDiff = timeStamp - this.options.scrolling.timer;
-                var next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, bottom - window.innerHeight - this.options.scrolling.position, this.options.scrolling.speed));
+                var next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, center - this.options.scrolling.position, this.options.scrolling.speed));
 
-                if (next < 0) {
-                    this.options.scrolling.position = window.scrollY;
-                    this.options.scrolling.timer = null;
-
-                    return;
-                } else if (bottom !== window.innerHeight + window.scrollY) {
-                    window.scrollTo(0, next);
-                }
+                window.scrollTo(0, next);
 
                 if (timeDiff < this.options.scrolling.speed) {
                     window.requestAnimationFrame(function (stamp) {
-                        _this10.__scrollMovement(stamp, bottom);
+                        _this11.__scrollMovement(stamp, center);
                     });
                 } else {
-                    this.options.scrolling.position = window.scrollY;
                     this.options.scrolling.timer = null;
+                    this.options.scrolling.position = Math.min(center, document.documentElement.offsetHeight - window.innerHeight);
                 }
             }
         }], [{

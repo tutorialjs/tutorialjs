@@ -38,10 +38,10 @@ kb = new Tutorial("nico<3", {
             text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
         }],
     debug: true,
-    persistent: true,
+    persistent: 1,
     buttons: {next: "Weiter"},
     autoplay: true,
-    progressbar: true
+    progressbar: false
 });
 
 function sayHello() {
