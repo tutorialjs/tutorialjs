@@ -477,24 +477,22 @@
         }
 
         _updateProgressBar() {
-            if(!this.components._elements.progressBar)
+            if(!this.components._elements.progressBar) {
                 return;
+            }
 
+            let progressSteps = Array.from(this.components._elements.progressBar.getElementsByTagName("li"));
             let progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
             progressTrack.style.width = (100/(this.elems.length-1)*this.step) + '%';
 
             for (var i = 0; i <= this.elems.length-1; i++) {
-                this.components._elements.progressBar.childNodes[1].childNodes[i].classList.remove("active");
+                progressSteps[i].classList.remove("active", "finished");
             }
 
-            for (var j = 0; j <= this.step-1; j++) {
-                this.components._elements.progressBar.childNodes[1].childNodes[j].classList.add("finished");
+            for (let j of progressSteps.slice(0, this.step)) {
+                j.classList.add("finished");
             }
 
-            if (!(this.step === this.elems.length-1)) {
-                this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
-                this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
-            }
             this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
         }
 

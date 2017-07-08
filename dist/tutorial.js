@@ -679,23 +679,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_updateProgressBar",
             value: function _updateProgressBar() {
-                if (!this.components._elements.progressBar) return;
+                if (!this.components._elements.progressBar) {
+                    return;
+                }
 
+                var progressSteps = Array.from(this.components._elements.progressBar.getElementsByTagName("li"));
                 var progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
-
                 progressTrack.style.width = 100 / (this.elems.length - 1) * this.step + '%';
 
                 for (var i = 0; i <= this.elems.length - 1; i++) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[i].classList.remove("active");
+                    progressSteps[i].classList.remove("active", "finished");
                 }
 
-                for (var j = 0; j <= this.step - 1; j++) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[j].classList.add("finished");
+                var _iteratorNormalCompletion6 = true;
+                var _didIteratorError6 = false;
+                var _iteratorError6 = undefined;
+
+                try {
+                    for (var _iterator6 = progressSteps.slice(0, this.step)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                        var j = _step6.value;
+
+                        j.classList.add("finished");
+                    }
+                } catch (err) {
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                            _iterator6.return();
+                        }
+                    } finally {
+                        if (_didIteratorError6) {
+                            throw _iteratorError6;
+                        }
+                    }
                 }
 
                 if (!(this.step === this.elems.length - 1)) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
-                    this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
+                    //this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
+                    //this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
                 }
                 this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
             }
