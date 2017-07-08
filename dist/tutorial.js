@@ -653,6 +653,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_createProgressbar",
             value: function _createProgressbar() {
+                var _this7 = this;
+
                 var progressBarWrapper = document.createElement("div");
                 var stepList = document.createElement("ul");
                 var progressTrack = document.createElement("div");
@@ -661,6 +663,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 progressBarWrapper.classList.add("progressbar-wrapper");
                 progressTrack.classList.add("progressbar-track");
 
+                var progressSteps = [];
                 for (var step = 0; step <= this.elems.length - 1; step++) {
                     var currentStep = document.createElement("li");
                     var currentStepText = document.createElement("span");
@@ -668,6 +671,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     currentStep.appendChild(currentStepText);
                     currentStep.style.left = 100 / (this.elems.length - 1) * step + '%';
                     stepList.appendChild(currentStep);
+                    progressSteps.push(currentStep);
+
+                    currentStep.addEventListener("click", function (e) {
+                        _this7.goToStep(e.target.textContent - 1);
+                    }, false);
                 }
 
                 progressTrack.appendChild(currentProgressTrack);
@@ -721,7 +729,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_moveHighlightBox",
             value: function _moveHighlightBox() {
-                var _this7 = this;
+                var _this8 = this;
 
                 if (this.state.running && this.options.animate) {
                     this.state.animating = true;
@@ -738,7 +746,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.tutorialBox.style.top = bounds.height + 2 * this.options.padding.top + 6 + "px";
 
                     window.requestAnimationFrame(function () {
-                        window.scrollTo(0, bounds.top - (window.innerHeight - (_this7.components._elements.tutorialBox.offsetHeight + _this7.components._elements.highlightBox.firstChild.offsetHeight)) / 2);
+                        window.scrollTo(0, bounds.top - (window.innerHeight - (_this8.components._elements.tutorialBox.offsetHeight + _this8.components._elements.highlightBox.firstChild.offsetHeight)) / 2);
                     });
                 }
 
@@ -747,7 +755,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_animateHighlightBox",
             value: function _animateHighlightBox() {
-                var _this8 = this;
+                var _this9 = this;
 
                 //https://aerotwist.com/blog/flip-your-animations/
                 var first = this.elems[this.state._firstStep].node;
@@ -766,7 +774,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this._scroll();
 
                 this.components._elements.highlightBox.addEventListener("transitionend", function () {
-                    _this8.state.animating = false;
+                    _this9.state.animating = false;
                 });
             }
         }, {
@@ -799,29 +807,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_getCurrentPosition",
             value: function _getCurrentPosition() {
-                var _this9 = this;
+                var _this10 = this;
 
                 if (this.options.advancedStorage) {
                     return window.localStorage.getItem("tutorial-" + this.name);
                 } else {
                     return document.cookie.split(",").filter(function (item) {
-                        return item.includes("tutorial-" + _this9.name);
+                        return item.includes("tutorial-" + _this10.name);
                     }).map(function (item) {
-                        return parseInt(item.replace("tutorial-" + _this9.name + "=", ""));
+                        return parseInt(item.replace("tutorial-" + _this10.name + "=", ""));
                     });
                 }
             }
         }, {
             key: "_scroll",
             value: function _scroll() {
-                var _this10 = this;
+                var _this11 = this;
 
                 var center = this.elems[this.step].node.offsetTop - (window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) / 2;
 
                 window.requestAnimationFrame(function (stamp) {
-                    _this10.options.scrolling.timer = stamp;
+                    _this11.options.scrolling.timer = stamp;
 
-                    _this10.__scrollMovement(stamp, center);
+                    _this11.__scrollMovement(stamp, center);
                 });
             }
         }, {
@@ -850,7 +858,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "__scrollMovement",
             value: function __scrollMovement(timeStamp, center) {
-                var _this11 = this;
+                var _this12 = this;
 
                 var timeDiff = timeStamp - this.options.scrolling.timer;
                 var next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, center - this.options.scrolling.position, this.options.scrolling.speed));
@@ -859,7 +867,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 if (timeDiff < this.options.scrolling.speed) {
                     window.requestAnimationFrame(function (stamp) {
-                        _this11.__scrollMovement(stamp, center);
+                        _this12.__scrollMovement(stamp, center);
                     });
                 } else {
                     this.options.scrolling.timer = null;
