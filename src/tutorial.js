@@ -493,7 +493,7 @@
                 j.classList.add("finished");
             }
 
-            this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
+            progressSteps[this.step].classList.add("active");
         }
 
         _moveHighlightBox() {

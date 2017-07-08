@@ -716,11 +716,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 }
 
-                if (!(this.step === this.elems.length - 1)) {
-                    //this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
-                    //this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
-                }
-                this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
+                progressSteps[this.step].classList.add("active");
             }
         }, {
             key: "_moveHighlightBox",
