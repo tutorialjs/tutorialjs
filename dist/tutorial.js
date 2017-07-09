@@ -337,6 +337,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._moveHighlightBox();
                     this._updateTutorialBox();
                     this._updateProgressBar();
+                    this._checkAndFixHighlightboxOrientation();
 
                     this.state.running = true;
 

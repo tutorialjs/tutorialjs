@@ -244,6 +244,7 @@
                 this._moveHighlightBox();
                 this._updateTutorialBox();
                 this._updateProgressBar();
+                this._checkAndFixHighlightboxOrientation()
 
                 this.state.running = true;
 
