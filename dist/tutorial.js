@@ -60,7 +60,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return Util;
     }();
 
-    var Step = function Step(node, callback) {
+    var Step = function Step(ctx, node, callback) {
         _classCallCheck(this, Step);
 
         this.node = node;
@@ -73,19 +73,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                callback.fn();
+                callback.fn.call(this, ctx);
                 this.run = true;
             };
         } else {
-            this.callback = callback.fn || callback;
+            this.callback = (callback.fn || callback).bind(this, ctx);
         }
     };
 
     var NormalStep = function (_Step) {
         _inherits(NormalStep, _Step);
 
-        function NormalStep(node, text) {
-            var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        function NormalStep(ctx, node, text) {
+            var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
                 _ref$title = _ref.title,
                 title = _ref$title === undefined ? "" : _ref$title,
                 _ref$callback = _ref.callback,
@@ -93,26 +93,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             _classCallCheck(this, NormalStep);
 
-            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, node, callback));
+            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, ctx, node, callback));
 
             _this.type = "normal";
             _this.text = text;
             _this.title = title;
-
-            if (!Object.keys(callback).length && typeof callback !== "function") {
-                _this.callback = function () {};
-            } else if (callback.once) {
-                _this.callback = function () {
-                    if (this.run) {
-                        return;
-                    }
-
-                    callback.fn();
-                    this.run = true;
-                };
-            } else {
-                _this.callback = callback.fn || callback;
-            }
             return _this;
         }
 
@@ -122,14 +107,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var ActionStep = function (_Step2) {
         _inherits(ActionStep, _Step2);
 
-        function ActionStep(node, htmlId) {
-            var _ref2 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        function ActionStep(ctx, node, htmlId) {
+            var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
                 _ref2$callback = _ref2.callback,
                 callback = _ref2$callback === undefined ? {} : _ref2$callback;
 
             _classCallCheck(this, ActionStep);
 
-            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, node, callback));
+            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, ctx, node, callback));
 
             _this2.type = "advanced";
             _this2.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
@@ -186,14 +171,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }
 
                         if (step.hasOwnProperty("action")) {
-                            var action = new ActionStep(node, step.action.template);
+                            var action = new ActionStep(this, node, step.action.template);
 
                             action.template = this._parseAdvancedStep(action);
                             action.template.classList.add("custom-box");
 
                             this.elems.push(action);
                         } else {
-                            this.elems.push(new NormalStep(node, step.text, {
+                            this.elems.push(new NormalStep(this, node, step.text, {
                                 title: step.title,
                                 callback: step.callback
                             }));
@@ -227,7 +212,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
                     this.elems = elems.map(function (item) {
-                        return new Step(item, item.getAttribute("t-text"), {
+                        return new NormalStep(_this3, item, item.getAttribute("t-text"), {
                             title: item.getAttribute("t-title")
                         });
                     });
@@ -238,6 +223,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 throw new Error("No activities point defined");
             } else {
                 this.name = name;
+                this.buttonText = {};
 
                 this.options = {
                     selector: selector,
@@ -246,7 +232,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     scrolling: {
                         speed: scrollSpeed,
                         timer: null,
-                        position: window.scrollY
+                        position: 0
                     },
                     padding: {
                         top: padding.top === undefined ? 12 : buttons.close,
@@ -260,36 +246,64 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     debug: debug
                 };
 
+                var curPosition = this._getCurrentPosition() || 0;
+
                 this.state = {
                     running: false,
+                    completed: curPosition === -1,
                     animation: false,
-                    type: this.elems[0].type
+                    transform: {
+                        translateY: 0,
+                        translateX: 0
+                    },
+                    type: this.elems[0].type,
+                    _firstStep: parseInt(this.options.persistent ? curPosition : 0)
                 };
 
                 this.components = {
-                    _step: parseInt(this.options.persistent ? this._getCurrentPosition() || 0 : 0),
+                    _step: parseInt(this.options.persistent ? curPosition : 0),
                     _eventHandler: {
                         load: this.__load(),
                         resize: this.__resize()
                     },
                     _elements: _extends({
+                        progressBar: progressbar ? this._createProgressbar() : false,
                         blur: this._createBlurElement()
                     }, this._createTutorialBox())
                 };
                 this.components._elements.highlightBox = this._createHighlightBox(this.components._elements.tutorialBox);
-
-                if (progressbar) {
-                    this.components._elements.progressBar = this._createProgressbar();
-                }
-
-                this._reset();
 
                 Object.defineProperty(this, "step", {
                     get: function get() {
                         return _this3.components._step;
                     },
                     set: function set(x) {
-                        _this3.components._step = x;
+                        if (!_this3.state.running) {
+                            console.warn("Tutorial is not running");
+                            return;
+                        }
+
+                        if (_this3.animating) {
+                            console.warn("Animation is already running");
+                            return;
+                        }
+
+                        if (x < 0) {
+                            _this3.close();
+                        }
+                        if (x === _this3.elems.length) {
+                            _this3.close();
+
+                            _this3.components._step = -1;
+                        } else {
+                            _this3.elems[_this3.components._step].node.classList.remove("tutorial-highlight");
+                            _this3.components._step = x;
+                            _this3.elems[x].node.classList.add("tutorial-highlight");
+
+                            _this3._updateTutorialBox();
+                            _this3._updateProgressBar();
+                            _this3._moveHighlightBox();
+                        }
 
                         if (_this3.options.persistent) {
                             _this3._saveCurrentPosition();
@@ -310,12 +324,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 if (this.state.running) {
                     console.warn("Tutorial instance already running");
+                } else if (this.step === -1) {
+                    console.warn("Tutoral already completed. Please reset steps.");
                 } else {
                     this.elems[this.step].node.classList.add("tutorial-highlight");
 
                     document.body.appendChild(this.components._elements.blur);
                     document.body.appendChild(this.components._elements.highlightBox);
-                    document.body.appendChild(this.components._elements.progressBar);
+
+                    if (this.components._elements.progressBar) document.body.appendChild(this.components._elements.progressBar);
 
                     this._moveHighlightBox();
                     this._updateTutorialBox();
@@ -334,74 +351,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
+                this.state.running = false;
+
                 this.elems[this.step].node.classList.remove("tutorial-highlight");
 
                 this.components._elements.highlightBox.style.transform = "";
-                this.components._elements.highlightBox.childNodes[0].style.transform = "";
+                this.components._elements.highlightBox.firstChild.style.transform = "";
 
                 document.body.removeChild(this.components._elements.blur);
                 document.body.removeChild(this.components._elements.highlightBox);
-                document.body.removeChild(this.components._elements.progressBar);
+
+                if (this.components._elements.progressBar) document.body.removeChild(this.components._elements.progressBar);
 
                 window.removeEventListener("resize", this.components._eventHandler.resize);
-                this._reset();
             }
         }, {
             key: "prev",
             value: function prev() {
-                if (!this.state.running) {
-                    console.warn("Tutorial is not running");
-                    return;
-                } else if (this.animating) {
-                    console.warn("Animation is already running");
-                    return;
-                }
+                this.step--;
 
                 if (this.options.debug) console.log("Going to previous element: #" + this.step);
-
-                //at first step
-                if (this.step === 0) {
-                    this.close();
-                    return;
-                } else {
-                    this.elems[this.step].node.classList.remove("tutorial-highlight");
-                    this.elems[--this.step].node.classList.add("tutorial-highlight");
-
-                    this._moveHighlightBox();
-                }
-
-                this._updateTutorialBox();
-                this._updateProgressBar();
             }
         }, {
             key: "next",
             value: function next() {
-                if (!this.state.running) {
-                    console.warn("Tutorial is not running");
-                    return;
-                } else if (this.animating) {
-                    console.warn("Animation is already running");
-                    return;
-                }
-
-                if (this.options.debug) console.log("Going to next element: #" + this.step);
-
-                //run callback - good call position?
                 this.elems[this.step].callback();
 
-                //last step?
-                if (this.step === this.elems.length - 1) {
-                    this.close();
-                    return;
-                } else {
-                    this.elems[this.step].node.classList.remove("tutorial-highlight");
-                    this.elems[++this.step].node.classList.add("tutorial-highlight");
+                this.step++;
 
-                    this._moveHighlightBox();
-                }
-
-                this._updateTutorialBox();
-                this._updateProgressBar();
+                if (this.options.debug) console.log("Going to next element: #" + (this.step === -1 ? 'Finished' : this.step));
             }
         }, {
             key: "goToStep",
@@ -415,13 +393,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return;
                 }
 
-                this.elems[this.step].node.classList.remove("tutorial-highlight");
                 this.step = step;
-                this.elems[this.step].node.classList.add("tutorial-highlight");
-
-                this._moveHighlightBox();
-                this._updateTutorialBox();
-                this._updateProgressBar();
+            }
+        }, {
+            key: "reset",
+            value: function reset() {
+                this.components._step = 0;
+                this.state._firstStep = 0;
+                this.state.transform.translateX = 0;
+                this.state.transform.translateY = 0;
             }
         }, {
             key: "_parseAdvancedStep",
@@ -627,6 +607,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     _this6.next();
                 }, false);
 
+                Object.defineProperties(this.buttonText, {
+                    "next": {
+                        get: function get() {
+                            return _this6.options.buttons.next;
+                        },
+                        set: function set(x) {
+                            _this6.options.buttons.next = x;
+                            next.textContent = x;
+                        }
+                    },
+                    "prev": {
+                        get: function get() {
+                            return _this6.options.buttons.previous;
+                        },
+                        set: function set(x) {
+                            _this6.options.buttons.previous = x;
+                            back.textContent = x;
+                        }
+                    }
+                });
+
                 buttonbox.appendChild(position);
                 buttonbox.appendChild(close);
                 buttonbox.appendChild(buttonbox_wrapper);
@@ -644,12 +645,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     tutorialWrapper: content_wrapper,
                     tutorialTitle: title,
                     tutorialText: text,
-                    tutorialPosition: position
+                    tutorialPosition: position,
+                    tutorialButtonNext: next,
+                    tutorialButtonPrev: back
                 };
             }
         }, {
             key: "_createProgressbar",
             value: function _createProgressbar() {
+                var _this7 = this;
+
                 var progressBarWrapper = document.createElement("div");
                 var stepList = document.createElement("ul");
                 var progressTrack = document.createElement("div");
@@ -658,6 +663,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 progressBarWrapper.classList.add("progressbar-wrapper");
                 progressTrack.classList.add("progressbar-track");
 
+                var progressSteps = [];
                 for (var step = 0; step <= this.elems.length - 1; step++) {
                     var currentStep = document.createElement("li");
                     var currentStepText = document.createElement("span");
@@ -665,6 +671,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     currentStep.appendChild(currentStepText);
                     currentStep.style.left = 100 / (this.elems.length - 1) * step + '%';
                     stepList.appendChild(currentStep);
+                    progressSteps.push(currentStep);
+
+                    currentStep.addEventListener("click", function (e) {
+                        _this7.goToStep(e.target.textContent - 1);
+                    }, false);
                 }
 
                 progressTrack.appendChild(currentProgressTrack);
@@ -676,45 +687,66 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_updateProgressBar",
             value: function _updateProgressBar() {
+                if (!this.components._elements.progressBar) {
+                    return;
+                }
 
+                var progressSteps = Array.from(this.components._elements.progressBar.getElementsByTagName("li"));
                 var progressTrack = this.components._elements.progressBar.childNodes[0].childNodes[0];
-
                 progressTrack.style.width = 100 / (this.elems.length - 1) * this.step + '%';
 
                 for (var i = 0; i <= this.elems.length - 1; i++) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[i].classList.remove("active");
+                    progressSteps[i].classList.remove("active", "finished");
                 }
 
-                for (var j = 0; j <= this.step - 1; j++) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[j].classList.add("finished");
+                var _iteratorNormalCompletion6 = true;
+                var _didIteratorError6 = false;
+                var _iteratorError6 = undefined;
+
+                try {
+                    for (var _iterator6 = progressSteps.slice(0, this.step)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+                        var j = _step6.value;
+
+                        j.classList.add("finished");
+                    }
+                } catch (err) {
+                    _didIteratorError6 = true;
+                    _iteratorError6 = err;
+                } finally {
+                    try {
+                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                            _iterator6.return();
+                        }
+                    } finally {
+                        if (_didIteratorError6) {
+                            throw _iteratorError6;
+                        }
+                    }
                 }
 
-                if (!(this.step === this.elems.length - 1)) {
-                    this.components._elements.progressBar.childNodes[1].childNodes[this.step + 1].classList.remove("active");
-                    this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.remove("finished");
-                }
-                this.components._elements.progressBar.childNodes[1].childNodes[this.step].classList.add("active");
+                progressSteps[this.step].classList.add("active");
             }
         }, {
             key: "_moveHighlightBox",
             value: function _moveHighlightBox() {
+                var _this8 = this;
+
                 if (this.state.running && this.options.animate) {
                     this.state.animating = true;
 
                     window.requestAnimationFrame(this._animateHighlightBox.bind(this));
                 } else {
                     var bounds = Util.getElementBounds(this.elems[this.step].node);
-                    var bottom = bounds.top + bounds.height + this.components._elements.tutorialBox.offsetHeight + this.options.padding.top * 2;
 
                     this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
                     this.components._elements.highlightBox.style.left = bounds.left - this.options.padding.left;
-                    this.components._elements.highlightBox.childNodes[0].style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
-                    this.components._elements.highlightBox.childNodes[0].style.width = bounds.width + 2 * this.options.padding.left;
+                    this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
+                    this.components._elements.highlightBox.firstChild.style.width = bounds.width + 2 * this.options.padding.left;
 
                     this.components._elements.tutorialBox.style.top = bounds.height + 2 * this.options.padding.top + 6 + "px";
 
                     window.requestAnimationFrame(function () {
-                        window.scrollTo(0, bottom - (window.scrollY + window.innerHeight + window.scrollY));
+                        window.scrollTo(0, bounds.top - (window.innerHeight - (_this8.components._elements.tutorialBox.offsetHeight + _this8.components._elements.highlightBox.firstChild.offsetHeight)) / 2);
                     });
                 }
 
@@ -723,10 +755,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_animateHighlightBox",
             value: function _animateHighlightBox() {
-                var _this7 = this;
+                var _this9 = this;
 
                 //https://aerotwist.com/blog/flip-your-animations/
-                var first = this.elems[0].node;
+                var first = this.elems[this.state._firstStep].node;
                 var last = this.elems[this.step].node;
 
                 this.state.transform.translateY = last.offsetTop - first.offsetTop;
@@ -751,13 +783,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.components._elements.highlightBox.style.transform = "translateX(" + this.state.transform.translateX + "px) translateY(" + this.state.transform.translateY + "px)";
 
-                this.components._elements.highlightBox.childNodes[0].style.width = last.offsetWidth + 2 * this.options.padding.top;
-                this.components._elements.highlightBox.childNodes[0].style.height = last.offsetHeight + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.height = last.offsetHeight + 2 * this.options.padding.top;
 
                 this._scroll();
 
                 this.components._elements.highlightBox.addEventListener("transitionend", function () {
-                    _this7.state.animating = false;
+                    _this9.state.animating = false;
                 });
             }
         }, {
@@ -781,52 +813,39 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "_saveCurrentPosition",
             value: function _saveCurrentPosition() {
                 if (this.options.advancedStorage) {
-                    window.localStorage.setItem("tutorial-" + this.name, this.step);
+                    window.localStorage.setItem("tutorial-" + this.name, this.components._step);
                 } else {
+                    //wrong - has to replace too
                     document.cookie += "tutorial-" + this.name + "=" + this.step + ";";
                 }
             }
         }, {
             key: "_getCurrentPosition",
             value: function _getCurrentPosition() {
-                var _this8 = this;
+                var _this10 = this;
 
                 if (this.options.advancedStorage) {
                     return window.localStorage.getItem("tutorial-" + this.name);
                 } else {
                     return document.cookie.split(",").filter(function (item) {
-                        return item.includes("tutorial-" + _this8.name);
+                        return item.includes("tutorial-" + _this10.name);
                     }).map(function (item) {
-                        return parseInt(item.replace("tutorial-" + _this8.name + "=", ""));
+                        return parseInt(item.replace("tutorial-" + _this10.name + "=", ""));
                     });
                 }
             }
         }, {
             key: "_scroll",
             value: function _scroll() {
-                var _this9 = this;
+                var _this11 = this;
 
-                var boxBounds = Util.getElementBounds(this.components._elements.tutorialBox);
-                var curElement = Util.getElementBounds(this.elems[this.step].node);
-                var progressBarHeight = this.components._elements.progressBar.offsetHeight || 0;
-
-                var bottom = curElement.top + curElement.height + boxBounds.height + this.options.padding.top * 2 + progressBarHeight;
+                var center = this.elems[this.step].node.offsetTop - (window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) / 2;
 
                 window.requestAnimationFrame(function (stamp) {
-                    _this9.options.scrolling.timer = stamp;
-                    _this9.__scrollMovement(stamp, bottom);
-                });
-            }
-        }, {
-            key: "_reset",
-            value: function _reset() {
-                this.step = 0;
-                this.state.running = false;
+                    _this11.options.scrolling.timer = stamp;
 
-                this.state.transform = {
-                    translateY: 0,
-                    translateX: 0
-                };
+                    _this11.__scrollMovement(stamp, center);
+                });
             }
         }, {
             key: "__load",
@@ -853,28 +872,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }, {
             key: "__scrollMovement",
-            value: function __scrollMovement(timeStamp, bottom) {
-                var _this10 = this;
+            value: function __scrollMovement(timeStamp, center) {
+                var _this12 = this;
 
                 var timeDiff = timeStamp - this.options.scrolling.timer;
-                var next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, bottom - window.innerHeight - this.options.scrolling.position, this.options.scrolling.speed));
+                var next = Math.ceil(Util.easeOutQuad(timeDiff, this.options.scrolling.position, center - this.options.scrolling.position, this.options.scrolling.speed));
 
-                if (next < 0) {
-                    this.options.scrolling.position = window.scrollY;
-                    this.options.scrolling.timer = null;
-
-                    return;
-                } else if (bottom !== window.innerHeight + window.scrollY) {
-                    window.scrollTo(0, next);
-                }
+                window.scrollTo(0, next);
 
                 if (timeDiff < this.options.scrolling.speed) {
                     window.requestAnimationFrame(function (stamp) {
-                        _this10.__scrollMovement(stamp, bottom);
+                        _this12.__scrollMovement(stamp, center);
                     });
                 } else {
-                    this.options.scrolling.position = window.scrollY;
                     this.options.scrolling.timer = null;
+                    this.options.scrolling.position = Math.min(center, document.documentElement.offsetHeight - window.innerHeight);
                 }
             }
         }], [{

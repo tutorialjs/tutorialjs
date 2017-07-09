@@ -148,6 +148,11 @@
           border-bottom-right-radius: 2px;
           border-left: none;
         }
+
+        &.disabled {
+          pointer-events: none;
+          color: #aaaaaa;
+        }
       }
 
       & > .tutorial-close {
@@ -220,6 +225,7 @@
       width: 30px;
       top: 50%;
       transform: translateY(-50%);
+      cursor:pointer;
 
       & > span {
         border: 1px solid #ddd;

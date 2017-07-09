@@ -15,7 +15,7 @@
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-flow": "^6.23.0",
     "chai": "^4.0.0",
-    "flow-bin": "^0.47.0",
+    "flow-bin": "^0.49.1",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^4.0.0",
     "gulp-babel": "^6.1.2",

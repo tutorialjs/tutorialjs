@@ -102,6 +102,9 @@
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
           border-left: none; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a.disabled {
+          pointer-events: none;
+          color: #aaaaaa; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
         position: absolute;
         top: 20px;
@@ -156,7 +159,8 @@
       margin-left: -15px;
       width: 30px;
       top: 50%;
-      transform: translateY(-50%); }
+      transform: translateY(-50%);
+      cursor: pointer; }
       .progressbar-wrapper > ul > li > span {
         border: 1px solid #ddd;
         border-radius: 50px;
