@@ -610,11 +610,16 @@
 
             let calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top +
                 this.components._elements.highlightBox.offsetHeight + window.scrollY +
-                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
+                this.components._elements.tutorialBox.offsetHeight //+ tutorialBoxOffset;
 
             if (calculatedHeight > windowHeight ) {
                 this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
-                // TODO: How can we change the pseudo Element to get a down arrow
+                this.components._elements.tutorialBox.classList.add("north")
+                this.components._elements.tutorialBox.classList.remove("south")
+            }
+            else {
+                this.components._elements.tutorialBox.classList.add("south")
+                this.components._elements.tutorialBox.classList.remove("north")
             }
         }
 
