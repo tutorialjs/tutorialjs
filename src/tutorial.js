@@ -600,9 +600,8 @@
         }
 
         _checkAndFixHighlightboxOrientation() {
-            let tutorialBoxOffset = this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top) + 6;
-
             let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
+
             let body = document.body,
                 html = document.documentElement;
 
@@ -614,7 +613,7 @@
                 this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
 
             if (calculatedHeight > windowHeight ) {
-                this.components._elements.tutorialBox.style.top = - tutorialBoxOffset
+                this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
                 // TODO: How can we change the pseudo Element to get a down arrow
             }
         }

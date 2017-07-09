@@ -840,9 +840,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "_checkAndFixHighlightboxOrientation",
             value: function _checkAndFixHighlightboxOrientation() {
-                var tutorialBoxOffset = this.components._elements.tutorialBox.offsetHeight + 2 * this.options.padding.top + 6;
-
                 var progressBarHeight = this.components._elements.progressBar.offsetHeight || 0;
+
                 var body = document.body,
                     html = document.documentElement;
 
@@ -851,7 +850,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
 
                 if (calculatedHeight > windowHeight) {
-                    this.components._elements.tutorialBox.style.top = -tutorialBoxOffset;
+                    this.components._elements.tutorialBox.style.top = -(this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
                     // TODO: How can we change the pseudo Element to get a down arrow
                 }
             }
