@@ -614,9 +614,7 @@
                 this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
 
             if (calculatedHeight > windowHeight ) {
-                this.components._elements.highlightBox.classList.add("skip-animation");
                 this.components._elements.tutorialBox.style.top = - tutorialBoxOffset
-                this.components._elements.highlightBox.classList.remove("skip-animation");
                 // TODO: How can we change the pseudo Element to get a down arrow
             }
         }
