@@ -535,28 +535,7 @@
             this.state.transform.translateY = last.offsetTop - first.offsetTop;
             this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
 
-
-            let tutorialBoxOffset = last.offsetHeight + (2 * this.options.padding.top) + 6;
-
-            let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
-            let body = document.body,
-                html = document.documentElement;
-
-            let windowHeight = Math.max( body.scrollHeight, body.offsetHeight,
-                html.clientHeight, html.scrollHeight, html.offsetHeight ) - progressBarHeight;
-
-            let calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top +
-                this.components._elements.highlightBox.offsetHeight + window.scrollY +
-                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
-
-            if (calculatedHeight < windowHeight )
-            {
-                this.components._elements.tutorialBox.style.top = tutorialBoxOffset + "px"
-            } else {
-                this.components._elements.tutorialBox.style.top = - tutorialBoxOffset - this.components._elements.tutorialWrapper.offsetHeight  + 2 * this.options.padding.top + 6 + "px"
-                // TODO: How can we change the pseudo Element to get a down arrow
-            }
-
+            this.components._elements.tutorialBox.style.top = last.offsetHeight + (2 * this.options.padding.top) + 6 + "px";
             this.components._elements.highlightBox.style.transform = `translateX(${this.state.transform.translateX}px) translateY(${this.state.transform.translateY}px)`;
 
             this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + (2 * this.options.padding.top);
@@ -566,6 +545,7 @@
 
             this.components._elements.highlightBox.addEventListener("transitionend", () => {
                 this.state.animating = false;
+                this._checkAndFixHighlightboxOrientation();
             })
         }
 
@@ -605,6 +585,10 @@
             }
         }
 
+        _getProgressbarHeight() {
+            return this.components._elements.progressBar.offsetHeight || 0
+        }
+
         _scroll() {
             let center = this.elems[this.step].node.offsetTop - ((window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) /2 )
 
@@ -613,6 +597,28 @@
 
                 this.__scrollMovement(stamp, center);
             });
+        }
+
+        _checkAndFixHighlightboxOrientation() {
+            let tutorialBoxOffset = this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top) + 6;
+
+            let progressBarHeight = this.components._elements.progressBar.offsetHeight || 0
+            let body = document.body,
+                html = document.documentElement;
+
+            let windowHeight = Math.max( body.scrollHeight, body.offsetHeight,
+                    html.clientHeight, html.scrollHeight, html.offsetHeight ) - progressBarHeight;
+
+            let calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top +
+                this.components._elements.highlightBox.offsetHeight + window.scrollY +
+                this.components._elements.tutorialBox.offsetHeight + tutorialBoxOffset;
+
+            if (calculatedHeight > windowHeight ) {
+                this.components._elements.highlightBox.classList.add("skip-animation");
+                this.components._elements.tutorialBox.style.top = - tutorialBoxOffset
+                this.components._elements.highlightBox.classList.remove("skip-animation");
+                // TODO: How can we change the pseudo Element to get a down arrow
+            }
         }
 
         __load() {
