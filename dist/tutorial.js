@@ -733,10 +733,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
 
                 var tutorialBoxOffset = last.offsetHeight + 2 * this.options.padding.top + 6;
-                var body = document.body,
-                    html = document.documentElement;
 
                 var progressBarHeight = this.components._elements.progressBar.offsetHeight || 0;
+                var body = document.body,
+                    html = document.documentElement;
 
                 var windowHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight) - progressBarHeight;
 
