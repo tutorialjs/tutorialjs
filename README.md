@@ -3,7 +3,7 @@ _tutorial.js is currently under development. This README.md is made for the fina
 # tutorial.js
 tutorial.js is a lightweight JavaScript-Library to introduce your website.
 
-[Demonstration](http://example.com)
+[Demonstration](http://tutorialjs.github.io)
 
 # Features
 
