@@ -1,4 +1,4 @@
-//v0.1.0
+//v0.1.2
 
 (function (window, document, undefined) {
     "use strict";
@@ -311,9 +311,9 @@
         }
 
         _parseAdvancedStep(step) {
-            let wrapper = document.createElement("div");
-            let attr = Tutorial.actions.baseAttributes;
-            let custom = Tutorial.actions.custom;
+            const wrapper = document.createElement("div");
+            const attr = Tutorial.actions.baseAttributes;
+            const custom = Tutorial.actions.custom;
 
             wrapper.insertAdjacentHTML("afterbegin", step.template);
 
@@ -452,10 +452,10 @@
         }
 
         _createProgressbar() {
-            let progressBarWrapper = document.createElement("div");
-            let stepList = document.createElement("ul");
-            let progressTrack = document.createElement("div");
-            let currentProgressTrack = document.createElement("span");
+            const progressBarWrapper = document.createElement("div");
+            const stepList = document.createElement("ul");
+            const progressTrack = document.createElement("div");
+            const currentProgressTrack = document.createElement("span");
 
             progressBarWrapper.classList.add("progressbar-wrapper");
             progressTrack.classList.add("progressbar-track");
@@ -502,10 +502,12 @@
 
                 window.requestAnimationFrame(this._animateHighlightBox.bind(this));
             } else {
-                let bounds = Util.getElementBounds(this.elems[this.step].node);
+                const bounds = Util.getElementBounds(this.elems[this.step].node);
+                const leftRightBorder = bounds.left - this.options.padding.left;
 
                 this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
-                this.components._elements.highlightBox.style.left = bounds.left - this.options.padding.left;
+                this.components._elements.highlightBox.style.left = leftRightBorder;
+                this.components._elements.highlightBox.style.right = leftRightBorder;
                 this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + (2 * this.options.padding.top);
                 this.components._elements.highlightBox.firstChild.style.width = bounds.width + (2 * this.options.padding.left);
 
@@ -596,10 +598,12 @@
 
         __resize() {
             return function handler() {
+                const leftRightBorder = this.elems[this.state._firstStep].node.offsetLeft - this.options.padding.left;
                 this.components._elements.highlightBox.classList.add("skip-animation");
 
-                this.components._elements.highlightBox.style.left = this.elems[0].node.offsetLeft - this.options.padding.left;
-                this.components._elements.highlightBox.style.top = this.elems[0].node.offsetTop - this.options.padding.top;
+                this.components._elements.highlightBox.style.left = leftRightBorder;
+                this.components._elements.highlightBox.style.right = leftRightBorder;
+                this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
 
                 this._animateHighlightBox();
 
