@@ -158,7 +158,8 @@
       margin-left: -15px;
       width: 30px;
       top: 50%;
-      transform: translateY(-50%); }
+      transform: translateY(-50%);
+      cursor: pointer; }
       .progressbar-wrapper > ul > li > span {
         border: 1px solid #ddd;
         border-radius: 50px;

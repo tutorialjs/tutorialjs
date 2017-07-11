@@ -460,6 +460,7 @@
             progressBarWrapper.classList.add("progressbar-wrapper");
             progressTrack.classList.add("progressbar-track");
 
+            let progressSteps = [];
             for (let step = 0; step <= this.elems.length-1; step++) {
                 let currentStep = document.createElement("li");
                 let currentStepText = document.createElement("span");
@@ -467,7 +468,14 @@
                 currentStep.appendChild(currentStepText);
                 currentStep.style.left = (100/(this.elems.length-1) * step) + '%';
                 stepList.appendChild(currentStep);
+                progressSteps.push(currentStep);
+
+                currentStep.addEventListener("click", e => {
+                    this.goToStep(e.target.textContent-1);
+                }, false);
             }
+
+
 
             progressTrack.appendChild(currentProgressTrack);
             progressBarWrapper.appendChild(progressTrack);
