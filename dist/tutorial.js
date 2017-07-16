@@ -337,6 +337,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this._moveHighlightBox();
                     this._updateTutorialBox();
                     this._updateProgressBar();
+                    this._checkAndFixHighlightboxOrientation();
 
                     this.state.running = true;
 
@@ -767,7 +768,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
 
                 this.components._elements.tutorialBox.style.top = last.offsetHeight + 2 * this.options.padding.top + 6 + "px";
-
                 this.components._elements.highlightBox.style.transform = "translateX(" + this.state.transform.translateX + "px) translateY(" + this.state.transform.translateY + "px)";
 
                 this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + 2 * this.options.padding.top;
@@ -777,6 +777,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.components._elements.highlightBox.addEventListener("transitionend", function () {
                     _this9.state.animating = false;
+                    _this9._checkAndFixHighlightboxOrientation();
                 });
             }
         }, {
@@ -822,6 +823,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }
             }
         }, {
+            key: "_getProgressbarHeight",
+            value: function _getProgressbarHeight() {
+                return this.components._elements.progressBar.offsetHeight || 0;
+            }
+        }, {
             key: "_scroll",
             value: function _scroll() {
                 var _this11 = this;
@@ -833,6 +839,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     _this11.__scrollMovement(stamp, center);
                 });
+            }
+        }, {
+            key: "_checkAndFixHighlightboxOrientation",
+            value: function _checkAndFixHighlightboxOrientation() {
+                var progressBarHeight = this.components._elements.progressBar.offsetHeight || 0;
+
+                var body = document.body,
+                    html = document.documentElement;
+
+                var windowHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight) - progressBarHeight;
+
+                var calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight; //+ tutorialBoxOffset;
+
+                if (calculatedHeight > windowHeight) {
+                    this.components._elements.tutorialBox.style.top = -(this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
+                    this.components._elements.tutorialBox.classList.add("north");
+                    this.components._elements.tutorialBox.classList.remove("south");
+                } else {
+                    this.components._elements.tutorialBox.classList.add("south");
+                    this.components._elements.tutorialBox.classList.remove("north");
+                }
             }
         }, {
             key: "__load",
@@ -854,6 +881,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
 
                     this._animateHighlightBox();
+                    this._checkAndFixHighlightboxOrientation();
 
                     //debounce to remove after 200ms
                     this.components._elements.highlightBox.classList.remove("skip-animation");

@@ -83,7 +83,7 @@
 
   will-change: top;
 
-  &:before {
+  &.south:before {
       content: "";
       position: absolute;
       top: -5px;
@@ -92,7 +92,17 @@
       border-right: 5px solid transparent;
       border-bottom: 5px solid white;
   }
-  
+
+  &.north:after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left:10px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
+  }
+
   & > .custom-box {
     padding: 15px;
 
