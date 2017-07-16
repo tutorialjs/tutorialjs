@@ -881,6 +881,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
 
                     this._animateHighlightBox();
+                    this._checkAndFixHighlightboxOrientation();
 
                     //debounce to remove after 200ms
                     this.components._elements.highlightBox.classList.remove("skip-animation");
