@@ -41,7 +41,7 @@ kb = new Tutorial("nico<3", {
     persistent: 1,
     buttons: {next: "Weiter"},
     autoplay: true,
-    progressbar: true
+    progressbar: false
 });
 
 function sayHello() {

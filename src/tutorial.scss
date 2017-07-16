@@ -68,13 +68,12 @@
 }
 
 .tutorial-box {
-  position: absolute;
+  position: relative;
   display: inline-block;
 
   z-index: 9998;
 
-  min-width: 320px;
-  width: 30%;
+  min-width: 240px;
   max-width: 400px;
 
   border-radius: 4px;

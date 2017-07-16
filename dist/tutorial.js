@@ -10,7 +10,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-//v0.1.0
+//v0.1.2
 
 (function (window, document, undefined) {
     "use strict";
@@ -738,9 +738,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     window.requestAnimationFrame(this._animateHighlightBox.bind(this));
                 } else {
                     var bounds = Util.getElementBounds(this.elems[this.step].node);
+                    var leftRightBorder = bounds.left - this.options.padding.left;
 
                     this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
-                    this.components._elements.highlightBox.style.left = bounds.left - this.options.padding.left;
+                    this.components._elements.highlightBox.style.left = leftRightBorder;
+                    this.components._elements.highlightBox.style.right = leftRightBorder;
                     this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
                     this.components._elements.highlightBox.firstChild.style.width = bounds.width + 2 * this.options.padding.left;
 
@@ -871,10 +873,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "__resize",
             value: function __resize() {
                 return function handler() {
+                    var leftRightBorder = this.elems[this.state._firstStep].node.offsetLeft - this.options.padding.left;
                     this.components._elements.highlightBox.classList.add("skip-animation");
 
-                    this.components._elements.highlightBox.style.left = this.elems[0].node.offsetLeft - this.options.padding.left;
-                    this.components._elements.highlightBox.style.top = this.elems[0].node.offsetTop - this.options.padding.top;
+                    this.components._elements.highlightBox.style.left = leftRightBorder;
+                    this.components._elements.highlightBox.style.right = leftRightBorder;
+                    this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
 
                     this._animateHighlightBox();
 
