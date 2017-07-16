@@ -20,7 +20,7 @@ let httpServer;
 gulp.task("default", () => {
     return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
-            presets: ["flow", "es2015", "es2017"],
+            presets: ["es2015", "es2017"],
             plugins: ["transform-object-rest-spread"]
         }))
         .pipe(gulp.dest(path.join(__dirname, "/dist")))
@@ -35,9 +35,8 @@ gulp.task('sass', function () {
 gulp.task("minifyJS", () => {
     return gulp.src(path.join(__dirname, "/src/tutorial.js"))
         .pipe(babel({
-            presets: ["flow", "es2015", "es2017"],
+            presets: ["es2015", "es2017"],
             plugins: ["transform-object-rest-spread"]
-
         }))
         .pipe(stripDebug())
         .pipe(uglify())

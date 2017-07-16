@@ -46,17 +46,16 @@
   background-color: white; }
 
 .tutorial-box {
-  position: absolute;
+  position: relative;
   display: inline-block;
   z-index: 9998;
-  min-width: 320px;
-  width: 30%;
+  min-width: 240px;
   max-width: 400px;
   border-radius: 4px;
   box-shadow: 0px 1px 2px #333;
   background-color: white;
   will-change: top; }
-  .tutorial-box:before {
+  .tutorial-box.south:before {
     content: "";
     position: absolute;
     top: -5px;
@@ -64,6 +63,14 @@
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-bottom: 5px solid white; }
+  .tutorial-box.north:after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 10px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white; }
   .tutorial-box > .custom-box {
     padding: 15px;
     overflow: hidden; }
@@ -102,6 +109,9 @@
           border-top-right-radius: 2px;
           border-bottom-right-radius: 2px;
           border-left: none; }
+        .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > div > a.disabled {
+          pointer-events: none;
+          color: #aaaaaa; }
       .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close {
         position: absolute;
         top: 20px;
@@ -120,3 +130,57 @@
           transform: rotateZ(45deg); }
         .tutorial-box > .tutorial-box-wrapper > .tutorial-buttons > .tutorial-close:after {
           transform: rotateZ(-45deg); }
+
+.progressbar-wrapper {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 50px;
+  background: white;
+  z-index: 9999;
+  padding: 0px 50px;
+  box-sizing: border-box; }
+  .progressbar-wrapper > .progressbar-track {
+    width: 100%;
+    position: relative;
+    left: 0px;
+    height: 5px;
+    background: #f2f2f2;
+    margin: 25px 0px; }
+    .progressbar-wrapper > .progressbar-track > span {
+      position: absolute;
+      width: 0%;
+      left: 0px;
+      height: 5px;
+      background: #79d679;
+      transition: width 1s; }
+  .progressbar-wrapper > ul {
+    position: relative;
+    margin-top: -53px;
+    padding: 0px 40px;
+    height: 100%; }
+    .progressbar-wrapper > ul > li {
+      list-style-type: none;
+      position: absolute;
+      margin-left: -15px;
+      width: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer; }
+      .progressbar-wrapper > ul > li > span {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        width: 25px;
+        height: 25px;
+        display: block;
+        text-align: center;
+        margin: 0 auto;
+        line-height: 25px;
+        background: white;
+        transition: 0.2s; }
+      .progressbar-wrapper > ul > li.active, .progressbar-wrapper > ul > li.finished {
+        color: white; }
+        .progressbar-wrapper > ul > li.active > span, .progressbar-wrapper > ul > li.finished > span {
+          background: #79d679;
+          border: 1px solid #79d679; }
