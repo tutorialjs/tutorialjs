@@ -4,7 +4,7 @@
 html {
     font-size: 16px;
     padding: 0px;
-    font-family:"Lato", Arial, sans-serif;
+    font-family: "Lato", Arial, sans-serif;
     color:#485863;
 }
 
@@ -36,7 +36,8 @@ pre {
 }
 
 .section {
-    width: 600px;
+    #width: 600px;
+    width: 100%;
     margin: 40px auto;
 }
 
