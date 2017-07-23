@@ -24,12 +24,13 @@
         }
 
         static getElementBounds(el) {
+            let element_position = el.getBoundingClientRect();
             return {
-                top: el.offsetTop,
-                left: el.offsetLeft,
-                bottom: el.offsetTop + el.offsetHeight,
-                width: el.offsetWidth,
-                height: el.offsetHeight
+                top: element_position.top,
+                left: element_position.left,
+                bottom: element_position.top + element_position.height,
+                width: element_position.width,
+                height: element_position.height
             };
         }
     }

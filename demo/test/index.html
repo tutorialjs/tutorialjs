@@ -10,17 +10,16 @@
         <link rel="stylesheet" type="text/css" href="style.css">
         <script type="text/javascript" src="../../dist/tutorial.js" defer></script>
         <script type="text/javascript" src="main.js" defer></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 
     </head>
     <body>
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-8">
+            <div class="col-md-12">
                     <div class="section center first-step" t-step="1" t-text="1">
                         <h1>Tutorial.js</h1>
                         <p>A lightweight introductory tool for your application</p>
@@ -74,8 +73,6 @@ var guide = new Tutorial({
                     <div class="section scroll-test" t-step="5"  t-text="5">
                         <p>Smooth scrolling is in, too</p>
                     </div>
-            </div>
-            <div class="col-md-2">
             </div>
         </div>
     </div>
