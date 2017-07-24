@@ -669,8 +669,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 for (var step = 0; step <= this.elems.length - 1; step++) {
                     var currentStep = document.createElement("li");
                     var currentStepText = document.createElement("span");
+                    var currentStepTitle = document.createElement("i");
+
+                    currentStepTitle.classList.add("step-title");
+
                     currentStepText.textContent = step + 1;
+
+                    if (!(this.elems[step].title == "")) {
+                        currentStepTitle.textContent = this.elems[step].title;
+                        currentStep.appendChild(currentStepTitle);
+                    }
                     currentStep.appendChild(currentStepText);
+
                     currentStep.style.left = 100 / (this.elems.length - 1) * step + '%';
                     stepList.appendChild(currentStep);
                     progressSteps.push(currentStep);

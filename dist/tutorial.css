@@ -168,6 +168,31 @@
       top: 50%;
       transform: translateY(-50%);
       cursor: pointer; }
+      .progressbar-wrapper > ul > li > .step-title {
+        opacity: 0;
+        visibility: hidden;
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        background: white;
+        padding: 10px;
+        transform: translateX(-50%) translateY(-25px);
+        font-style: normal;
+        color: #485863;
+        transition: 0.2s; }
+        .progressbar-wrapper > ul > li > .step-title:after {
+          content: "";
+          position: absolute;
+          bottom: -4px;
+          left: 50%;
+          transform: translateX(-50%);
+          border-left: 5px solid rgba(255, 255, 255, 0);
+          border-right: 5px solid transparent;
+          border-top: 5px solid white; }
+      .progressbar-wrapper > ul > li:hover .step-title {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-60px); }
       .progressbar-wrapper > ul > li > span {
         border: 1px solid #ddd;
         border-radius: 50px;
@@ -176,7 +201,7 @@
         display: block;
         text-align: center;
         margin: 0 auto;
-        line-height: 25px;
+        line-height: 24px;
         background: white;
         transition: 0.2s; }
       .progressbar-wrapper > ul > li.active, .progressbar-wrapper > ul > li.finished {
@@ -184,3 +209,15 @@
         .progressbar-wrapper > ul > li.active > span, .progressbar-wrapper > ul > li.finished > span {
           background: #79d679;
           border: 1px solid #79d679; }
+
+@media (max-width: 768px) {
+  .progressbar-wrapper > ul > li {
+    display: none; }
+  .progressbar-wrapper > .progressbar-track,
+  .progressbar-wrapper > .progressbar-track > span,
+  .progressbar-wrapper {
+    height: 10px; }
+  .progressbar-wrapper {
+    padding: 0px; }
+  .progressbar-wrapper > .progressbar-track {
+    margin: 0px; } }
