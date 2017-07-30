@@ -47,12 +47,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "getElementBounds",
             value: function getElementBounds(el) {
+                var element_position = el.getBoundingClientRect();
                 return {
-                    top: el.offsetTop,
-                    left: el.offsetLeft,
-                    bottom: el.offsetTop + el.offsetHeight,
-                    width: el.offsetWidth,
-                    height: el.offsetHeight
+                    top: element_position.top,
+                    left: element_position.left,
+                    bottom: element_position.top + element_position.height,
+                    width: element_position.width,
+                    height: element_position.height
                 };
             }
         }]);
@@ -750,7 +751,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     var bounds = Util.getElementBounds(this.elems[this.step].node);
                     var leftRightBorder = bounds.left - this.options.padding.left;
 
-                    this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
+                    this.components._elements.highlightBox.style.top = bounds.top + window.scrollY - this.options.padding.top;
                     this.components._elements.highlightBox.style.left = leftRightBorder;
                     this.components._elements.highlightBox.style.right = leftRightBorder;
                     this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + 2 * this.options.padding.top;
@@ -774,14 +775,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var first = this.elems[this.state._firstStep].node;
                 var last = this.elems[this.step].node;
 
-                this.state.transform.translateY = last.offsetTop - first.offsetTop;
-                this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
+                this.state.transform.translateY = Util.getElementBounds(last).top - Util.getElementBounds(first).top;
+                this.state.transform.translateX = Util.getElementBounds(last).left - Util.getElementBounds(first).left;
 
-                this.components._elements.tutorialBox.style.top = last.offsetHeight + 2 * this.options.padding.top + 6 + "px";
+                this.components._elements.tutorialBox.style.top = Util.getElementBounds(last).height + 2 * this.options.padding.top + 6 + "px";
                 this.components._elements.highlightBox.style.transform = "translateX(" + this.state.transform.translateX + "px) translateY(" + this.state.transform.translateY + "px)";
 
-                this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + 2 * this.options.padding.top;
-                this.components._elements.highlightBox.firstChild.style.height = last.offsetHeight + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.width = Util.getElementBounds(last).width + 2 * this.options.padding.top;
+                this.components._elements.highlightBox.firstChild.style.height = Util.getElementBounds(last).height + 2 * this.options.padding.top;
 
                 this._scroll();
 
@@ -842,8 +843,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function _scroll() {
                 var _this11 = this;
 
-                var center = this.elems[this.step].node.offsetTop - (window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) / 2;
-
+                var center = Util.getElementBounds(this.elems[this.step].node).top - (window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) / 2;
                 window.requestAnimationFrame(function (stamp) {
                     _this11.options.scrolling.timer = stamp;
 
@@ -883,12 +883,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "__resize",
             value: function __resize() {
                 return function handler() {
-                    var leftRightBorder = this.elems[this.state._firstStep].node.offsetLeft - this.options.padding.left;
+                    var leftRightBorder = Util.getElementBounds(this.elems[this.state._firstStep].node).left - this.options.padding.left;
                     this.components._elements.highlightBox.classList.add("skip-animation");
 
                     this.components._elements.highlightBox.style.left = leftRightBorder;
                     this.components._elements.highlightBox.style.right = leftRightBorder;
-                    this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
+                    this.components._elements.highlightBox.style.top = Util.getElementBounds(this.elems[this.state._firstStep].node).top - this.options.padding.top;
 
                     this._animateHighlightBox();
                     this._checkAndFixHighlightboxOrientation();

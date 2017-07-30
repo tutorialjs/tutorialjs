@@ -38,7 +38,7 @@ kb = new Tutorial("nico<3", {
             text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
         }],
     debug: true,
-    persistent: 1,
+    persistent: false,
     buttons: {next: "Weiter"},
     autoplay: true,
     progressbar: true

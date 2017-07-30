@@ -24,12 +24,13 @@
         }
 
         static getElementBounds(el) {
+            let element_position = el.getBoundingClientRect();
             return {
-                top: el.offsetTop,
-                left: el.offsetLeft,
-                bottom: el.offsetTop + el.offsetHeight,
-                width: el.offsetWidth,
-                height: el.offsetHeight
+                top: element_position.top,
+                left: element_position.left,
+                bottom: element_position.top + element_position.height,
+                width: element_position.width,
+                height: element_position.height
             };
         }
     }
@@ -244,7 +245,7 @@
                 this._moveHighlightBox();
                 this._updateTutorialBox();
                 this._updateProgressBar();
-                this._checkAndFixHighlightboxOrientation()
+                this._checkAndFixHighlightboxOrientation();
 
                 this.state.running = true;
 
@@ -524,7 +525,7 @@
                 const bounds = Util.getElementBounds(this.elems[this.step].node);
                 const leftRightBorder = bounds.left - this.options.padding.left;
 
-                this.components._elements.highlightBox.style.top = bounds.top - this.options.padding.top;
+                this.components._elements.highlightBox.style.top = bounds.top + window.scrollY - this.options.padding.top;
                 this.components._elements.highlightBox.style.left = leftRightBorder;
                 this.components._elements.highlightBox.style.right = leftRightBorder;
                 this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + (2 * this.options.padding.top);
@@ -545,14 +546,14 @@
             let first = this.elems[this.state._firstStep].node;
             let last = this.elems[this.step].node;
 
-            this.state.transform.translateY = last.offsetTop - first.offsetTop;
-            this.state.transform.translateX = last.offsetLeft - first.offsetLeft;
+            this.state.transform.translateY = Util.getElementBounds(last).top - Util.getElementBounds(first).top;
+            this.state.transform.translateX = Util.getElementBounds(last).left - Util.getElementBounds(first).left;
 
-            this.components._elements.tutorialBox.style.top = last.offsetHeight + (2 * this.options.padding.top) + 6 + "px";
+            this.components._elements.tutorialBox.style.top = Util.getElementBounds(last).height + (2 * this.options.padding.top) + 6 + "px";
             this.components._elements.highlightBox.style.transform = `translateX(${this.state.transform.translateX}px) translateY(${this.state.transform.translateY}px)`;
 
-            this.components._elements.highlightBox.firstChild.style.width = last.offsetWidth + (2 * this.options.padding.top);
-            this.components._elements.highlightBox.firstChild.style.height = last.offsetHeight + (2 * this.options.padding.top);
+            this.components._elements.highlightBox.firstChild.style.width = Util.getElementBounds(last).width + (2 * this.options.padding.top);
+            this.components._elements.highlightBox.firstChild.style.height = Util.getElementBounds(last).height + (2 * this.options.padding.top);
 
             this._scroll();
 
@@ -603,8 +604,7 @@
         }
 
         _scroll() {
-            let center = this.elems[this.step].node.offsetTop - ((window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) /2 )
-
+            let center = Util.getElementBounds(this.elems[this.step].node).top - ((window.innerHeight - (this.components._elements.tutorialBox.offsetHeight + this.components._elements.highlightBox.firstChild.offsetHeight)) /2 );
             window.requestAnimationFrame(stamp => {
                 this.options.scrolling.timer = stamp;
 
@@ -645,15 +645,15 @@
 
         __resize() {
             return function handler() {
-                const leftRightBorder = this.elems[this.state._firstStep].node.offsetLeft - this.options.padding.left;
+                const leftRightBorder = Util.getElementBounds(this.elems[this.state._firstStep].node).left - this.options.padding.left;
                 this.components._elements.highlightBox.classList.add("skip-animation");
 
                 this.components._elements.highlightBox.style.left = leftRightBorder;
                 this.components._elements.highlightBox.style.right = leftRightBorder;
-                this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
+                this.components._elements.highlightBox.style.top = Util.getElementBounds(this.elems[this.state._firstStep].node).top - this.options.padding.top;
 
                 this._animateHighlightBox();
-                this._checkAndFixHighlightboxOrientation()
+                this._checkAndFixHighlightboxOrientation();
 
 
                 //debounce to remove after 200ms
