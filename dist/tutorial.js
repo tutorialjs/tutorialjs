@@ -884,14 +884,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "__resize",
             value: function __resize() {
                 return function handler() {
-                    var leftRightBorder = this.elems[this.state._firstStep].node.offsetLeft - this.options.padding.left;
+                    var bounds = Util.getElementBounds(this.elems[this.state._firstStep].node);
+                    var leftRightBorder = bounds.left - this.options.padding.left;
+                    var topBorder = bounds.top - this.options.padding.top;
+
                     this.components._elements.highlightBox.classList.add("skip-animation");
 
                     this.components._elements.highlightBox.style.left = leftRightBorder;
                     this.components._elements.highlightBox.style.right = leftRightBorder;
-                    this.components._elements.highlightBox.style.top = this.elems[this.state._firstStep].node.offsetTop - this.options.padding.top;
+                    this.components._elements.highlightBox.style.top = topBorder;
 
-                    this._animateHighlightBox();
+                    this._moveHighlightBox();
                     this._checkAndFixHighlightboxOrientation();
 
                     //debounce to remove after 200ms
