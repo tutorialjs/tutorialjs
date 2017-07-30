@@ -36,8 +36,9 @@
     }
 
     class Step {
-        constructor(ctx, node, callback) {
+        constructor(ctx, node, callback, position="auto") {
             this.node = node;
+            this.position = position
 
             if (!Object.keys(callback).length && typeof callback !== "function") {
                 this.callback = () => {};
@@ -57,8 +58,8 @@
     }
 
     class NormalStep extends Step{
-        constructor(ctx, node, text, {title = "", callback = {}} ={}) {
-            super(ctx, node, callback);
+        constructor(ctx, node, text, {title = "", callback = {}, position = "auto"} ={}) {
+            super(ctx, node, callback, position);
 
             this.type = "normal";
             this.text = text;
@@ -67,8 +68,8 @@
     }
 
     class ActionStep extends Step{
-        constructor(ctx, node, htmlId, {callback = {}} = {}) {
-            super(ctx, node, callback);
+        constructor(ctx, node, htmlId, {callback = {}, position = "auto"} = {}) {
+            super(ctx, node, callback, position);
 
             this.type = "advanced";
             this.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
@@ -109,7 +110,8 @@
                     } else {
                         this.elems.push(new NormalStep(this, node, step.text, {
                             title: step.title,
-                            callback: step.callback
+                            callback: step.callback,
+                            position: step.position
                         }));
                     }
                 }
@@ -122,7 +124,8 @@
                     elems.sort((a, b) => {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    this.elems = elems.map(item => new NormalStep(this, item, item.getAttribute("t-text"), {
+                    let position = item.getAttribute("t-position") || "auto";
+                    this.elems = elems.map(item => new NormalStep(this, item, item.getAttribute("t-text"), position, {
                         title: item.getAttribute("t-title")
                     }));
                 }
@@ -625,14 +628,30 @@
                 this.components._elements.highlightBox.offsetHeight + window.scrollY +
                 this.components._elements.tutorialBox.offsetHeight //+ tutorialBoxOffset;
 
-            if (calculatedHeight > windowHeight ) {
+            let pos = this.elems[this.step].position
+            console.log(pos);
+
+            this.components._elements.tutorialBox.classList.remove("north");
+            this.components._elements.tutorialBox.classList.remove("east");
+            this.components._elements.tutorialBox.classList.remove("south");
+            this.components._elements.tutorialBox.classList.remove("west");
+
+            if (pos === "top" || pos === "auto" && calculatedHeight > windowHeight ) {
                 this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
                 this.components._elements.tutorialBox.classList.add("north")
-                this.components._elements.tutorialBox.classList.remove("south")
             }
-            else {
+            else if (pos === "bottom" || pos === "auto" && calculatedHeight <= windowHeight) {
                 this.components._elements.tutorialBox.classList.add("south")
-                this.components._elements.tutorialBox.classList.remove("north")
+            }
+            else if (pos === "left") {
+                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
+                this.components._elements.tutorialBox.style.left = - (this.components._elements.tutorialBox.offsetWidth + (2 * this.options.padding.left - 8));
+                this.components._elements.tutorialBox.classList.add("west");
+            }
+            else if (pos === "right") {
+                this.components._elements.tutorialBox.classList.add("east")
+                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
+                this.components._elements.tutorialBox.style.right = - 0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8));
             }
         }
 
