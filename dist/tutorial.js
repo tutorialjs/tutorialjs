@@ -883,17 +883,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "__resize",
             value: function __resize() {
                 return function handler() {
-                    var leftRightBorder = Util.getElementBounds(this.elems[this.state._firstStep].node).left - this.options.padding.left;
+                    var bounds = Util.getElementBounds(this.elems[this.state._firstStep].node);
+                    var leftRightBorder = bounds.left - this.options.padding.left;
+                    var topBorder = bounds.top - this.options.padding.top;
+
                     this.components._elements.highlightBox.classList.add("skip-animation");
 
                     this.components._elements.highlightBox.style.left = leftRightBorder;
                     this.components._elements.highlightBox.style.right = leftRightBorder;
-                    this.components._elements.highlightBox.style.top = Util.getElementBounds(this.elems[this.state._firstStep].node).top - this.options.padding.top;
+                    this.components._elements.highlightBox.style.top = topBorder;
 
                     this._animateHighlightBox();
                     this._checkAndFixHighlightboxOrientation();
 
-                    //debounce to remove after 200ms
+                    // debounce to remove after 200ms
                     this.components._elements.highlightBox.classList.remove("skip-animation");
                 }.bind(this);
             }

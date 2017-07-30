@@ -645,18 +645,20 @@
 
         __resize() {
             return function handler() {
-                const leftRightBorder = Util.getElementBounds(this.elems[this.state._firstStep].node).left - this.options.padding.left;
+                const bounds = Util.getElementBounds(this.elems[this.state._firstStep].node)
+                const leftRightBorder = bounds.left - this.options.padding.left
+                const topBorder = bounds.top - this.options.padding.top
+
                 this.components._elements.highlightBox.classList.add("skip-animation");
 
                 this.components._elements.highlightBox.style.left = leftRightBorder;
                 this.components._elements.highlightBox.style.right = leftRightBorder;
-                this.components._elements.highlightBox.style.top = Util.getElementBounds(this.elems[this.state._firstStep].node).top - this.options.padding.top;
+                this.components._elements.highlightBox.style.top = topBorder;
 
                 this._animateHighlightBox();
                 this._checkAndFixHighlightboxOrientation();
 
-
-                //debounce to remove after 200ms
+                // debounce to remove after 200ms
                 this.components._elements.highlightBox.classList.remove("skip-animation");
             }.bind(this);
         }
