@@ -784,6 +784,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var first = this.elems[this.state._firstStep].node;
                 var last = this.elems[this.step].node;
 
+                if (this._shouldSmoothTutorialboxTransition()) {
+                    this.components._elements.tutorialBox.classList.add("hidden");
+                }
+
                 this.state.transform.translateY = Util.getElementBounds(last).top - Util.getElementBounds(first).top;
                 this.state.transform.translateX = Util.getElementBounds(last).left - Util.getElementBounds(first).left;
 
@@ -894,6 +898,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.tutorialBox.style.top = -0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
                     this.components._elements.tutorialBox.style.right = -0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8));
                 }
+                if (this._shouldSmoothTutorialboxTransition()) {
+                    this.components._elements.tutorialBox.classList.remove("hidden");
+                }
+                this.last_position = pos;
+            }
+        }, {
+            key: "_shouldSmoothTutorialboxTransition",
+            value: function _shouldSmoothTutorialboxTransition() {
+                return this.last_position && this.last_position != this.elems[this.step].position;
             }
         }, {
             key: "__load",
