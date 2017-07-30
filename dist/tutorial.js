@@ -62,9 +62,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }();
 
     var Step = function Step(ctx, node, callback) {
+        var position = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "auto";
+
         _classCallCheck(this, Step);
 
         this.node = node;
+        this.position = position;
 
         if (!Object.keys(callback).length && typeof callback !== "function") {
             this.callback = function () {};
@@ -90,11 +93,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 _ref$title = _ref.title,
                 title = _ref$title === undefined ? "" : _ref$title,
                 _ref$callback = _ref.callback,
-                callback = _ref$callback === undefined ? {} : _ref$callback;
+                callback = _ref$callback === undefined ? {} : _ref$callback,
+                _ref$position = _ref.position,
+                position = _ref$position === undefined ? "auto" : _ref$position;
 
             _classCallCheck(this, NormalStep);
 
-            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, ctx, node, callback));
+            var _this = _possibleConstructorReturn(this, (NormalStep.__proto__ || Object.getPrototypeOf(NormalStep)).call(this, ctx, node, callback, position));
 
             _this.type = "normal";
             _this.text = text;
@@ -111,11 +116,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         function ActionStep(ctx, node, htmlId) {
             var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
                 _ref2$callback = _ref2.callback,
-                callback = _ref2$callback === undefined ? {} : _ref2$callback;
+                callback = _ref2$callback === undefined ? {} : _ref2$callback,
+                _ref2$position = _ref2.position,
+                position = _ref2$position === undefined ? "auto" : _ref2$position;
 
             _classCallCheck(this, ActionStep);
 
-            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, ctx, node, callback));
+            var _this2 = _possibleConstructorReturn(this, (ActionStep.__proto__ || Object.getPrototypeOf(ActionStep)).call(this, ctx, node, callback, position));
 
             _this2.type = "advanced";
             _this2.template = document.getElementById(htmlId.substr(1)).childNodes[0].data;
@@ -181,7 +188,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         } else {
                             this.elems.push(new NormalStep(this, node, step.text, {
                                 title: step.title,
-                                callback: step.callback
+                                callback: step.callback,
+                                position: step.position
                             }));
                         }
                     }
@@ -212,8 +220,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     elems.sort(function (a, b) {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
+                    var position = item.getAttribute("t-position") || "auto";
                     this.elems = elems.map(function (item) {
-                        return new NormalStep(_this3, item, item.getAttribute("t-text"), {
+                        return new NormalStep(_this3, item, item.getAttribute("t-text"), position, {
                             title: item.getAttribute("t-title")
                         });
                     });
@@ -775,6 +784,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var first = this.elems[this.state._firstStep].node;
                 var last = this.elems[this.step].node;
 
+                if (this._shouldSmoothTutorialboxTransition()) {
+                    this.components._elements.tutorialBox.classList.add("hidden");
+                }
+
                 this.state.transform.translateY = Util.getElementBounds(last).top - Util.getElementBounds(first).top;
                 this.state.transform.translateX = Util.getElementBounds(last).left - Util.getElementBounds(first).left;
 
@@ -862,14 +875,38 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 var calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight; //+ tutorialBoxOffset;
 
-                if (calculatedHeight > windowHeight) {
+                var pos = this.elems[this.step].position;
+
+                this.components._elements.tutorialBox.classList.remove("north");
+                this.components._elements.tutorialBox.classList.remove("east");
+                this.components._elements.tutorialBox.classList.remove("south");
+                this.components._elements.tutorialBox.classList.remove("west");
+                this.components._elements.tutorialBox.style.left = "";
+                this.components._elements.tutorialBox.style.right = "";
+
+                if (pos === "top" || pos === "auto" && calculatedHeight > windowHeight) {
                     this.components._elements.tutorialBox.style.top = -(this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
                     this.components._elements.tutorialBox.classList.add("north");
-                    this.components._elements.tutorialBox.classList.remove("south");
-                } else {
+                } else if (pos === "bottom" || pos === "auto" && calculatedHeight <= windowHeight) {
                     this.components._elements.tutorialBox.classList.add("south");
-                    this.components._elements.tutorialBox.classList.remove("north");
+                } else if (pos === "left") {
+                    this.components._elements.tutorialBox.style.top = -0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
+                    this.components._elements.tutorialBox.style.left = -(this.components._elements.tutorialBox.offsetWidth + (2 * this.options.padding.left - 8));
+                    this.components._elements.tutorialBox.classList.add("west");
+                } else if (pos === "right") {
+                    this.components._elements.tutorialBox.classList.add("east");
+                    this.components._elements.tutorialBox.style.top = -0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
+                    this.components._elements.tutorialBox.style.right = -0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8));
                 }
+                if (this._shouldSmoothTutorialboxTransition()) {
+                    this.components._elements.tutorialBox.classList.remove("hidden");
+                }
+                this.last_position = pos;
+            }
+        }, {
+            key: "_shouldSmoothTutorialboxTransition",
+            value: function _shouldSmoothTutorialboxTransition() {
+                return this.last_position && this.last_position != this.elems[this.step].position;
             }
         }, {
             key: "__load",
@@ -883,17 +920,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "__resize",
             value: function __resize() {
                 return function handler() {
-                    var leftRightBorder = Util.getElementBounds(this.elems[this.state._firstStep].node).left - this.options.padding.left;
+                    var bounds = Util.getElementBounds(this.elems[this.state._firstStep].node);
+                    var leftRightBorder = bounds.left - this.options.padding.left;
+                    var topBorder = bounds.top - this.options.padding.top;
+
                     this.components._elements.highlightBox.classList.add("skip-animation");
 
                     this.components._elements.highlightBox.style.left = leftRightBorder;
                     this.components._elements.highlightBox.style.right = leftRightBorder;
-                    this.components._elements.highlightBox.style.top = Util.getElementBounds(this.elems[this.state._firstStep].node).top - this.options.padding.top;
+                    this.components._elements.highlightBox.style.top = topBorder;
 
                     this._animateHighlightBox();
                     this._checkAndFixHighlightboxOrientation();
 
-                    //debounce to remove after 200ms
+                    // debounce to remove after 200ms
                     this.components._elements.highlightBox.classList.remove("skip-animation");
                 }.bind(this);
             }

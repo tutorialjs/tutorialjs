@@ -103,6 +103,28 @@
     border-top: 5px solid white;
   }
 
+  &.west:after {
+    content: "";
+    position: absolute;
+    right: -20px;
+    bottom: 50%;
+    border-top: 6px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 12px solid white;
+  }
+
+  &.east:after {
+    content: "";
+    position: absolute;
+    left: -20px;
+    bottom: 50%;
+    border-top: 6px solid transparent;
+    border-right: 12px solid white;
+    border-bottom: 6px solid transparent;
+    border-left: 12px solid transparent;
+  }
+
   & > .custom-box {
     padding: 15px;
 
@@ -311,5 +333,9 @@
 
   .progressbar-wrapper > .progressbar-track {
     margin:0px;
+  }
+
+  .hidden {
+    display: none !important
   }
 }

@@ -4,33 +4,37 @@
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="stylesheet" type="text/css" href="style.css">
-        <link rel="stylesheet" href="../../dist/tutorial.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="../../dist/tutorial.css">
+        <link rel="stylesheet" type="text/css" href="style.css">
         <script type="text/javascript" src="../../dist/tutorial.js" defer></script>
         <script type="text/javascript" src="main.js" defer></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
         <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
 
     </head>
     <body>
-        <div id="wrapper">
-            <div class="section center first-step" t-step="1" t-text="1">
-                <h1>Tutorial.js</h1>
-                <p>A lightweight introductory tool for your application</p>
-            </div>
-            <div class="section second-step" t-step="2" t-text="2">
-                <h2>How to</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                    <div class="section center first-step" t-step="1" t-text="1">
+                        <h1>Tutorial.js</h1>
+                        <p>A lightweight introductory tool for your application</p>
+                    </div>
+                    <div class="section second-step" t-step="2" t-text="2">
+                        <h2>How to</h2>
 
-<pre class="prettyprint lang-css">
+                        <pre class="prettyprint lang-css">
 <span><</span>link rel="stylesheet" href="tutorial.css" />
 <span><</span>script src="tutorial.js"><span><</span>/script>
 </pre>
-            </div>
-            <div class="section third-step" t-step="3" t-text="3">
-                <h2>Initialization</h2>
-<pre class="prettyprint">
+                    </div>
+                    <div class="section third-step" t-step="3" t-text="3">
+                        <h2>Initialization</h2>
+                        <pre class="prettyprint">
 var guide = new Tutorial({
     steps: [
         {
@@ -45,11 +49,11 @@ var guide = new Tutorial({
     autoplay: true
 )};
 </pre>
-            </div>
-            <div class="section fourth-step">
-                <h2>Advanced</h2>
-                <h3>Use your own template</h3>
-<pre class="prettyprint">
+                    </div>
+                    <div class="section fourth-step">
+                        <h2>Advanced</h2>
+                        <h3>Use your own template</h3>
+                        <pre class="prettyprint">
 var guide = new Tutorial({
     steps: [
         {
@@ -61,15 +65,17 @@ var guide = new Tutorial({
         }]
 )};
 </pre>
-            </div>
-            <div class="section center more-links" t-step="4"  t-text="4">
-                <a href="#"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
-                <a href="#"><i class="fa fa-file" aria-hidden="true"></i> Documentation</a>
-            </div>
-            <div class="section scroll-test" t-step="5"  t-text="5">
-                <p>Smooth scrolling is in, too</p>
+                    </div>
+                    <div class="section center more-links" t-step="4"  t-text="4">
+                        <a href="#" class="left_position"><i class="fa fa-github" aria-hidden="true"></i> Github</a>
+                        <a href="#" class="right_position"><i class="fa fa-file" aria-hidden="true"></i> Documentation</a>
+                    </div>
+                    <div class="section scroll-test" t-step="5"  t-text="5">
+                        <p>Smooth scrolling is in, too</p>
+                    </div>
             </div>
         </div>
+    </div>
     </body>
 
     <script type="text/template" id="test-advanced">
