@@ -629,12 +629,13 @@
                 this.components._elements.tutorialBox.offsetHeight //+ tutorialBoxOffset;
 
             let pos = this.elems[this.step].position
-            console.log(pos);
 
             this.components._elements.tutorialBox.classList.remove("north");
             this.components._elements.tutorialBox.classList.remove("east");
             this.components._elements.tutorialBox.classList.remove("south");
             this.components._elements.tutorialBox.classList.remove("west");
+            this.components._elements.tutorialBox.style.left = "";
+            this.components._elements.tutorialBox.style.right = "";
 
             if (pos === "top" || pos === "auto" && calculatedHeight > windowHeight ) {
                 this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));

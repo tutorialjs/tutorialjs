@@ -872,12 +872,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var calculatedHeight = this.components._elements.highlightBox.getBoundingClientRect().top + this.components._elements.highlightBox.offsetHeight + window.scrollY + this.components._elements.tutorialBox.offsetHeight; //+ tutorialBoxOffset;
 
                 var pos = this.elems[this.step].position;
-                console.log(pos);
 
                 this.components._elements.tutorialBox.classList.remove("north");
                 this.components._elements.tutorialBox.classList.remove("east");
                 this.components._elements.tutorialBox.classList.remove("south");
                 this.components._elements.tutorialBox.classList.remove("west");
+                this.components._elements.tutorialBox.style.left = "";
+                this.components._elements.tutorialBox.style.right = "";
 
                 if (pos === "top" || pos === "auto" && calculatedHeight > windowHeight) {
                     this.components._elements.tutorialBox.style.top = -(this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
@@ -916,7 +917,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.highlightBox.style.right = leftRightBorder;
                     this.components._elements.highlightBox.style.top = topBorder;
 
-                    this._moveHighlightBox();
+                    this._animateHighlightBox();
                     this._checkAndFixHighlightboxOrientation();
 
                     // debounce to remove after 200ms
