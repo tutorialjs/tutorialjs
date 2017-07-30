@@ -36,6 +36,16 @@ kb = new Tutorial("nico<3", {
         {
             highlight: ".scroll-test",
             text: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+        },
+        {
+            highlight: ".left_position",
+            text: "Fork this on Github",
+            position: "left"
+        },
+        {
+            highlight: ".right_position",
+            text: "Check out the docs",
+            position: "right"
         }],
     debug: true,
     persistent: 1,
