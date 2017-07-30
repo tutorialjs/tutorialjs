@@ -916,7 +916,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     this.components._elements.highlightBox.style.right = leftRightBorder;
                     this.components._elements.highlightBox.style.top = topBorder;
 
-                    this._animateHighlightBox();
+                    this._moveHighlightBox();
                     this._checkAndFixHighlightboxOrientation();
 
                     // debounce to remove after 200ms
