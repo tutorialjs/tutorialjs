@@ -528,11 +528,11 @@
                 const bounds = Util.getElementBounds(this.elems[this.step].node);
                 const leftRightBorder = bounds.left - this.options.padding.left;
 
-                this.components._elements.highlightBox.style.top = bounds.top + window.scrollY - this.options.padding.top;
-                this.components._elements.highlightBox.style.left = leftRightBorder;
-                this.components._elements.highlightBox.style.right = leftRightBorder;
-                this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + (2 * this.options.padding.top);
-                this.components._elements.highlightBox.firstChild.style.width = bounds.width + (2 * this.options.padding.left);
+                this.components._elements.highlightBox.style.top = bounds.top + window.scrollY - this.options.padding.top + "px";
+                this.components._elements.highlightBox.style.left = leftRightBorder + "px";
+                this.components._elements.highlightBox.style.right = leftRightBorder + "px";
+                this.components._elements.highlightBox.firstChild.style.height = bounds.bottom - bounds.top + (2 * this.options.padding.top) + "px";
+                this.components._elements.highlightBox.firstChild.style.width = bounds.width + (2 * this.options.padding.left) + "px";
 
                 this.components._elements.tutorialBox.style.top = bounds.height + (2 * this.options.padding.top) + 6 + "px";
 
@@ -559,8 +559,8 @@
             this.components._elements.tutorialBox.style.top = Util.getElementBounds(last).height + (2 * this.options.padding.top) + 6 + "px";
             this.components._elements.highlightBox.style.transform = `translateX(${this.state.transform.translateX}px) translateY(${this.state.transform.translateY}px)`;
 
-            this.components._elements.highlightBox.firstChild.style.width = Util.getElementBounds(last).width + (2 * this.options.padding.top);
-            this.components._elements.highlightBox.firstChild.style.height = Util.getElementBounds(last).height + (2 * this.options.padding.top);
+            this.components._elements.highlightBox.firstChild.style.width = Util.getElementBounds(last).width + (2 * this.options.padding.top) + "px";
+            this.components._elements.highlightBox.firstChild.style.height = Util.getElementBounds(last).height + (2 * this.options.padding.top) + "px";
 
             this._scroll();
 
@@ -642,21 +642,21 @@
             this.components._elements.tutorialBox.style.right = "";
 
             if (pos === "top" || pos === "auto" && calculatedHeight > windowHeight ) {
-                this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8));
+                this.components._elements.tutorialBox.style.top = - (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 8)) + "px";
                 this.components._elements.tutorialBox.classList.add("north")
             }
             else if (pos === "bottom" || pos === "auto" && calculatedHeight <= windowHeight) {
                 this.components._elements.tutorialBox.classList.add("south")
             }
             else if (pos === "left") {
-                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
-                this.components._elements.tutorialBox.style.left = - (this.components._elements.tutorialBox.offsetWidth + (2 * this.options.padding.left - 8));
+                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100)) + "px";
+                this.components._elements.tutorialBox.style.left = - (this.components._elements.tutorialBox.offsetWidth + (2 * this.options.padding.left - 8)) + "px";
                 this.components._elements.tutorialBox.classList.add("west");
             }
             else if (pos === "right") {
                 this.components._elements.tutorialBox.classList.add("east")
-                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100));
-                this.components._elements.tutorialBox.style.right = - 0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8));
+                this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100)) + "px";
+                this.components._elements.tutorialBox.style.right = - 0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8)) + "px";
             }
             if (this._shouldSmoothTutorialboxTransition()) {
                 this.components._elements.tutorialBox.classList.remove("hidden");
@@ -683,9 +683,9 @@
 
                 this.components._elements.highlightBox.classList.add("skip-animation");
 
-                this.components._elements.highlightBox.style.left = leftRightBorder;
-                this.components._elements.highlightBox.style.right = leftRightBorder;
-                this.components._elements.highlightBox.style.top = topBorder;
+                this.components._elements.highlightBox.style.left = leftRightBorder + "px";
+                this.components._elements.highlightBox.style.right = leftRightBorder + "px";
+                this.components._elements.highlightBox.style.top = topBorder + "px";
 
                 this._animateHighlightBox();
                 this._checkAndFixHighlightboxOrientation();
