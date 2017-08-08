@@ -124,8 +124,11 @@
                     elems.sort((a, b) => {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    let position = item.getAttribute("t-position") || "auto";
+                    /* let position = item.getAttribute("t-position") || "auto";
                     this.elems = elems.map(item => new NormalStep(this, item, item.getAttribute("t-text"), position, {
+                        title: item.getAttribute("t-title")
+                    })); */
+                    this.elems = elems.map(item => new NormalStep(this, item, item.getAttribute("t-text"), {
                         title: item.getAttribute("t-title")
                     }));
                 }
