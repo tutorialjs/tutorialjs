@@ -632,6 +632,8 @@
                 this.components._elements.highlightBox.offsetHeight + window.scrollY +
                 this.components._elements.tutorialBox.offsetHeight //+ tutorialBoxOffset;
 
+            const bounds = Util.getElementBounds(this.elems[this.step].node);
+
             let pos = this.elems[this.step].position
 
             this.components._elements.tutorialBox.classList.remove("north");
@@ -656,7 +658,8 @@
             else if (pos === "right") {
                 this.components._elements.tutorialBox.classList.add("east")
                 this.components._elements.tutorialBox.style.top = - 0.5 * (this.components._elements.tutorialBox.offsetHeight + (2 * this.options.padding.top - 100)) + "px";
-                this.components._elements.tutorialBox.style.right = - 0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8)) + "px";
+                //this.components._elements.tutorialBox.style.right = - 0.9 * (this.components._elements.tutorialBox.offsetWidth - (2 * this.options.padding.left - 8)) + "px";
+                this.components._elements.tutorialBox.style.right = - (bounds.width + (2 * this.options.padding.left + 8)) + "px";
             }
             if (this._shouldSmoothTutorialboxTransition()) {
                 this.components._elements.tutorialBox.classList.remove("hidden");
