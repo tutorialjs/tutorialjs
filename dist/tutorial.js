@@ -220,10 +220,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     elems.sort(function (a, b) {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    var position = item.getAttribute("t-position") || "auto";
+                    //let position = item.getAttribute("t-position") || "auto";
                     this.elems = elems.map(function (item) {
-                        return new NormalStep(_this3, item, item.getAttribute("t-text"), position, {
-                            title: item.getAttribute("t-title")
+                        return new NormalStep(_this3, item, item.getAttribute("t-text"), {
+                            title: item.getAttribute("t-title"),
+                            position: item.getAttribute("t-position")
                         });
                     });
                 }
