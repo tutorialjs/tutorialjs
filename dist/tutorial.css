@@ -38,7 +38,8 @@
   left: -12px;
   width: 20px;
   height: 20px;
-  font-size: 16px;
+  line-height: 20px;
+  font-size: 12px;
   font-style: normal;
   text-align: center;
   border: 1px solid black;
@@ -96,6 +97,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     position: relative; }
+    .tutorial-box > .tutorial-box-wrapper p {
+      margin: 0px; }
     .tutorial-box > .tutorial-box-wrapper > .tutorial-title {
       font-size: 18px;
       font-weight: bold;
@@ -197,7 +200,8 @@
         transform: translateX(-50%) translateY(-25px);
         font-style: normal;
         color: #485863;
-        transition: 0.2s; }
+        transition: 0.2s;
+        white-space: nowrap; }
         .progressbar-wrapper > ul > li > .step-title:after {
           content: "";
           position: absolute;

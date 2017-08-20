@@ -55,8 +55,9 @@
 
   width: 20px;
   height: 20px;
+  line-height:20px;
 
-  font-size: 16px;
+  font-size: 12px;
   font-style: normal;
 
   text-align: center;
@@ -135,6 +136,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     position:relative;
+
+    & p {
+      margin:0px;
+    }
 
     & > .tutorial-title {
       font-size: 18px;
@@ -270,6 +275,7 @@
         font-style: normal;
         color: #485863;
         transition: 0.2s;
+        white-space:nowrap;
 
         &:after {
           content: "";

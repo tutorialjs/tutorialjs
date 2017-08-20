@@ -475,7 +475,7 @@
 
                 currentStepText.textContent = step+1;
 
-                if (!(this.elems[step].title == "")) {
+                if (!(this.elems[step].title == "") && !(typeof this.elems[step].title == "undefined")) {
                     currentStepTitle.textContent = this.elems[step].title;
                     currentStep.appendChild(currentStepTitle);
                 }

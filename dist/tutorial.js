@@ -220,7 +220,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     elems.sort(function (a, b) {
                         return parseInt(a.getAttribute("t-step")) - parseInt(b.getAttribute("t-step"));
                     });
-                    //let position = item.getAttribute("t-position") || "auto";
                     this.elems = elems.map(function (item) {
                         return new NormalStep(_this3, item, item.getAttribute("t-text"), {
                             title: item.getAttribute("t-title"),
@@ -685,7 +684,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     currentStepText.textContent = step + 1;
 
-                    if (!(this.elems[step].title == "")) {
+                    if (!(this.elems[step].title == "") && !(typeof this.elems[step].title == "undefined")) {
                         currentStepTitle.textContent = this.elems[step].title;
                         currentStep.appendChild(currentStepTitle);
                     }
