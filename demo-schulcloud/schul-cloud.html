@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)https://schul-cloud.org/dashboard/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Übersicht - Schul-Cloud</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="#b10438">
+        <meta name="apple-mobile-web-app-title" content="Schul-Cloud">
+        <meta name="theme-color" content="#b10438">
+        <meta name="application-name" content="Schul-Cloud">
+
+        <link rel="preload" href="https://schul-cloud.org/fonts/ptsans/ptsans-regular.woff" as="font" type="font/woff" crossorigin="">
+        <link rel="preload" href="https://schul-cloud.org/fonts/ptsans/ptsans-bold.woff" as="font" type="font/woff" crossorigin="">
+        <link rel="preload" href="https://schul-cloud.org/fonts/ptsans/ptsans-italic.woff" as="font" type="font/woff" crossorigin="">
+        <link rel="preload" href="https://schul-cloud.org/fonts/fontawesome/fontawesome-webfont.woff" as="font" type="font/woff" crossorigin="">
+        <link rel="preload" href="./schul-cloud-files/hpi-logo.png" as="image" crossorigin="">
+        <link rel="mask-icon" href="https://schul-cloud.org/images/safari-pinned-tab.svg" color="#5bbad5">
+        <link rel="apple-touch-icon" href="https://schul-cloud.org/images/webapp.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="https://schul-cloud.org/images/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="https://schul-cloud.org/images/favicon-16x16.png">
+        <link rel="manifest" href="https://schul-cloud.org/images/manifest.json">
+        <link rel="stylesheet" href="./schul-cloud-files/ptsans.css">
+        <link rel="stylesheet" href="./schul-cloud-files/fontawesome.css">
+        <link rel="stylesheet" href="./schul-cloud-files/base.css">
+        <link rel="stylesheet" href="./schul-cloud-files/loggedin.css">
+        <link rel="stylesheet" href="./schul-cloud-files/feedback-button.css">
+        <link rel="stylesheet" href="./schul-cloud-files/dashboard.css">
+
+        <script type="text/javascript" async="" defer="" src="https://open.hpi.de/piwik/piwik.js"></script><script src="./schul-cloud-files/all.js.Download" type="text/javascript" defer=""></script>
+        <script src="./schul-cloud-files/loggedin.js.Download" type="text/javascript" defer=""></script>
+
+        <script type="text/javascript" src="./schul-cloud-files/firebase-app.js.Download" defer=""></script>
+        <script type="text/javascript" src="./schul-cloud-files/firebase-messaging.js.Download" defer=""></script>
+        <script type="text/javascript" src="./schul-cloud-files/indexFirebase.js.Download" defer=""></script>
+
+        <script type="text/javascript" src="./schul-cloud-files/callback.js.Download" defer=""></script>
+        <script type="text/javascript" src="./schul-cloud-files/MathJax.js.Download" defer=""></script>
+        <script type="text/javascript" src="./schul-cloud-files/index.js.Download" defer=""></script>
+		
+		<link rel="stylesheet" href="tutorial.min.css">
+		<script type="text/javascript" src="tutorial.min.js"></script>
+
+        <script type="text/javascript">
+        window.addEventListener('DOMContentLoaded', function() {
+            setupFirebasePush();
+            $('.sidebar-list').css({"height": window.innerHeight});
+        });
+        window.addEventListener("resize", function () {
+            $('.sidebar-list').css({"height": window.innerHeight});
+        });
+        </script>
+        <script type="text/javascript" src="./schul-cloud-files/dashboard.js.Download" defer=""></script>
+
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body><div id="MathJax_Message" style="display: none;"></div>
+            <aside class="nav-sidebar hide-inline">
+            <nav>
+                <ul class="sidebar-list" style="height: 910px;">
+                    <li>
+                        <div class="sc-branding">
+                            <i class="fa fa-cloud" aria-hidden="true"></i>
+                            <span>Schul-Cloud</span>
+                        </div>
+                    </li>
+                        <li>
+                            <a class="active" href="https://schul-cloud.org/dashboard/">
+                                <i class="fa fa-th-large" aria-hidden="true"></i>
+                                <span class="link-name">Übersicht</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/courses/">
+                                <i class="fa fa-graduation-cap" aria-hidden="true"></i>
+                                <span class="link-name">Kurse</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/classes/">
+                                <i class="fa fa-odnoklassniki" aria-hidden="true"></i>
+                                <span class="link-name">Klassen</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/calendar/">
+                                <i class="fa fa-table" aria-hidden="true"></i>
+                                <span class="link-name">Termine</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/homework/">
+                                <i class="fa fa-tasks" aria-hidden="true"></i>
+                                <span class="link-name">Aufgaben</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/files/">
+                                <i class="fa fa-folder-open" aria-hidden="true"></i>
+                                <span class="link-name">Meine Dateien</span>
+                            </a>
+
+
+                        </li>
+                        <li>
+                            <a class="" href="https://schul-cloud.org/content/">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                <span class="link-name">Materialien</span>
+                            </a>
+
+
+                        </li>
+                </ul>
+            </nav>
+            <a class="mobile-nav-toggle">
+                <i class="fa fa-bars"></i>
+            </a>
+        </aside>
+
+            <section class="demo">
+                <div class="alert alert-warning" role="alert">
+                    <p>Dies ist ein Demoaccount. Sämtliche Aktionen, die Daten anlegen oder ändern, sind deaktiviert und nicht sichtbar.</p>
+                </div>
+            </section>
+
+        <section class="content-wrapper">
+            <div class="notification alert alert-dismissible hidden" role="alert">
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <div class="notification-content"></div>
+            </div>            <nav class="topbar navbar hide-inline">
+
+
+                <ul class="nav navbar-nav float-xs-right dropdowns">
+                    <li class="nav-item qr-code-action">
+                        <div class="dropdown">
+                            <a class="btn btn-secondary btn-thin btn-create-qr dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-qrcode"></i>
+                            </a>
+                            <div class="dropdown-menu qr-show"><canvas width="200" height="200" style="width: 200px; height: 200px;"></canvas></div>
+                        </div>
+                    </li>
+                    <li class="nav-item notification-dropdown">
+                        <div class="dropdown show">
+                            <a class="btn btn-secondary btn-thin dropdown-toggle notification-dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-bolt"></i> 
+                            </a>
+
+                            <div class="dropdown-menu">
+                                    <div class="notification-item" data-notification-id="0">
+                                        <span>Derzeit keine Benachrichtigungen</span>
+                                    </div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item help-drodown">
+                        <div class="dropdown">
+                            <a class="btn btn-secondary btn-thin dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-question"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-action"><span>Schnellhilfe <a href="https://schul-cloud.org/help/" style="float: right">Hilfebereich</a></span></li>
+                                    <div class="delimiter"></div>
+                                    <li class="list-group-item list-group-item-action"><span><i class="fa fa-magic" aria-hidden="true"></i><a href="https://schul-cloud.org/help/#changelog" class="link">Neuste Funktionen</a></span></li>
+                                    <li class="list-group-item list-group-item-action"><span><i class="fa fa-comments-o" aria-hidden="true"></i><a href="https://schul-cloud.org/help/faq" class="link">FAQ</a></span></li>
+                                    <div class="delimiter"></div>
+                                    <li class="list-group-item list-group-item-action"><span><i class="fa fa-pencil" aria-hidden="true"></i>
+                                        <a href="https://schul-cloud.org/dashboard/#" class="link submit-helpdesk">Eine User-Story eingeben</a></span></li>
+                                    <li class="list-group-item list-group-item-action"><span><i class="fa fa-comment" aria-hidden="true"></i>
+                                        <a href="https://schul-cloud.org/dashboard/#" class="link submit-problem">Ein Problem melden</a></span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
+                        <li class="nav-item school-data">Demo Schule</li>
+                            <img class="nav-item federal-state" src="./schul-cloud-files/354px-Brandenburg_Wappen.svg.png">
+
+                    <li class="nav-item">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary dropdown-toggle account-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <strong>Erika Meier (Demo)</strong>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="https://schul-cloud.org/account/">Einstellungen</a>
+                                <a class="dropdown-item" href="https://schul-cloud.org/logout/">Abmelden</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <section class="section-title">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <div>
+                                <h4>Übersicht</h4>
+                            </div>
+                            <div>
+                                
+                            </div>
+                        </div>
+                            <div class="col-sm-3 hide-inline">
+                                <form class="search-wrapper" action="https://schul-cloud.org/content/" method="get">
+                                    <a class="mobile-search-toggle">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control search-field " placeholder="Suche nach..." name="q">
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-secondary">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                                <div class="row mobile-no-margin-right">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="container-fluid">
+
+                        <section class="section-timetable">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <h5>Stundenplan</h5>
+                                    <time class="selected-date">Mittwoch, 11. Oktober 2017</time>
+                                </div>
+                            </div>
+
+                            <div class="container-fluid timetable">
+                                <div class="row lesson-cards">
+                                    <div>
+                                            <a class="lesson-card" href="https://schul-cloud.org/courses/59a3c657a2049554a93fec3a" style="width: 15%; left: 20%;">
+                                                <div class="card card-block" style="background-color: #ffb9b9;
+                                                        border-color: #ffb9b9;">
+                                                    <time class="lesson-time">10:00 - 11:30</time>
+                                                    <h3 class="card-title">Biologie 9b</h3>
+                                                    <p class="card-text">1.6</p>
+                                                </div>
+                                            </a>
+                                            <a class="lesson-card" href="https://schul-cloud.org/courses/59a3cabaa2049554a93fec60" style="width: 15%; left: 40%;">
+                                                <div class="card card-block" style="background-color: #aee1bd;
+                                                        border-color: #aee1bd;">
+                                                    <time class="lesson-time">12:00 - 13:30</time>
+                                                    <h3 class="card-title">Mathe 9b</h3>
+                                                    <p class="card-text">1.3</p>
+                                                </div>
+                                            </a>
+                                            <a class="lesson-card" href="https://schul-cloud.org/courses/59a3c948a2049554a93fec5f" style="width: 15%; left: 0%;">
+                                                <div class="card card-block" style="background-color: #a5d6fa;
+                                                        border-color: #a5d6fa;">
+                                                    <time class="lesson-time">08:00 - 09:30</time>
+                                                    <h3 class="card-title">Physik 9b</h3>
+                                                    <p class="card-text">2.1</p>
+                                                </div>
+                                            </a>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="timeline">
+                                        <div class="container-fluid">
+                                                <table style="width:100%">
+                                                    <tbody><tr>
+                                                            <td style="width:10%">
+                                                                <div class="tick">8.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">9.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">10.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">11.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">12.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">13.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">14.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">15.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">16.00</div>
+                                                            </td>
+                                                            <td style="width:10%">
+                                                                <div class="tick">17.00</div>
+                                                            </td>
+                                                    </tr>
+                                                </tbody></table>
+                                        </div>
+                                        <div class="current-time" style="width:89.83333333333333%;">
+                                            <span>16:59</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+
+                    <section class="section-tasks">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-12"><h5>Gestellte Aufgaben</h5></div>
+                            </div>
+                            <div class="tasks row card-deck-row">
+                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 7 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#a5d6fa">●</span> [Physik 9b] Bestandteile des menschlichen Auges</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Vergleiche die Abbildung des Auges im Biologieunterricht&nbsp;mit der nachfolgenden Abbildung und schreibe zu den Punkten jeweils die korrek...</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59afd42e1f513506904e1d1a">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 7 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#a5d6fa">●</span> [Physik 9b] Bestandteile einer Kamera</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>In der folgenden Abbildung siehst Du den Strahlengang einer einfachen Kamera.<br> Besuche die Seite https://www.lernhelfer.de/schuelerlexikon/ku...</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59afe3e31f513506904e1d53">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#b0b0d9">●</span> [Deutsch 9b] Gedichtanalyse Theodor Storm - Die Stadt</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Analysiere die äußere Form des Gedichts! Orientiere dich dabei am Leitfaden der letzten Stunde!</p>
+                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59a3c87aa2049554a93fec5c">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#aee1bd">●</span> [Mathe 9b] Einführung in Wahrscheinlichkeitsrechnung</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Zeichne und erkläre ein Baumdiagramm für einen zweifachen Münzwurf (Kopf oder Zahl!).</p>
+                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59a40665a2049554a93fecb9">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#ffb9b9">●</span> [Biologie 9b] Aufbau des Auges</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Fertige eine Zeichnung des Auges eines Tiers deiner Wahl an! Wir werden alle Schüler-Zeichnungen im Unterricht vergleichen und Gemeinsa...</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59a40c67a2049554a93feccf">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#ffc5a8">●</span> [Erdkunde 9b] Nachbarstaaten Deutschlands</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>1. Welche der Nachbarstaaten Deutschlands habt ihr schon besucht?</p> <p>2. Sucht geographische Informationen zu euren bereisten Nachbarstaaten Deu...</p>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59a41144a2049554a93fecdb">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section-tasks">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-12"><h5>Meine Aufgaben</h5></div>
+                            </div>
+                            <div class="row tasks card-deck-row">
+                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#aee1bd">●</span> [Mathe 9b] Kontrolle Test zur Wahrscheinlichkeitsrechnung</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Erinnerung!</p>
+                                        
+                                        <p>&nbsp;</p>
+                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59a406a3a2049554a93fecba">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                                        <div class="col-md-4 col-sm-6 col-xs-12">
+                                            <div class="card h-100">
+                                                <div class="card-block assignment">
+                                                    <div class="card-text">
+                                                        <small class="text-muted">Fällig: in 8 Monaten</small>
+                                                    </div>
+                                        
+                                                    <div class="card-text"><strong><span style="color:#ffc5a8">●</span> [Erdkunde 9b] Bilder zu Hauptstädten der Nachbarstaaten Deutschlands</strong></div>
+                                                    <div class="card-text description">
+                                                        <p>Bilder zu Hauptstädten der Nachbarstaaten Deutschlands in die Schul-Cloud recherchieren und in die einbinden!</p>
+                                        
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <a class="btn btn-primary btn-block" href="https://schul-cloud.org/homework/59afdd5b1f513506904e1d33">Zur Aufgabe</a>
+                                                </div>
+                                            </div>
+                                        </div>                            </div>
+                        </div>
+                    </section>
+
+
+                    <section class="section-news">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-12"><h5>Neuigkeiten</h5></div>
+                            </div>
+                            <div class="row articles">
+                                <div class="col-sm-12">
+                                    <div class="card-group">
+                                            <div class="card card-block"><strong class="card-text">Willkommen im Schuljahr!</strong>
+                                                <p class="card-text">Die Schulleitung heißt alle (neuen) Schüler im neuen Schuljahr willkommen. Auch dieses Jahr haben wir wieder viele neue Veranstaltungen für Euch geplant. Unter anderem einen Besuch bei der UNESCO und einen Schüleraustausch mit einer Schule im Silicon Valley der Klasse 10. Viel Erfolg wünscht Euch das Lehrerkolleg!</p>
+                                                <p class="card-text">
+                                                    <small class="text-muted">vor 4 Monaten</small>
+                                                </p>
+                                                <!--<a href="">Weiterlesen</a>-->
+                                            </div>
+                                            <div class="card card-block"><strong class="card-text">Preisverleihung Sommerfestspiele</strong>
+                                                <p class="card-text">Auch in diesem Jahr gab es wieder herausragende sportliche Leistungen. Unter anderem ein neuer Schulrekord im 100m-Lauf bei den Mädchen und beim Weitsprung der Jungen. Auch für die Versorgung mit Wasser und Energieriegel wurde durch den Förderverein gesorgt. Die Urkundenübergabe findet am 30. Juli um 13 Uhr in der Sporthalle statt.</p>
+                                                <p class="card-text">
+                                                    <small class="text-muted">vor 5 Monaten</small>
+                                                </p>
+                                                <!--<a href="">Weiterlesen</a>-->
+                                            </div>
+                                            <div class="card card-block"><strong class="card-text">Einführung der Schul-Cloud</strong>
+                                                <p class="card-text">Um auch im nächsten Jahrzehnt des 21. Jahrhunderts bildungsmäßig spitze aufgestellt zu sein, nutzen wir ab sofort die Schul-Cloud. Mit Hilfe der Schul-Cloud können wir uns unter anderem mit den bereits bestehenden Moodle-Accounts anmelden, viele Tools nutzen und auf Bildungsinhalte zugreifen. Weiterhin können wir auch die Stundenpläne online aktualisieren und Aufgaben erstellen.</p>
+                                                <p class="card-text">
+                                                    <small class="text-muted">vor 5 Monaten</small>
+                                                </p>
+                                                <!--<a href="">Weiterlesen</a>-->
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+<div class="modal fade feedback-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Übersicht</h4>
+            </div>
+                    <form class="modal-form" method="post" action="https://schul-cloud.org/dashboard/">
+
+            <div class="modal-body">
+                                    <div class="form-group">
+                        <label class="control-label" for="title">Als ...</label>
+                        <input type="text" name="role" id="role" placeholder="z.B. Schüler, Lehrer, Administrator, Hausmeister usw." class="form-control" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="message">möchte ich ...</label>
+                        <textarea class="form-control" id="desire" cols="50" name="desire" rows="6" required="" placeholder="z.B. eine im System angelegte Schüleraufgabe leicht auffinden und ändern können">                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="message">um ...</label><span class="text-muted float-right"> (optional)</span>
+                        <textarea class="form-control" id="benefit" cols="50" name="benefit" rows="6" placeholder="z.B. sie zu aktualisieren">                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="message">Akzeptanzkriterien</label><span class="text-muted float-right"> (optional)</span>
+                        <textarea class="form-control" id="acceptance_criteria" cols="50" name="acceptance_criteria" rows="6" placeholder="z.B. Nach der Systemanmeldung gelange ich in maximal zwei Schritten zum Stundenkontext, kann die Schüleraufgabe dort mit einem Klick bearbeiten und die SchülerInnen bei Bedarf automatisch über die Änderung informieren.">                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <select name="category" id="category" data-placeholder="Bereich auswählen" class="chosen-select" tabindex="-1" style="display: none;">
+                            <option value="dashboard">Übersicht</option>
+                            <option value="courses">Kurse</option>
+                            <option value="classes">Klassen</option>
+                            <option value="calendar">Termine</option>
+                            <option value="homework">Aufgaben</option>
+                            <option value="files">Meine Dateien</option>
+                            <option value="content">Materialien</option>
+                            <option value="administration">Verwaltung</option>
+                            <option value="other">Sonstiges</option>
+                        </select><div class="chosen-container chosen-container-single chosen-container-single-nosearch" style="width: 100%;" title="" id="category_chosen"><a class="chosen-single"><span>Übersicht</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly="" tabindex="-1"></div><ul class="chosen-results"></ul></div></div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-close">
+                    
+                </button>
+
+                
+
+                <button type="submit" class="btn btn-primary btn-submit">
+                    
+                </button>
+            </div>
+        </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade problem-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Übersicht</h4>
+            </div>
+                    <form class="modal-form" method="post" action="https://schul-cloud.org/dashboard/">
+
+            <div class="modal-body">
+                                    <div class="form-group">
+                        <label class="control-label" for="title">Kurzbeschreibung des Problems</label>
+                        <input type="text" name="title" id="title" placeholder="Kurzbeschreibung des Problems" class="form-control" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="hasHappened">Beschreiben Sie den Ist-Zustand (was geschieht zur Zeit, nachdem ich welche Schritte durchgeführt habe?)</label>
+                        <textarea class="form-control" id="hasHappened" cols="50" name="hasHappened" rows="6">                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="supposedToHappen">Beschreiben Sie den Soll-Zustand (was sollte stattdessen geschehen?)</label>
+                        <textarea class="form-control" id="supposedToHappen" cols="50" name="supposedToHappen" rows="6">                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <select data-placeholder="Kategorie wählen" class="form-control" name="category" id="category" style="display: none;">
+                            <optgroup label="Bereich">
+                                <option value="dashboard">Übersicht</option>
+                                <option value="courses">Kurse</option>
+                                <option value="classes">Klassen</option>
+                                <option value="calendar">Termine</option>
+                                <option value="homework">Aufgaben</option>
+                                <option value="files">Meine Dateien</option>
+                                <option value="content">Materialien</option>
+                                <option value="administration">Verwaltung</option>
+                                <option value="login_registration">Anmeldung/Registrierung</option>
+                                <option value="other">Sonstiges</option>
+                            </optgroup>
+                            <optgroup label="Technisches">
+                                <option value="technical_problem">Technische Probleme</option>
+                            </optgroup>
+                        </select><div class="chosen-container chosen-container-single chosen-container-single-nosearch" style="width: 100%;" title="" id="category_chosen"><a class="chosen-single"><span>Übersicht</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-close">
+                    
+                </button>
+
+                
+
+                <button type="submit" class="btn btn-primary btn-submit">
+                    
+                </button>
+            </div>
+        </form>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade feature-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Neue Features sind verfügbar</h4>
+            </div>
+                                <div class="form-group">
+                    <div style="text-align: center">
+                        <img src="./schul-cloud-files/giphy.gif" style="width: 50%; height: auto">
+                        <div>
+                            Es gibt neue Features in der Schul-Cloud.
+                            <br>
+                            Für weitere Informationen klicken Sie doch bitte diesen Button
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding-top: 8px;">
+                        <a href="https://schul-cloud.org/help/#changelog">
+                        <button class="btn btn-primary btn-add" style="width: 95%;">
+                            Hier klicken
+                        </button>
+                        </a>
+                    </div>
+                    </div>
+        </div>
+    </div>
+</div>
+
+        </section>
+
+
+        <footer class="hide-inline small-footer">
+    <div class="imprint">
+        <div class="center">
+            <img src="./schul-cloud-files/hpi-logo.png" width="235" height="44">
+            <a>© 2017 Schul-Cloud </a>
+
+            <nobr>
+                <span> - </span>
+                <a href="https://hpi.de/impressum.html" target="blank">Impressum</a>
+                <span> - </span>
+                <a href="mailto:hpi-info@hpi.de?subject=Schul_Cloud%20Anfrage">Kontakt</a>
+                <span> - </span>
+                <a href="https://schul-cloud.org/partner">Partner</a>
+            </nobr>
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript" src="main.js"></script>
+
+
+    <script type="text/javascript">
+    var _paq = _paq || [];
+        _paq.push(['setCustomDimension', customDimensionId = 1, customDimensionValue = 'Demo Schule']);
+        _paq.push(['setCustomDimension', customDimensionId = 2, customDimensionValue = '']);
+        _paq.push(['setCustomDimension', customDimensionId = 4, customDimensionValue = 'demoTeacher']);
+
+
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+
+    (function () {
+        var u = "//open.hpi.de/piwik/";
+        _paq.push(['setTrackerUrl', u + 'piwik.php']);
+        _paq.push(['setSiteId', '8']);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.defer = true;
+        g.src = u + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
+
+
+
+</body></html>
